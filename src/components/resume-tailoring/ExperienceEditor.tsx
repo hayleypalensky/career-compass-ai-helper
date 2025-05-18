@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Experience } from "@/components/ExperienceForm";
 import ExperienceBulletPoint from "./ExperienceBulletPoint";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Plus } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -381,11 +381,12 @@ const ExperienceEditor = ({
                       {generateNewBulletSuggestions(expIndex).map((suggestion, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <Button 
-                            variant="ghost" 
+                            variant="outline" 
                             size="sm"
-                            className="text-xs h-auto py-1 px-2"
+                            className="text-xs h-auto py-1 px-2 flex items-center gap-1"
                             onClick={() => handleAddSuggestion(expIndex, suggestion)}
                           >
+                            <Plus className="h-3 w-3" />
                             Add
                           </Button>
                           <p className="text-sm">{suggestion}</p>
