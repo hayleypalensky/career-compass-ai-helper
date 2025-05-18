@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,9 +8,11 @@ import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDes
 import TailorResume from "@/components/TailorResume";
 import ResumePdfExport from "@/components/ResumePdfExport";
 import AddToJobTracker from "@/components/AddToJobTracker";
+import JobSuggestions from "@/components/job-suggestions/JobSuggestions";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TailorPage = () => {
   const navigate = useNavigate();
@@ -132,40 +135,51 @@ const TailorPage = () => {
     <div className="space-y-8">
       <h1>Tailor Your Resume</h1>
       
-      <div className="grid grid-cols-1 gap-8">
-        <JobDescriptionAnalyzer 
-          profile={profile} 
-          onAnalysisComplete={handleAnalysisComplete} 
-        />
+      <Tabs defaultValue="tailor" className="w-full">
+        <TabsList>
+          <TabsTrigger value="tailor">Tailor Resume</TabsTrigger>
+          <TabsTrigger value="suggestions">Job Suggestions</TabsTrigger>
+        </TabsList>
         
-        {showTailorSection && (
-          <>
-            <TailorResume
-              profile={profile}
-              relevantSkills={relevantSkills}
-              missingSkills={missingSkills}
-              onUpdateResume={handleUpdateResume}
-              jobDescription={jobDescription}
-            />
-            
-            {isTailored && (
-              <div className="flex flex-col md:flex-row gap-4 mt-6">
-                <ResumePdfExport 
-                  profile={profile}
-                  jobTitle={jobTitle}
-                  companyName={companyName}
-                />
-                
-                <AddToJobTracker
-                  jobTitle={jobTitle}
-                  companyName={companyName}
-                  jobDescription={jobDescription}
-                />
-              </div>
-            )}
-          </>
-        )}
-      </div>
+        <TabsContent value="tailor" className="space-y-8 mt-6">
+          <JobDescriptionAnalyzer 
+            profile={profile} 
+            onAnalysisComplete={handleAnalysisComplete} 
+          />
+          
+          {showTailorSection && (
+            <>
+              <TailorResume
+                profile={profile}
+                relevantSkills={relevantSkills}
+                missingSkills={missingSkills}
+                onUpdateResume={handleUpdateResume}
+                jobDescription={jobDescription}
+              />
+              
+              {isTailored && (
+                <div className="flex flex-col md:flex-row gap-4 mt-6">
+                  <ResumePdfExport 
+                    profile={profile}
+                    jobTitle={jobTitle}
+                    companyName={companyName}
+                  />
+                  
+                  <AddToJobTracker
+                    jobTitle={jobTitle}
+                    companyName={companyName}
+                    jobDescription={jobDescription}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </TabsContent>
+        
+        <TabsContent value="suggestions" className="mt-6">
+          <JobSuggestions profile={profile} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
