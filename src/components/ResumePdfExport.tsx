@@ -44,12 +44,15 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       // Add specific styles for PDF export to ensure proper vertical alignment
       const styleElement = document.createElement('style');
       styleElement.textContent = `
-        .pdf-export-container .skills-item {
+        .pdf-export-container .skill-item {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
-          height: 100% !important;
+          height: 32px !important; /* Fixed height */
+          margin: 4px !important;
+          padding: 0 12px !important;
           vertical-align: middle !important;
+          line-height: 32px !important;
         }
         .pdf-export-container .skills-container {
           display: flex !important;
@@ -70,7 +73,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       // Add classes to skills items in the clone for PDF export
       const skillItems = cloneContent.querySelectorAll('.skill-item');
       skillItems.forEach(item => {
-        item.classList.add('skills-item');
+        item.classList.add('skill-item'); // Make sure the class is applied
       });
       
       const skillsContainer = cloneContent.querySelector('.skills-wrapper');

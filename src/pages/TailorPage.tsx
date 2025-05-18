@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -82,6 +81,11 @@ const TailorPage = () => {
     });
   };
 
+  // Update selected color theme when it changes in TailorResume
+  const handleColorThemeChange = (theme: string) => {
+    setSelectedColorTheme(theme);
+  };
+
   if (!profile) {
     return (
       <div className="flex flex-col items-center justify-center space-y-4 py-12">
@@ -148,6 +152,7 @@ const TailorPage = () => {
               missingSkills={missingSkills}
               onUpdateResume={handleUpdateResume}
               jobDescription={jobDescription}
+              onColorThemeChange={handleColorThemeChange} // Add this prop
             />
             
             {isTailored && (
