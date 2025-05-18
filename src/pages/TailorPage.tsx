@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import JobDescriptionAnalyzer from "@/components/JobDescriptionAnalyzer";
+import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
 import TailorResume from "@/components/TailorResume";
 import ResumePdfExport from "@/components/ResumePdfExport";
 import AddToJobTracker from "@/components/AddToJobTracker";
