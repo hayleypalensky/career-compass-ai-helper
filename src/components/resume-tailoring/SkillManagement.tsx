@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skill } from "@/components/SkillsForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Info, X, Check, AlertCircle } from "lucide-react";
+import { Info, X, Check, AlertCircle, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
