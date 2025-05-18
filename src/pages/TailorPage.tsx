@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/JobDescriptionAnalyzer";
 import TailorResume from "@/components/TailorResume";
+import ResumePdfExport from "@/components/ResumePdfExport";
+import AddToJobTracker from "@/components/AddToJobTracker";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
@@ -17,6 +18,10 @@ const TailorPage = () => {
   const [relevantSkills, setRelevantSkills] = useState<string[]>([]);
   const [missingSkills, setMissingSkills] = useState<string[]>([]);
   const [showTailorSection, setShowTailorSection] = useState(false);
+  const [jobTitle, setJobTitle] = useState<string>("");
+  const [companyName, setCompanyName] = useState<string>("");
+  const [jobDescription, setJobDescription] = useState<string>("");
+  const [isTailored, setIsTailored] = useState(false);
 
   // Load profile from localStorage
   useEffect(() => {
@@ -41,10 +46,17 @@ const TailorPage = () => {
     }
   }, []);
 
-  const handleAnalysisComplete = (relevant: string[], missing: string[]) => {
+  const handleAnalysisComplete = (
+    relevant: string[], 
+    missing: string[], 
+    jobInfo: { title?: string; company?: string; description?: string }
+  ) => {
     setRelevantSkills(relevant);
     setMissingSkills(missing);
     setShowTailorSection(true);
+    setJobTitle(jobInfo.title || "");
+    setCompanyName(jobInfo.company || "");
+    setJobDescription(jobInfo.description || "");
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
@@ -60,6 +72,7 @@ const TailorPage = () => {
     // Save to localStorage
     localStorage.setItem("resumeProfile", JSON.stringify(updatedProfile));
     setProfile(updatedProfile);
+    setIsTailored(true);
 
     toast({
       title: "Resume updated",
@@ -126,12 +139,30 @@ const TailorPage = () => {
         />
         
         {showTailorSection && (
-          <TailorResume
-            profile={profile}
-            relevantSkills={relevantSkills}
-            missingSkills={missingSkills}
-            onUpdateResume={handleUpdateResume}
-          />
+          <>
+            <TailorResume
+              profile={profile}
+              relevantSkills={relevantSkills}
+              missingSkills={missingSkills}
+              onUpdateResume={handleUpdateResume}
+            />
+            
+            {isTailored && (
+              <div className="flex flex-col md:flex-row gap-4 mt-6">
+                <ResumePdfExport 
+                  profile={profile}
+                  jobTitle={jobTitle}
+                  companyName={companyName}
+                />
+                
+                <AddToJobTracker
+                  jobTitle={jobTitle}
+                  companyName={companyName}
+                  jobDescription={jobDescription}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
