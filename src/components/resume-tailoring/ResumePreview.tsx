@@ -104,7 +104,7 @@ const ResumePreview = ({
           )}
         </div>
         
-        {/* Experience section - with improved bullet formatting */}
+        {/* Experience section - Filter out any empty bullet points */}
         {experiences.length > 0 && (
           <div className="mb-4">
             <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Experience</h3>
@@ -117,11 +117,13 @@ const ResumePreview = ({
                   </div>
                   <p className="text-gray-700 text-sm mb-1">{exp.company}{exp.location ? `, ${exp.location}` : ''}</p>
                   <ul className="text-xs space-y-0.5 ml-4">
-                    {exp.bullets.map((bullet: string, idx: number) => (
-                      <li key={idx} className="text-gray-800 relative pl-3 before:content-['•'] before:absolute before:left-0 before:top-0 before:text-gray-600">
-                        {bullet}
-                      </li>
-                    ))}
+                    {exp.bullets
+                      .filter((bullet: string) => bullet.trim() !== "") // Filter out empty bullets
+                      .map((bullet: string, idx: number) => (
+                        <li key={idx} className="text-gray-800 relative pl-3 before:content-['•'] before:absolute before:left-0 before:top-0 before:text-gray-600">
+                          {bullet}
+                        </li>
+                      ))}
                   </ul>
                 </div>
               ))}
