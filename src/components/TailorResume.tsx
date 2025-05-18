@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { X, MessageSquarePencil } from "lucide-react"; 
+import { X, MessageSquare, Pencil } from "lucide-react"; 
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
@@ -266,7 +265,10 @@ const TailorResume = ({
                             onClick={() => toggleSuggestions(expIndex, bulletIndex)}
                             title="Get suggestions"
                           >
-                            <MessageSquarePencil className="h-4 w-4" />
+                            <div className="relative">
+                              <MessageSquare className="h-4 w-4" />
+                              <Pencil className="h-3 w-3 absolute -bottom-1 -right-1" />
+                            </div>
                           </Button>
                           <Button
                             variant="destructive"
