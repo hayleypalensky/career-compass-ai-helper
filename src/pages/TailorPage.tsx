@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,11 +8,9 @@ import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDes
 import TailorResume from "@/components/TailorResume";
 import ResumePdfExport from "@/components/ResumePdfExport";
 import AddToJobTracker from "@/components/AddToJobTracker";
-import JobSuggestions from "@/components/job-suggestions/JobSuggestions";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const TailorPage = () => {
   const navigate = useNavigate();
@@ -24,7 +23,6 @@ const TailorPage = () => {
   const [companyName, setCompanyName] = useState<string>("");
   const [jobDescription, setJobDescription] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
-  const [currentTab, setCurrentTab] = useState("tailor");
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
 
   // Load profile from localStorage
@@ -61,11 +59,6 @@ const TailorPage = () => {
     setJobTitle(jobInfo.title || "");
     setCompanyName(jobInfo.company || "");
     setJobDescription(jobInfo.description || "");
-    
-    // If user analyzed a job description, switch to tailor tab automatically
-    if (currentTab !== "tailor") {
-      setCurrentTab("tailor");
-    }
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
@@ -146,47 +139,36 @@ const TailorPage = () => {
         onAnalysisComplete={handleAnalysisComplete} 
       />
       
-      <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-        <TabsList>
-          <TabsTrigger value="tailor">Tailor Resume</TabsTrigger>
-          <TabsTrigger value="suggestions">Job Suggestions</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="tailor" className="space-y-8 mt-6">
-          {showTailorSection && (
-            <>
-              <TailorResume
-                profile={profile}
-                relevantSkills={relevantSkills}
-                missingSkills={missingSkills}
-                onUpdateResume={handleUpdateResume}
-                jobDescription={jobDescription}
-              />
-              
-              {isTailored && (
-                <div className="flex flex-col md:flex-row gap-4 mt-6">
-                  <ResumePdfExport 
-                    profile={profile}
-                    jobTitle={jobTitle}
-                    companyName={companyName}
-                    colorTheme={selectedColorTheme}
-                  />
-                  
-                  <AddToJobTracker
-                    jobTitle={jobTitle}
-                    companyName={companyName}
-                    jobDescription={jobDescription}
-                  />
-                </div>
-              )}
-            </>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="suggestions" className="mt-6">
-          <JobSuggestions profile={profile} />
-        </TabsContent>
-      </Tabs>
+      <div className="space-y-8 mt-6">
+        {showTailorSection && (
+          <>
+            <TailorResume
+              profile={profile}
+              relevantSkills={relevantSkills}
+              missingSkills={missingSkills}
+              onUpdateResume={handleUpdateResume}
+              jobDescription={jobDescription}
+            />
+            
+            {isTailored && (
+              <div className="flex flex-col md:flex-row gap-4 mt-6">
+                <ResumePdfExport 
+                  profile={profile}
+                  jobTitle={jobTitle}
+                  companyName={companyName}
+                  colorTheme={selectedColorTheme}
+                />
+                
+                <AddToJobTracker
+                  jobTitle={jobTitle}
+                  companyName={companyName}
+                  jobDescription={jobDescription}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

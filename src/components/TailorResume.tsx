@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,6 +13,7 @@ import ExperienceEditor from "./resume-tailoring/ExperienceEditor";
 import ResumePreview from "./resume-tailoring/ResumePreview";
 import SkillManagement from "./resume-tailoring/SkillManagement";
 import ResumeColorSelector from "./resume-tailoring/ResumeColorSelector";
+import SummaryEditor from "./resume-tailoring/SummaryEditor";
 
 interface TailorResumeProps {
   profile: Profile;
@@ -36,6 +38,7 @@ const TailorResume = ({
   const [skillsToAdd, setSkillsToAdd] = useState<string[]>([]);
   const [skillsToRemove, setSkillsToRemove] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<string>("purple");
+  const [updatedSummary, setUpdatedSummary] = useState<string>(profile.personalInfo.summary || "");
 
   // Handle changes to experience bullet points
   const handleBulletChange = (expIndex: number, bulletIndex: number, value: string) => {
@@ -389,6 +392,11 @@ const TailorResume = ({
     setSelectedTheme(themeId);
   };
 
+  // Handle summary update
+  const handleSummaryChange = (summary: string) => {
+    setUpdatedSummary(summary);
+  };
+
   // Save the tailored resume
   const saveTailoredResume = () => {
     // Create unique skills from the selected missing skills (prevent duplicates)
@@ -411,6 +419,15 @@ const TailorResume = ({
       })),
     ];
 
+    // Create updated profile with new summary
+    const updatedProfile = {
+      ...profile,
+      personalInfo: {
+        ...profile.personalInfo,
+        summary: updatedSummary
+      }
+    };
+
     onUpdateResume(tailoredExperiences, newSkills);
     
     toast({
@@ -422,6 +439,13 @@ const TailorResume = ({
   return (
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
+
+      <SummaryEditor
+        currentSummary={profile.personalInfo.summary || ""}
+        jobDescription={jobDescription}
+        relevantSkills={relevantSkills}
+        onSummaryChange={handleSummaryChange}
+      />
 
       <SkillManagement
         profileSkills={profile.skills}
@@ -449,7 +473,13 @@ const TailorResume = ({
       />
 
       <ResumePreview 
-        profile={profile}
+        profile={{
+          ...profile,
+          personalInfo: {
+            ...profile.personalInfo,
+            summary: updatedSummary
+          }
+        }}
         experiences={tailoredExperiences}
         skillsToAdd={skillsToAdd}
         skillsToRemove={skillsToRemove}
