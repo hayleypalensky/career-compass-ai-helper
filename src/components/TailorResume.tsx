@@ -17,6 +17,7 @@ interface TailorResumeProps {
   relevantSkills: string[];
   missingSkills: string[];
   onUpdateResume: (experiences: Experience[], skills: Skill[]) => void;
+  jobDescription?: string;
 }
 
 const TailorResume = ({
@@ -24,6 +25,7 @@ const TailorResume = ({
   relevantSkills,
   missingSkills,
   onUpdateResume,
+  jobDescription = "",
 }: TailorResumeProps) => {
   const { toast } = useToast();
   const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>(
@@ -100,25 +102,103 @@ const TailorResume = ({
   const generateBulletSuggestions = (expIndex: number, bulletIndex: number) => {
     const experience = tailoredExperiences[expIndex];
     const currentBullet = experience.bullets[bulletIndex];
+    const suggestions: string[] = [];
     
-    // Generate suggestions based on relevant skills and current bullet point
-    // This is a simple implementation - in a real app, this would use more sophisticated NLP
-    const suggestions = relevantSkills.map(skill => {
-      if (!currentBullet.toLowerCase().includes(skill.toLowerCase())) {
-        return `${currentBullet} utilizing ${skill} to improve outcomes`;
+    // Extract key terms from job description
+    const jobKeywords = extractKeywordsFromJobDescription(jobDescription);
+    
+    // Match experience with job requirements
+    const relevantTerms = jobKeywords.filter(term => 
+      experience.title.toLowerCase().includes(term) || 
+      experience.description?.toLowerCase().includes(term)
+    );
+    
+    // Generate suggestions based on job description and experience
+    if (jobDescription) {
+      // Add suggestions that incorporate relevant skills from the job
+      relevantSkills.forEach(skill => {
+        if (!currentBullet.toLowerCase().includes(skill.toLowerCase())) {
+          suggestions.push(`Utilized ${skill} to ${getRandomActionVerb()} ${getRandomOutcome()}`);
+        }
+      });
+      
+      // Add suggestions based on job keywords
+      if (relevantTerms.length > 0) {
+        suggestions.push(
+          `Demonstrated expertise in ${relevantTerms.slice(0, 2).join(" and ")} to ${getRandomActionVerb()} business objectives`,
+          `Led initiatives focused on ${relevantTerms[0] || "key business areas"}, resulting in ${getRandomMetric()}`
+        );
       }
-      return `Enhanced ${skill} expertise through ${experience.title} role, resulting in measurable improvements`;
-    });
+    }
     
     // Add quantifiable suggestions
     suggestions.push(
-      `${currentBullet}, resulting in 20% improvement in efficiency`,
-      `Led initiative to ${currentBullet.replace(/^I /i, '').replace(/^Led /i, '')} that saved the company resources`,
-      `Collaborated with cross-functional teams to ${currentBullet.replace(/^I /i, '')}`
+      `${getRandomActionVerb(true)} ${currentBullet.replace(/^I |^Led |^Managed |^Developed /i, '')}, resulting in ${getRandomMetric()}`,
+      `Collaborated with cross-functional teams to ${currentBullet.replace(/^I |^Led |^Managed |^Developed /i, '').toLowerCase()}`
     );
     
-    // Filter out empty suggestions
+    // Filter out empty suggestions and remove duplicates
     return [...new Set(suggestions.filter(s => s && s !== currentBullet))].slice(0, 3);
+  };
+  
+  // Helper function to extract keywords from job description
+  const extractKeywordsFromJobDescription = (description: string): string[] => {
+    if (!description) return [];
+    
+    const commonJobTerms = [
+      "leadership", "management", "development", "strategy", "analysis",
+      "planning", "execution", "communication", "collaboration", "project",
+      "innovation", "improvement", "efficiency", "skills", "experience",
+      "implementation", "solution", "design", "customer", "client", 
+      "stakeholder", "team", "budget", "revenue", "growth", "cost reduction"
+    ];
+    
+    // Find terms in the job description
+    return commonJobTerms.filter(term => 
+      description.toLowerCase().includes(term.toLowerCase())
+    );
+  };
+  
+  // Helper function to generate random action verbs
+  const getRandomActionVerb = (capitalized = false): string => {
+    const verbs = [
+      "improved", "increased", "reduced", "developed", "implemented",
+      "created", "established", "led", "managed", "coordinated",
+      "streamlined", "enhanced", "optimized", "accelerated", "achieved"
+    ];
+    
+    const verb = verbs[Math.floor(Math.random() * verbs.length)];
+    return capitalized ? verb.charAt(0).toUpperCase() + verb.slice(1) : verb;
+  };
+  
+  // Helper function to generate random outcomes
+  const getRandomOutcome = (): string => {
+    const outcomes = [
+      "improve team productivity",
+      "enhance business processes",
+      "drive customer satisfaction",
+      "achieve business objectives",
+      "maximize operational efficiency",
+      "deliver project milestones",
+      "streamline workflow"
+    ];
+    
+    return outcomes[Math.floor(Math.random() * outcomes.length)];
+  };
+  
+  // Helper function to generate random metrics
+  const getRandomMetric = (): string => {
+    const metrics = [
+      "20% improvement in efficiency",
+      "30% reduction in costs",
+      "significant increase in team productivity",
+      "substantial improvement in customer satisfaction",
+      "measurable enhancement in quality metrics",
+      "15% growth in key performance indicators",
+      "positive feedback from stakeholders"
+    ];
+    
+    return metrics[Math.floor(Math.random() * metrics.length)];
   };
 
   // Save the tailored resume
@@ -159,6 +239,8 @@ const TailorResume = ({
         onRemoveBullet={removeBullet}
         onAddBullet={addBullet}
         generateBulletSuggestions={generateBulletSuggestions}
+        jobDescription={jobDescription}
+        relevantSkills={relevantSkills}
       />
 
       <ResumePreview 

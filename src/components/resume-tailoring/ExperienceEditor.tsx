@@ -11,6 +11,8 @@ interface ExperienceEditorProps {
   onRemoveBullet: (expIndex: number, bulletIndex: number) => void;
   onAddBullet: (expIndex: number) => void;
   generateBulletSuggestions: (expIndex: number, bulletIndex: number) => string[];
+  jobDescription?: string;
+  relevantSkills: string[];
 }
 
 const ExperienceEditor = ({
@@ -19,6 +21,8 @@ const ExperienceEditor = ({
   onRemoveBullet,
   onAddBullet,
   generateBulletSuggestions,
+  jobDescription = "",
+  relevantSkills = [],
 }: ExperienceEditorProps) => {
   return (
     <Card>
@@ -44,7 +48,9 @@ const ExperienceEditor = ({
                     expIndex={expIndex}
                     onBulletChange={onBulletChange}
                     onRemoveBullet={onRemoveBullet}
-                    generateSuggestions={generateBulletSuggestions}
+                    generateSuggestions={(expIndex, bulletIndex) => 
+                      generateBulletSuggestions(expIndex, bulletIndex)
+                    }
                   />
                 ))}
                 <Button

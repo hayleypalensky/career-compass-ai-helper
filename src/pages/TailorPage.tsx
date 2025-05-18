@@ -145,6 +145,7 @@ const TailorPage = () => {
               relevantSkills={relevantSkills}
               missingSkills={missingSkills}
               onUpdateResume={handleUpdateResume}
+              jobDescription={jobDescription}
             />
             
             {isTailored && (
