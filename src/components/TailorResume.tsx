@@ -104,38 +104,74 @@ const TailorResume = ({
     const currentBullet = experience.bullets[bulletIndex];
     const suggestions: string[] = [];
     
-    // Extract key terms from job description
+    // Extract key terms from job description that are relevant to this specific experience
     const jobKeywords = extractKeywordsFromJobDescription(jobDescription);
     
-    // Match experience with job requirements
-    const relevantTerms = jobKeywords.filter(term => 
+    // Find skills that are relevant to both the experience and job
+    const relevantTermsForExperience = jobKeywords.filter(term => 
       experience.title.toLowerCase().includes(term) || 
-      experience.description?.toLowerCase().includes(term)
+      experience.description?.toLowerCase().includes(term) ||
+      term === experience.company.toLowerCase()
     );
     
-    // Generate suggestions based on job description and experience
-    if (jobDescription) {
-      // Add suggestions that incorporate relevant skills from the job
-      relevantSkills.forEach(skill => {
-        if (!currentBullet.toLowerCase().includes(skill.toLowerCase())) {
-          suggestions.push(`Utilized ${skill} to ${getRandomActionVerb()} ${getRandomOutcome()}`);
-        }
-      });
+    // Generate suggestions based on the experience type and job requirements
+    const roleKeywords = experience.title.toLowerCase();
+    const isLeadershipRole = roleKeywords.includes("manager") || roleKeywords.includes("lead") || 
+                             roleKeywords.includes("director") || roleKeywords.includes("supervisor");
+    
+    const isTechnicalRole = roleKeywords.includes("engineer") || roleKeywords.includes("developer") || 
+                            roleKeywords.includes("architect") || roleKeywords.includes("programmer");
+    
+    const isDesignRole = roleKeywords.includes("designer") || roleKeywords.includes("ux") || 
+                         roleKeywords.includes("ui") || roleKeywords.includes("creative");
+    
+    // Add role-specific suggestions
+    if (isLeadershipRole) {
+      suggestions.push(
+        `Led cross-functional team to deliver ${getContextRelevantDeliverable(experience)} resulting in ${getRandomBusinessOutcome()}`,
+        `Managed ${getRandomTeamSize()} team members while implementing ${getRelevantProject(experience, jobKeywords)}`
+      );
+    }
+    
+    if (isTechnicalRole) {
+      // Find technical skills in the relevant skills
+      const technicalSkills = relevantSkills.filter(skill => 
+        !["leadership", "communication", "teamwork", "management"].includes(skill.toLowerCase())
+      );
       
-      // Add suggestions based on job keywords
-      if (relevantTerms.length > 0) {
+      if (technicalSkills.length > 0) {
+        const randomTechSkill = technicalSkills[Math.floor(Math.random() * technicalSkills.length)];
         suggestions.push(
-          `Demonstrated expertise in ${relevantTerms.slice(0, 2).join(" and ")} to ${getRandomActionVerb()} business objectives`,
-          `Led initiatives focused on ${relevantTerms[0] || "key business areas"}, resulting in ${getRandomMetric()}`
+          `Implemented ${randomTechSkill} solutions for ${getRelevantProject(experience, jobKeywords)} that ${getRandomTechnicalOutcome()}`,
+          `Architected and developed ${getContextRelevantDeliverable(experience)} using ${randomTechSkill} to ${getRandomTechnicalBenefit()}`
         );
       }
     }
     
-    // Add quantifiable suggestions
-    suggestions.push(
-      `${getRandomActionVerb(true)} ${currentBullet.replace(/^I |^Led |^Managed |^Developed /i, '')}, resulting in ${getRandomMetric()}`,
-      `Collaborated with cross-functional teams to ${currentBullet.replace(/^I |^Led |^Managed |^Developed /i, '').toLowerCase()}`
-    );
+    if (isDesignRole) {
+      suggestions.push(
+        `Created user-centered designs for ${getRelevantProject(experience, jobKeywords)} resulting in ${getRandomDesignOutcome()}`,
+        `Redesigned ${getContextRelevantDeliverable(experience)} to improve user experience, leading to ${getRandomBusinessMetric()}`
+      );
+    }
+    
+    // Add general suggestions based on the job description and relevant skills
+    if (relevantTermsForExperience.length > 0) {
+      const relevantTerm = relevantTermsForExperience[Math.floor(Math.random() * relevantTermsForExperience.length)];
+      suggestions.push(
+        `Demonstrated expertise in ${relevantTerm} by ${getRandomActionVerb()}ing ${getContextRelevantDeliverable(experience)}`,
+        `Utilized knowledge of ${relevantTerm} to ${getRandomActionVerb()} ${getRelevantProject(experience, jobKeywords)}`
+      );
+    }
+    
+    // Add quantifiable suggestions based on the current bullet
+    if (currentBullet && currentBullet.length > 10) {
+      const cleanedBullet = currentBullet.replace(/^I |^Led |^Managed |^Developed /i, '');
+      suggestions.push(
+        `${getRandomActionVerb(true)} ${cleanedBullet}, resulting in ${getRandomBusinessMetric()}`,
+        `Successfully ${getRandomActionVerb()} ${cleanedBullet} that led to ${getRandomBusinessOutcome()}`
+      );
+    }
     
     // Filter out empty suggestions and remove duplicates
     return [...new Set(suggestions.filter(s => s && s !== currentBullet))].slice(0, 3);
@@ -159,46 +195,163 @@ const TailorResume = ({
     );
   };
   
+  // Helper function to generate role-appropriate deliverables
+  const getContextRelevantDeliverable = (experience: Experience): string => {
+    const roleKeywords = experience.title.toLowerCase();
+    
+    if (roleKeywords.includes("engineer") || roleKeywords.includes("developer")) {
+      const deliverables = [
+        "microservices architecture", "backend API", "frontend application", 
+        "database optimization solution", "CI/CD pipeline", "cloud infrastructure"
+      ];
+      return deliverables[Math.floor(Math.random() * deliverables.length)];
+    }
+    
+    if (roleKeywords.includes("manager") || roleKeywords.includes("lead")) {
+      const deliverables = [
+        "strategic initiative", "team restructuring plan", "process improvement", 
+        "cross-departmental project", "resource allocation strategy"
+      ];
+      return deliverables[Math.floor(Math.random() * deliverables.length)];
+    }
+    
+    if (roleKeywords.includes("designer") || roleKeywords.includes("ux")) {
+      const deliverables = [
+        "user interface redesign", "user experience flow", "design system", 
+        "brand identity refresh", "interactive prototype"
+      ];
+      return deliverables[Math.floor(Math.random() * deliverables.length)];
+    }
+    
+    // Default deliverables
+    const defaultDeliverables = [
+      "key project", "strategic initiative", "critical component", 
+      "business solution", "customer-facing feature"
+    ];
+    return defaultDeliverables[Math.floor(Math.random() * defaultDeliverables.length)];
+  };
+  
+  // Generate a relevant project based on experience and job keywords
+  const getRelevantProject = (experience: Experience, jobKeywords: string[]): string => {
+    // Try to find a project that matches both the experience and job keywords
+    const relevantWords = jobKeywords.filter(word => 
+      experience.description?.toLowerCase().includes(word) || 
+      experience.company.toLowerCase().includes(word) ||
+      experience.title.toLowerCase().includes(word)
+    );
+    
+    if (relevantWords.length > 0) {
+      const word = relevantWords[Math.floor(Math.random() * relevantWords.length)];
+      const projects = [
+        `${word}-focused projects`,
+        `${word} initiative`,
+        `${word} strategy implementation`,
+        `enterprise ${word} solution`
+      ];
+      return projects[Math.floor(Math.random() * projects.length)];
+    }
+    
+    // Default projects based on role
+    const roleKeywords = experience.title.toLowerCase();
+    
+    if (roleKeywords.includes("engineer") || roleKeywords.includes("developer")) {
+      const techProjects = [
+        "system architecture redesign", 
+        "application performance optimization", 
+        "cloud migration project",
+        "API integration framework"
+      ];
+      return techProjects[Math.floor(Math.random() * techProjects.length)];
+    }
+    
+    return "key business initiatives";
+  };
+  
+  // Generate random team size for leadership roles
+  const getRandomTeamSize = (): string => {
+    const sizes = ["3-5", "5-7", "8-10", "10+", "cross-functional"];
+    return sizes[Math.floor(Math.random() * sizes.length)];
+  };
+  
   // Helper function to generate random action verbs
   const getRandomActionVerb = (capitalized = false): string => {
     const verbs = [
       "improved", "increased", "reduced", "developed", "implemented",
       "created", "established", "led", "managed", "coordinated",
-      "streamlined", "enhanced", "optimized", "accelerated", "achieved"
+      "streamlined", "enhanced", "optimized", "accelerated", "achieved",
+      "designed", "deployed", "architected", "engineered", "delivered"
     ];
     
     const verb = verbs[Math.floor(Math.random() * verbs.length)];
     return capitalized ? verb.charAt(0).toUpperCase() + verb.slice(1) : verb;
   };
   
-  // Helper function to generate random outcomes
-  const getRandomOutcome = (): string => {
+  // Helper function to generate random technical outcomes
+  const getRandomTechnicalOutcome = (): string => {
     const outcomes = [
-      "improve team productivity",
-      "enhance business processes",
-      "drive customer satisfaction",
-      "achieve business objectives",
-      "maximize operational efficiency",
-      "deliver project milestones",
-      "streamline workflow"
+      "reduced server response time by 25%",
+      "improved application performance by 30%",
+      "decreased deployment time from hours to minutes",
+      "reduced downtime by over 40%",
+      "enabled seamless integration with third-party services",
+      "eliminated critical security vulnerabilities"
     ];
     
     return outcomes[Math.floor(Math.random() * outcomes.length)];
   };
   
-  // Helper function to generate random metrics
-  const getRandomMetric = (): string => {
+  // Helper function to generate random technical benefits
+  const getRandomTechnicalBenefit = (): string => {
+    const benefits = [
+      "accelerate development cycles",
+      "enhance system reliability",
+      "improve data processing efficiency",
+      "enable real-time analytics",
+      "streamline user authentication processes",
+      "scale operations efficiently"
+    ];
+    
+    return benefits[Math.floor(Math.random() * benefits.length)];
+  };
+  
+  // Helper function to generate random design outcomes
+  const getRandomDesignOutcome = (): string => {
+    const outcomes = [
+      "a 35% increase in user engagement",
+      "significantly improved usability test scores",
+      "positive feedback from 90% of beta testers",
+      "a streamlined user journey with 25% fewer steps",
+      "a modern interface that increased conversion by 20%"
+    ];
+    
+    return outcomes[Math.floor(Math.random() * outcomes.length)];
+  };
+  
+  // Helper function to generate random business metrics
+  const getRandomBusinessMetric = (): string => {
     const metrics = [
       "20% improvement in efficiency",
       "30% reduction in costs",
-      "significant increase in team productivity",
-      "substantial improvement in customer satisfaction",
-      "measurable enhancement in quality metrics",
-      "15% growth in key performance indicators",
-      "positive feedback from stakeholders"
+      "$100K in annual savings",
+      "40% faster time-to-market",
+      "95% customer satisfaction rating",
+      "25% increase in team productivity"
     ];
     
     return metrics[Math.floor(Math.random() * metrics.length)];
+  };
+  
+  // Helper function to generate random business outcomes
+  const getRandomBusinessOutcome = (): string => {
+    const outcomes = [
+      "exceeding quarterly targets by 15%",
+      "receiving recognition from senior leadership",
+      "setting new performance benchmarks for the department",
+      "establishing best practices adopted company-wide",
+      "significantly improving stakeholder satisfaction"
+    ];
+    
+    return outcomes[Math.floor(Math.random() * outcomes.length)];
   };
 
   // Save the tailored resume
