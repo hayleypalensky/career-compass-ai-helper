@@ -7,19 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Link } from "lucide-react";
+import { PersonalInfo } from "@/types/profile";
 
 interface PersonalInfoFormProps {
   onSave: (data: PersonalInfo) => void;
   initialData?: PersonalInfo;
-}
-
-export interface PersonalInfo {
-  name: string;
-  email: string;
-  phone: string;
-  location: string;
-  summary: string;
-  link?: string;
 }
 
 const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
@@ -31,7 +23,7 @@ const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
       phone: "",
       location: "",
       summary: "",
-      link: "",
+      website: "",  // Changed from link to website to match the profile.ts type
     }
   );
 
@@ -88,7 +80,7 @@ const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
             <Input
               id="phone"
               name="phone"
-              value={formData.phone}
+              value={formData.phone || ""}
               onChange={handleChange}
               placeholder="(123) 456-7890"
             />
@@ -99,20 +91,20 @@ const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
             <Input
               id="location"
               name="location"
-              value={formData.location}
+              value={formData.location || ""}
               onChange={handleChange}
               placeholder="City, State"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="link" className="flex items-center gap-2">
+            <Label htmlFor="website" className="flex items-center gap-2">
               <Link className="h-4 w-4" /> Portfolio/Personal Website
             </Label>
             <Input
-              id="link"
-              name="link"
-              value={formData.link || ""}
+              id="website"
+              name="website"
+              value={formData.website || ""}
               onChange={handleChange}
               placeholder="https://myportfolio.com"
               type="url"
