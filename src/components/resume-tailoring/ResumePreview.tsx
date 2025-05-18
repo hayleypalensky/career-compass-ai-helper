@@ -55,6 +55,28 @@ const ResumePreview = ({
           <p className="text-gray-800 text-sm">{profile.personalInfo.summary}</p>
         </div>
         
+        {/* Education section - moved to after the professional summary */}
+        {profile.education && profile.education.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Education</h3>
+            <div className="space-y-2">
+              {profile.education.map((edu) => (
+                <div key={edu.id} className="mb-1">
+                  <div className="flex justify-between mb-0.5">
+                    <h4 className="font-medium text-sm">{edu.degree}</h4>
+                    <span className="text-gray-600 text-xs">{edu.startDate} - {edu.endDate || 'Present'}</span>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    {edu.school}
+                    {'location' in edu && edu.location ? `, ${String(edu.location)}` : ''}
+                  </p>
+                  {edu.description && <p className="text-gray-600 text-xs mt-0.5">{edu.description}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {/* Skills section - Always display this section */}
         <div className="mb-4">
           <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Skills</h3>
@@ -101,28 +123,6 @@ const ResumePreview = ({
                       </li>
                     ))}
                   </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        
-        {/* Education section - with more compact formatting */}
-        {profile.education && profile.education.length > 0 && (
-          <div className="mb-4">
-            <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Education</h3>
-            <div className="space-y-2">
-              {profile.education.map((edu) => (
-                <div key={edu.id} className="mb-1">
-                  <div className="flex justify-between mb-0.5">
-                    <h4 className="font-medium text-sm">{edu.degree}</h4>
-                    <span className="text-gray-600 text-xs">{edu.startDate} - {edu.endDate || 'Present'}</span>
-                  </div>
-                  <p className="text-gray-700 text-sm">
-                    {edu.school}
-                    {'location' in edu && edu.location ? `, ${String(edu.location)}` : ''}
-                  </p>
-                  {edu.description && <p className="text-gray-600 text-xs mt-0.5">{edu.description}</p>}
                 </div>
               ))}
             </div>
