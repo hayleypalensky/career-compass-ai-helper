@@ -16,7 +16,7 @@ const RelevantSkillsCard = ({ relevantSkills }: RelevantSkillsCardProps) => {
         <div className="flex flex-wrap gap-2">
           {relevantSkills.length > 0 ? (
             relevantSkills.map((skill, index) => (
-              <Badge key={index} className="bg-green-600">
+              <Badge key={index} className="bg-green-600 flex items-center justify-center">
                 {skill}
               </Badge>
             ))

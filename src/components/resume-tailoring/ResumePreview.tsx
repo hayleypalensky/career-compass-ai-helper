@@ -104,14 +104,14 @@ const ResumePreview = ({
           </div>
         )}
         
-        {/* Skills section - Moved to be last */}
+        {/* Skills section - Moved to be last, with center-aligned text */}
         <div className="mb-2">
           <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Skills</h3>
           <div className="flex flex-wrap gap-1 mb-1">
             {profile.skills.map((skill) => (
               <span 
                 key={skill.id} 
-                className={`px-2 py-0.5 rounded text-xs ${
+                className={`px-2 py-0.5 rounded text-xs flex items-center justify-center ${
                   relevantSkills.includes(skill.name) 
                     ? 'bg-green-100 text-green-800 font-medium' 
                     : 'bg-gray-100 text-gray-800'
@@ -121,7 +121,7 @@ const ResumePreview = ({
               </span>
             ))}
             {skillsToAdd.map((skill) => (
-              <span key={skill} className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium">
+              <span key={skill} className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium flex items-center justify-center">
                 {skill}*
               </span>
             ))}

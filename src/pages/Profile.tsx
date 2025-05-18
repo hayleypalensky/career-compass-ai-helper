@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import PersonalInfoForm, { PersonalInfo } from "@/components/PersonalInfoForm";
+import PersonalInfoForm from "@/components/PersonalInfoForm";
 import ExperienceForm, { Experience } from "@/components/ExperienceForm";
 import SkillsForm, { Skill } from "@/components/SkillsForm";
 import EducationForm, { Education } from "@/components/EducationForm";
-import { Profile as ProfileType } from "@/types/profile";
+import { Profile as ProfileType, PersonalInfo } from "@/types/profile";
 import { toast } from "@/components/ui/use-toast";
 
 const ProfilePage = () => {
@@ -28,6 +28,7 @@ const ProfilePage = () => {
         phone: "",
         location: "",
         summary: "",
+        website: "",
       },
       experiences: [],
       skills: [],
@@ -77,6 +78,7 @@ const ProfilePage = () => {
           phone: "",
           location: "",
           summary: "",
+          website: "",
         },
         experiences: [],
         skills: [],
