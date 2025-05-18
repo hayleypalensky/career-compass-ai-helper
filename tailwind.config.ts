@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,16 +53,32 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+				navy: {
+					50: '#f0f2f8',
+					100: '#d9e0ee',
+					200: '#b7c4df',
+					300: '#8a9dcb',
+					400: '#677fb3',
+					500: '#4f649c',
+					600: '#414f7e',
+					700: '#354067',
+					800: '#2e3654',
+					900: '#262c42',
+					950: '#141623',
+				},
+				gold: {
+					50: '#fdf9ed',
+					100: '#f8eac8',
+					200: '#f2d68e',
+					300: '#ecbe53',
+					400: '#e7ad2d',
+					500: '#d19418',
+					600: '#ad7114',
+					700: '#8a5316',
+					800: '#724119',
+					900: '#603618',
+					950: '#351b0c',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
