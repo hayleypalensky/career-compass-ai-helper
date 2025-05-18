@@ -64,6 +64,16 @@ const JobsPage = () => {
     });
   };
 
+  const handleDeleteJob = (jobId: string) => {
+    const jobToDelete = jobs.find(job => job.id === jobId);
+    setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+    
+    toast({
+      title: "Job deleted",
+      description: jobToDelete ? `"${jobToDelete.title}" has been deleted.` : "The job application has been deleted.",
+    });
+  };
+
   // Filter jobs based on search term and active tab
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch =
@@ -158,6 +168,7 @@ const JobsPage = () => {
                             job={job}
                             onUpdate={handleUpdateJob}
                             onArchive={handleArchiveJob}
+                            onDelete={handleDeleteJob}
                           />
                         ))}
                       </div>
@@ -180,6 +191,7 @@ const JobsPage = () => {
                       job={job}
                       onUpdate={handleUpdateJob}
                       onArchive={handleArchiveJob}
+                      onDelete={handleDeleteJob}
                     />
                   ))}
                 </div>
