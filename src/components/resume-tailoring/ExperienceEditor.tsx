@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,15 +29,147 @@ const ExperienceEditor = ({
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState<number | null>(null);
 
+  // Extract job responsibilities and requirements from the job description
+  const extractJobResponsibilities = (jobDesc: string): string[] => {
+    if (!jobDesc) return [];
+    
+    const responsibilities: string[] = [];
+    
+    // Look for common headers in job descriptions
+    const sections = [
+      "responsibilities", "duties", "what you'll do", "what you will do",
+      "day to day", "day-to-day", "role description", "the role", "your role",
+      "job duties", "key responsibilities", "main responsibilities"
+    ];
+    
+    // Convert to lowercase for easier matching
+    const lowerDesc = jobDesc.toLowerCase();
+    
+    // Find sentences that might contain responsibilities
+    const sentences = jobDesc.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    
+    // Look for sections with responsibilities
+    let inResponsibilitiesSection = false;
+    
+    sentences.forEach(sentence => {
+      const lowerSentence = sentence.toLowerCase().trim();
+      
+      // Check if this sentence starts a responsibilities section
+      const isHeader = sections.some(section => lowerSentence.includes(section));
+      
+      if (isHeader) {
+        inResponsibilitiesSection = true;
+        return;
+      }
+      
+      // Check if this sentence starts a new section (no longer responsibilities)
+      if (inResponsibilitiesSection && 
+          (lowerSentence.includes("requirements") || 
+           lowerSentence.includes("qualifications") ||
+           lowerSentence.includes("what you'll need") ||
+           lowerSentence.includes("benefits") ||
+           lowerSentence.includes("about us"))) {
+        inResponsibilitiesSection = false;
+        return;
+      }
+      
+      // If we're in a responsibilities section, or the sentence contains action verbs
+      // common in responsibilities, add it
+      const hasActionVerb = ["develop", "create", "manage", "lead", "design", "implement", 
+                           "build", "maintain", "coordinate", "analyze", "support", "ensure",
+                           "collaborate", "communicate", "organize", "plan", "research"].some(verb => 
+                            lowerSentence.includes(verb));
+      
+      if ((inResponsibilitiesSection || hasActionVerb) && 
+          sentence.length > 20 && 
+          !responsibilities.includes(sentence.trim())) {
+        responsibilities.push(sentence.trim());
+      }
+    });
+    
+    // If we couldn't find explicit responsibilities, look for bullet points
+    if (responsibilities.length === 0) {
+      const bulletPoints = jobDesc.split('\n')
+        .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
+        .map(line => line.trim().replace(/^[-•*]/, '').trim());
+      
+      responsibilities.push(...bulletPoints);
+    }
+    
+    // Look for required skills and tools
+    const requiredSkillsSection = false;
+    const tools: string[] = [];
+    
+    // Common tools and technologies
+    const techTools = ["figma", "sketch", "adobe", "photoshop", "illustrator", 
+                      "react", "vue", "angular", "javascript", "typescript", 
+                      "html", "css", "java", "python", "node", "aws", "azure",
+                      "docker", "kubernetes", "jenkins", "git", "jira", "confluence",
+                      "sql", "nosql", "mongodb", "mysql", "postgresql", "agile", "scrum"];
+    
+    // Find mentioned tools
+    techTools.forEach(tool => {
+      if (lowerDesc.includes(tool) && !tools.includes(tool)) {
+        tools.push(tool);
+      }
+    });
+    
+    // Add tools as potential responsibilities (using them)
+    tools.forEach(tool => {
+      responsibilities.push(`Experience with ${tool}`);
+    });
+    
+    return responsibilities;
+  };
+
   // Generate 3 new bullet point suggestions for an experience
   const generateNewBulletSuggestions = (expIndex: number): string[] => {
     const experience = experiences[expIndex];
     
-    // Extract keywords from job description that are relevant to this specific experience
-    const jobKeywords = extractKeywordsFromJobDescription(jobDescription);
+    // Get job responsibilities from the job description
+    const jobResponsibilities = extractJobResponsibilities(jobDescription);
     
-    // Generate suggestions based on the experience type and job requirements
+    // Match experience with relevant responsibilities
     const roleKeywords = experience.title.toLowerCase();
+    const relevantResponsibilities = jobResponsibilities.filter(resp => {
+      const respLower = resp.toLowerCase();
+      // Check if responsibility matches experience title or description
+      return roleKeywords.split(" ").some(word => 
+        word.length > 3 && respLower.includes(word)
+      ) || (experience.description && experience.description.toLowerCase().split(" ").some(word => 
+        word.length > 3 && respLower.includes(word)
+      ));
+    });
+    
+    const suggestions: string[] = [];
+    
+    // First, directly use relevant responsibilities from job description
+    if (relevantResponsibilities.length > 0) {
+      // Take up to 2 responsibilities that are most relevant
+      relevantResponsibilities.slice(0, 2).forEach(resp => {
+        // Convert to bullet point format with action verb
+        const cleanedResp = resp.trim().replace(/^I |^you will |^you'll /i, '');
+        
+        // Add appropriate action verb if needed
+        let bulletPoint = cleanedResp;
+        
+        if (!bulletPoint.match(/^[A-Z][a-z]+ed|^[A-Z][a-z]+d|^[A-Z][a-z]+t/)) {
+          // If doesn't start with past tense verb, add one
+          const actionVerbs = ["Developed", "Implemented", "Created", "Managed", "Led", 
+                              "Designed", "Built", "Maintained", "Coordinated", "Analyzed"];
+          bulletPoint = `${actionVerbs[Math.floor(Math.random() * actionVerbs.length)]} ${bulletPoint}`;
+        }
+        
+        // Add measurable outcome if not present
+        if (!bulletPoint.includes("resulting in") && !bulletPoint.includes("led to")) {
+          bulletPoint += `, resulting in ${getRandomBusinessOutcome()}`;
+        }
+        
+        suggestions.push(bulletPoint);
+      });
+    }
+    
+    // Generate role-specific suggestions based on the experience type and job description
     const isLeadershipRole = roleKeywords.includes("manager") || roleKeywords.includes("lead") || 
                            roleKeywords.includes("director") || roleKeywords.includes("supervisor");
     
@@ -48,87 +179,164 @@ const ExperienceEditor = ({
     const isDesignRole = roleKeywords.includes("designer") || roleKeywords.includes("ux") || 
                        roleKeywords.includes("ui") || roleKeywords.includes("creative");
     
-    const isMarketingRole = roleKeywords.includes("market") || roleKeywords.includes("brand") || 
-                          roleKeywords.includes("content") || roleKeywords.includes("social media");
-
-    // Find relevant terms that match both the experience and job
-    const relevantTermsForExperience = jobKeywords.filter(term => 
-      experience.title.toLowerCase().includes(term) || 
-      experience.description?.toLowerCase().includes(term) ||
-      term === experience.company.toLowerCase()
-    );
-    
-    // Start with empty suggestions array
-    const suggestions: string[] = [];
+    // Extract key requirements from job description
+    const requirements = extractRequirementsFromJobDescription(jobDescription);
     
     // Add role-specific suggestions
     if (isLeadershipRole) {
-      suggestions.push(
-        `Led strategic initiative to improve ${getRandomBusinessMetric()} across the organization`,
-        `Mentored ${getRandomTeamSize()} team members, resulting in ${getRandomTeamOutcome()}`,
-        `Established performance metrics and KPIs that improved ${getRandomBusinessProcess()} efficiency by ${getRandomPercentage()}%`
-      );
-    }
-    
-    if (isTechnicalRole) {
-      // Find technical skills in the relevant skills
-      const technicalSkills = relevantSkills.filter(skill => 
-        !["leadership", "communication", "teamwork", "management"].includes(skill.toLowerCase())
+      const leadershipRequirements = requirements.filter(req => 
+        req.includes("lead") || req.includes("manage") || req.includes("team") || 
+        req.includes("strategy") || req.includes("direct")
       );
       
-      if (technicalSkills.length > 0) {
-        const randomTechSkill1 = technicalSkills[Math.floor(Math.random() * technicalSkills.length)];
-        const randomTechSkill2 = technicalSkills.filter(s => s !== randomTechSkill1)[Math.floor(Math.random() * (technicalSkills.length - 1))] || randomTechSkill1;
-        
+      if (leadershipRequirements.length > 0) {
         suggestions.push(
-          `Architected and implemented ${randomTechSkill1} solutions that ${getRandomTechnicalOutcome()}`,
-          `Optimized ${getContextRelevantSystem(experience)} using ${randomTechSkill2}, reducing ${getRandomTechnicalMetric()} by ${getRandomPercentage()}%`,
-          `Collaborated with cross-functional teams to deliver ${getRelevantProject(experience, jobKeywords)} ahead of schedule`
+          `Led initiatives to ${leadershipRequirements[0].toLowerCase()}, resulting in ${getRandomBusinessMetric()}`
         );
       } else {
         suggestions.push(
-          `Developed scalable solutions for ${getRelevantProject(experience, jobKeywords)} that improved system performance by ${getRandomPercentage()}%`,
-          `Implemented automated testing framework that reduced bug rate by ${getRandomPercentage()}%`,
-          `Optimized database queries resulting in ${getRandomPercentage()}% faster load times`
+          `Led cross-functional team to deliver ${getContextRelevantDeliverable(experience, jobDescription)} resulting in ${getRandomBusinessOutcome()}`
+        );
+      }
+    }
+    
+    if (isTechnicalRole) {
+      // Find technical requirements in the job description
+      const technicalRequirements = requirements.filter(req => 
+        req.includes("develop") || req.includes("code") || req.includes("build") || 
+        req.includes("implement") || req.includes("architecture") || req.includes("design") ||
+        req.includes("program")
+      );
+      
+      // Find technical skills mentioned in the job that match your relevant skills
+      const technicalSkills = relevantSkills.filter(skill => 
+        !["leadership", "communication", "teamwork", "management"].includes(skill.toLowerCase()) &&
+        jobDescription.toLowerCase().includes(skill.toLowerCase())
+      );
+      
+      if (technicalRequirements.length > 0 && technicalSkills.length > 0) {
+        suggestions.push(
+          `Implemented ${technicalSkills[0]} solutions for ${technicalRequirements[0].toLowerCase()}, resulting in ${getRandomTechnicalOutcome()}`
+        );
+      } else if (technicalSkills.length > 0) {
+        suggestions.push(
+          `Architected and developed ${getContextRelevantDeliverable(experience, jobDescription)} using ${technicalSkills[0]} to ${getRandomTechnicalBenefit()}`
+        );
+      } else if (technicalRequirements.length > 0) {
+        suggestions.push(
+          `Developed solutions to ${technicalRequirements[0].toLowerCase()}, improving system performance by ${getRandomPercentage()}%`
         );
       }
     }
     
     if (isDesignRole) {
+      // Find design requirements in the job description
+      const designRequirements = requirements.filter(req => 
+        req.includes("design") || req.includes("user") || req.includes("interface") || 
+        req.includes("ux") || req.includes("ui") || req.includes("visual") ||
+        req.includes("wireframe") || req.includes("prototype") || req.includes("figma") ||
+        req.includes("sketch")
+      );
+      
+      if (designRequirements.length > 0) {
+        suggestions.push(
+          `Created ${designRequirements[0].toLowerCase()}, resulting in ${getRandomDesignOutcome()}`
+        );
+      } else {
+        suggestions.push(
+          `Designed user-centered interfaces for ${getContextRelevantDeliverable(experience, jobDescription)}, leading to ${getRandomDesignOutcome()}`
+        );
+      }
+    }
+    
+    // Add general suggestions based on required skills
+    const jobKeywords = extractKeywordsFromJobDescription(jobDescription);
+    const missingTools = jobKeywords.filter(keyword => 
+      !relevantSkills.some(skill => skill.toLowerCase().includes(keyword))
+    );
+    
+    if (missingTools.length > 0) {
       suggestions.push(
-        `Designed user interface that improved conversion rates by ${getRandomPercentage()}%`,
-        `Created user-centered design system that standardized the product experience across ${getRandomNumber(3, 10)} platforms`,
-        `Conducted ${getRandomNumber(5, 20)} user research sessions to inform design decisions for ${getRelevantProject(experience, jobKeywords)}`
+        `Utilized ${missingTools[0]} to ${getRandomActionVerb()} ${getRelevantProject(experience, jobKeywords)}, resulting in ${getRandomBusinessMetric()}`
       );
     }
     
-    if (isMarketingRole) {
-      suggestions.push(
-        `Developed marketing campaign that increased customer acquisition by ${getRandomPercentage()}%`,
-        `Managed social media strategy resulting in ${getRandomNumber(20, 200)}% growth in audience engagement`,
-        `Created content strategy that generated ${getRandomNumber(30, 300)}% more qualified leads`
-      );
-    }
-    
-    // Add general suggestions based on the job description and relevant skills
-    if (relevantTermsForExperience.length > 0) {
-      const relevantTerm = relevantTermsForExperience[Math.floor(Math.random() * relevantTermsForExperience.length)];
-      suggestions.push(
-        `Leveraged expertise in ${relevantTerm} to implement solutions that ${getRandomBusinessOutcome()}`,
-        `Applied knowledge of ${relevantTerm} to optimize ${getRandomBusinessProcess()}, resulting in ${getRandomBusinessMetric()}`
-      );
-    }
-    
-    // Ensure we have enough suggestions, add generics if needed
+    // Ensure we have enough suggestions
     while (suggestions.length < 3) {
       suggestions.push(
-        `Spearheaded initiative that resulted in ${getRandomBusinessMetric()}`,
-        `Collaborated with stakeholders to deliver ${getContextRelevantDeliverable(experience)} that ${getRandomBusinessOutcome()}`
+        `${getRandomActionVerb(true)} ${getContextRelevantDeliverable(experience, jobDescription)} that ${getRandomBusinessOutcome()}`,
+        `Successfully ${getRandomActionVerb()} ${getRelevantProject(experience, jobKeywords)}, resulting in ${getRandomBusinessMetric()}`
       );
     }
     
-    // Return 3 unique suggestions (or fewer if there are duplicates)
+    // Return 3 unique suggestions
     return [...new Set(suggestions)].slice(0, 3);
+  };
+
+  // Extract requirements from job description
+  const extractRequirementsFromJobDescription = (jobDesc: string): string[] => {
+    if (!jobDesc) return [];
+    
+    const requirements: string[] = [];
+    
+    // Look for common headers in job descriptions
+    const sections = [
+      "requirements", "qualifications", "what you'll need", "what you need",
+      "skills", "experience", "you have", "you should have", "you must have"
+    ];
+    
+    // Convert to lowercase for easier matching
+    const lowerDesc = jobDesc.toLowerCase();
+    
+    // Find sentences that might contain requirements
+    const sentences = jobDesc.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    
+    // Look for sections with requirements
+    let inRequirementsSection = false;
+    
+    sentences.forEach(sentence => {
+      const lowerSentence = sentence.toLowerCase().trim();
+      
+      // Check if this sentence starts a requirements section
+      const isHeader = sections.some(section => lowerSentence.includes(section));
+      
+      if (isHeader) {
+        inRequirementsSection = true;
+        return;
+      }
+      
+      // Check if this sentence starts a new section (no longer requirements)
+      if (inRequirementsSection && 
+          (lowerSentence.includes("responsibilities") || 
+           lowerSentence.includes("what you'll do") ||
+           lowerSentence.includes("benefits") ||
+           lowerSentence.includes("about us"))) {
+        inRequirementsSection = false;
+        return;
+      }
+      
+      // If we're in a requirements section, or the sentence contains requirement indicators
+      const isRequirement = ["experience", "knowledge", "ability", "proficient", "familiar", 
+                            "degree", "years", "background", "skill"].some(indicator => 
+                              lowerSentence.includes(indicator));
+      
+      if ((inRequirementsSection || isRequirement) && 
+          sentence.length > 15 && 
+          !requirements.includes(sentence.trim())) {
+        requirements.push(sentence.trim());
+      }
+    });
+    
+    // If we couldn't find explicit requirements, look for bullet points
+    if (requirements.length === 0) {
+      const bulletPoints = jobDesc.split('\n')
+        .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-') || line.trim().startsWith('*'))
+        .map(line => line.trim().replace(/^[-•*]/, '').trim());
+      
+      requirements.push(...bulletPoints);
+    }
+    
+    return requirements;
   };
 
   // Helper functions
@@ -140,7 +348,13 @@ const ExperienceEditor = ({
       "planning", "execution", "communication", "collaboration", "project",
       "innovation", "improvement", "efficiency", "skills", "experience",
       "implementation", "solution", "design", "customer", "client", 
-      "stakeholder", "team", "budget", "revenue", "growth", "cost reduction"
+      "stakeholder", "team", "budget", "revenue", "growth", "cost reduction",
+      // Add specific tools and technologies
+      "figma", "sketch", "adobe", "photoshop", "illustrator", 
+      "react", "vue", "angular", "javascript", "typescript", 
+      "html", "css", "java", "python", "node", "aws", "azure",
+      "docker", "kubernetes", "jenkins", "git", "jira", "confluence",
+      "sql", "nosql", "mongodb", "mysql", "postgresql", "agile", "scrum"
     ];
     
     return commonJobTerms.filter(term => 
@@ -148,7 +362,23 @@ const ExperienceEditor = ({
     );
   };
   
-  const getContextRelevantDeliverable = (experience: Experience): string => {
+  const getContextRelevantDeliverable = (experience: Experience, jobDesc: string): string => {
+    // Try to extract from job description first
+    const jobResponsibilities = extractJobResponsibilities(jobDesc);
+    const relevantDeliverables = jobResponsibilities.filter(resp => 
+      resp.includes("develop") || resp.includes("create") || resp.includes("build") ||
+      resp.includes("implement") || resp.includes("design")
+    ).map(resp => {
+      // Extract what comes after "develop", "create", etc.
+      const matches = resp.match(/(?:develop|create|build|implement|design)\s+([^,\.]+)/i);
+      return matches ? matches[1].trim() : null;
+    }).filter(Boolean);
+    
+    if (relevantDeliverables.length > 0) {
+      return relevantDeliverables[0];
+    }
+    
+    // Fall back to role-based deliverables
     const roleKeywords = experience.title.toLowerCase();
     
     if (roleKeywords.includes("engineer") || roleKeywords.includes("developer")) {
@@ -175,6 +405,7 @@ const ExperienceEditor = ({
       return deliverables[Math.floor(Math.random() * deliverables.length)];
     }
     
+    // Default deliverables
     const defaultDeliverables = [
       "key project", "strategic initiative", "critical component", 
       "business solution", "customer-facing feature"
@@ -250,6 +481,19 @@ const ExperienceEditor = ({
     return outcomes[Math.floor(Math.random() * outcomes.length)];
   };
   
+  const getRandomTechnicalBenefit = (): string => {
+    const benefits = [
+      "accelerate development cycles",
+      "enhance system reliability",
+      "improve data processing efficiency",
+      "enable real-time analytics",
+      "streamline user authentication processes",
+      "scale operations efficiently"
+    ];
+    
+    return benefits[Math.floor(Math.random() * benefits.length)];
+  };
+  
   const getRandomTechnicalMetric = (): string => {
     return ["memory usage", "load time", "API response time", 
             "database query time", "build time", "error rate"][Math.floor(Math.random() * 6)];
@@ -292,6 +536,18 @@ const ExperienceEditor = ({
       "increased employee satisfaction scores by 20%",
       "developed two team members for promotion",
       "created a high-performing, collaborative culture"
+    ];
+    
+    return outcomes[Math.floor(Math.random() * outcomes.length)];
+  };
+  
+  const getRandomDesignOutcome = (): string => {
+    const outcomes = [
+      "a 35% increase in user engagement",
+      "significantly improved usability test scores",
+      "positive feedback from 90% of beta testers",
+      "a streamlined user journey with 25% fewer steps",
+      "a modern interface that increased conversion by 20%"
     ];
     
     return outcomes[Math.floor(Math.random() * outcomes.length)];
@@ -352,6 +608,7 @@ const ExperienceEditor = ({
                     generateSuggestions={(expIndex, bulletIndex) => 
                       generateBulletSuggestions(expIndex, bulletIndex)
                     }
+                    jobDescription={jobDescription}
                   />
                 ))}
                 <div className="flex flex-wrap gap-2">
@@ -373,7 +630,7 @@ const ExperienceEditor = ({
                   </Button>
                 </div>
 
-                {/* Suggestions for new bullet points */}
+                {/* Suggestions for new bullet points - specifically based on job description */}
                 {expandedSuggestions === expIndex && (
                   <div className="mt-3 p-3 bg-slate-50 rounded-md border border-slate-200">
                     <h4 className="text-sm font-medium mb-2">Suggested bullet points based on the job description:</h4>

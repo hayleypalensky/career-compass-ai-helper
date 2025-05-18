@@ -12,6 +12,7 @@ interface ExperienceBulletPointProps {
   onBulletChange: (expIndex: number, bulletIndex: number, value: string) => void;
   onRemoveBullet: (expIndex: number, bulletIndex: number) => void;
   generateSuggestions: (expIndex: number, bulletIndex: number) => string[];
+  jobDescription?: string; // Add job description prop
 }
 
 const ExperienceBulletPoint = ({
@@ -21,6 +22,7 @@ const ExperienceBulletPoint = ({
   onBulletChange,
   onRemoveBullet,
   generateSuggestions,
+  jobDescription = "",
 }: ExperienceBulletPointProps) => {
   const { toast } = useToast();
   const [showSuggestions, setShowSuggestions] = useState(false);

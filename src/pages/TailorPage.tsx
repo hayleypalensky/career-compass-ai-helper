@@ -25,6 +25,7 @@ const TailorPage = () => {
   const [companyName, setCompanyName] = useState<string>("");
   const [jobDescription, setJobDescription] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
+  const [currentTab, setCurrentTab] = useState("tailor");
 
   // Load profile from localStorage
   useEffect(() => {
@@ -60,6 +61,11 @@ const TailorPage = () => {
     setJobTitle(jobInfo.title || "");
     setCompanyName(jobInfo.company || "");
     setJobDescription(jobInfo.description || "");
+    
+    // If user analyzed a job description, switch to tailor tab automatically
+    if (currentTab !== "tailor") {
+      setCurrentTab("tailor");
+    }
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
@@ -135,18 +141,18 @@ const TailorPage = () => {
     <div className="space-y-8">
       <h1>Tailor Your Resume</h1>
       
-      <Tabs defaultValue="tailor" className="w-full">
+      <JobDescriptionAnalyzer 
+        profile={profile} 
+        onAnalysisComplete={handleAnalysisComplete} 
+      />
+      
+      <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
         <TabsList>
           <TabsTrigger value="tailor">Tailor Resume</TabsTrigger>
           <TabsTrigger value="suggestions">Job Suggestions</TabsTrigger>
         </TabsList>
         
         <TabsContent value="tailor" className="space-y-8 mt-6">
-          <JobDescriptionAnalyzer 
-            profile={profile} 
-            onAnalysisComplete={handleAnalysisComplete} 
-          />
-          
           {showTailorSection && (
             <>
               <TailorResume
