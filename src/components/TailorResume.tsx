@@ -334,7 +334,8 @@ const TailorResume = ({
             {profile.personalInfo.phone && (
               <span className="text-gray-600">{profile.personalInfo.phone}</span>
             )}
-            {profile.personalInfo.website && (
+            {/* Only render website if it exists on the PersonalInfo type */}
+            {profile.personalInfo.website && 'website' in profile.personalInfo && (
               <span className="text-gray-600">{profile.personalInfo.website}</span>
             )}
           </div>
@@ -376,7 +377,8 @@ const TailorResume = ({
                       <h4 className="font-medium">{edu.degree}</h4>
                       <span className="text-gray-600">{edu.startDate} - {edu.endDate || 'Present'}</span>
                     </div>
-                    <p className="text-gray-700">{edu.school}{edu.location ? `, ${edu.location}` : ''}</p>
+                    <p className="text-gray-700">{edu.school}{/* Only check for location if it exists on the Education type */}
+                    {'location' in edu && edu.location ? `, ${edu.location}` : ''}</p>
                     {edu.description && <p className="text-gray-600 mt-1">{edu.description}</p>}
                   </div>
                 ))}
