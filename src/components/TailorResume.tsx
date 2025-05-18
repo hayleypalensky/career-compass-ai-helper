@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -334,9 +333,9 @@ const TailorResume = ({
             {profile.personalInfo.phone && (
               <span className="text-gray-600">{profile.personalInfo.phone}</span>
             )}
-            {/* Only render website if it exists on the PersonalInfo type */}
-            {profile.personalInfo.website && 'website' in profile.personalInfo && (
-              <span className="text-gray-600">{profile.personalInfo.website}</span>
+            {/* Only render website if it exists as a property on the PersonalInfo object */}
+            {'website' in profile.personalInfo && profile.personalInfo.website && (
+              <span className="text-gray-600">{String(profile.personalInfo.website)}</span>
             )}
           </div>
           
@@ -345,6 +344,7 @@ const TailorResume = ({
             <p className="text-gray-800">{profile.personalInfo.summary}</p>
           </div>
           
+          {/* Experience section */}
           {tailoredExperiences.length > 0 && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold border-b pb-1 mb-4">Experience</h3>
@@ -367,6 +367,7 @@ const TailorResume = ({
             </div>
           )}
           
+          {/* Education section */}
           {profile.education && profile.education.length > 0 && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold border-b pb-1 mb-4">Education</h3>
@@ -377,8 +378,9 @@ const TailorResume = ({
                       <h4 className="font-medium">{edu.degree}</h4>
                       <span className="text-gray-600">{edu.startDate} - {edu.endDate || 'Present'}</span>
                     </div>
-                    <p className="text-gray-700">{edu.school}{/* Only check for location if it exists on the Education type */}
-                    {'location' in edu && edu.location ? `, ${edu.location}` : ''}</p>
+                    <p className="text-gray-700">{edu.school}
+                    {/* Only check for location if it exists as a property on the Education object */}
+                    {'location' in edu && edu.location ? `, ${String(edu.location)}` : ''}</p>
                     {edu.description && <p className="text-gray-600 mt-1">{edu.description}</p>}
                   </div>
                 ))}
@@ -386,6 +388,7 @@ const TailorResume = ({
             </div>
           )}
           
+          {/* Skills section */}
           <div>
             <h3 className="text-lg font-semibold border-b pb-1 mb-4">Skills</h3>
             <div className="flex flex-wrap gap-2">
