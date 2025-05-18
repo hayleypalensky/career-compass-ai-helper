@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInfoForm, { PersonalInfo } from "@/components/PersonalInfoForm";
 import ExperienceForm, { Experience } from "@/components/ExperienceForm";
 import SkillsForm, { Skill } from "@/components/SkillsForm";
+import EducationForm, { Education } from "@/components/EducationForm";
 import { Profile as ProfileType } from "@/types/profile";
 import { toast } from "@/components/ui/use-toast";
 
@@ -30,6 +31,7 @@ const ProfilePage = () => {
       },
       experiences: [],
       skills: [],
+      education: [],
     };
   });
 
@@ -59,6 +61,13 @@ const ProfilePage = () => {
     }));
   };
 
+  const handleEducationSave = (education: Education[]) => {
+    setProfile((prev) => ({
+      ...prev,
+      education,
+    }));
+  };
+
   const handleResetProfile = () => {
     if (confirm("Are you sure you want to reset your entire profile? This action cannot be undone.")) {
       setProfile({
@@ -71,6 +80,7 @@ const ProfilePage = () => {
         },
         experiences: [],
         skills: [],
+        education: [],
       });
       
       toast({
@@ -97,9 +107,10 @@ const ProfilePage = () => {
       </p>
 
       <Tabs defaultValue="personal" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
           <TabsTrigger value="experience">Experience</TabsTrigger>
+          <TabsTrigger value="education">Education</TabsTrigger>
           <TabsTrigger value="skills">Skills</TabsTrigger>
         </TabsList>
         
@@ -114,6 +125,13 @@ const ProfilePage = () => {
           <ExperienceForm 
             onSave={handleExperiencesSave}
             initialData={profile.experiences}
+          />
+        </TabsContent>
+        
+        <TabsContent value="education" className="mt-6">
+          <EducationForm 
+            onSave={handleEducationSave}
+            initialData={profile.education}
           />
         </TabsContent>
         
