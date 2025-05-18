@@ -11,7 +11,7 @@ interface ResumePdfExportProps {
   profile: Profile;
   jobTitle?: string;
   companyName?: string;
-  colorTheme?: string; // Added colorTheme prop
+  colorTheme?: string;
 }
 
 const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple" }: ResumePdfExportProps) => {
@@ -64,21 +64,38 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
           padding: 25px !important;
           margin: 15px !important;
         }
+        /* Ensure the skills wrapper is visible */
+        .pdf-export-container .skills-wrapper {
+          display: block !important;
+          width: 100% !important;
+          margin-bottom: 16px !important;
+        }
       `;
       document.head.appendChild(styleElement);
       
       // Clone the resume content
       const cloneContent = resumeElement.cloneNode(true) as HTMLElement;
       
+      // Force display block on skills section
+      const skillsSection = cloneContent.querySelector('.skills-wrapper');
+      if (skillsSection) {
+        skillsSection.setAttribute('style', 'display: block !important; width: 100% !important; margin-bottom: 16px !important;');
+      }
+      
       // Add classes to skills items in the clone for PDF export
       const skillItems = cloneContent.querySelectorAll('.skill-item');
       skillItems.forEach(item => {
         item.classList.add('skill-item'); // Make sure the class is applied
+        (item as HTMLElement).style.display = 'inline-flex';
+        (item as HTMLElement).style.alignItems = 'center';
+        (item as HTMLElement).style.justifyContent = 'center';
       });
       
       const skillsContainer = cloneContent.querySelector('.skills-wrapper');
       if (skillsContainer) {
         skillsContainer.classList.add('skills-container');
+        (skillsContainer as HTMLElement).style.display = 'block';
+        (skillsContainer as HTMLElement).style.width = '100%';
       }
       
       // Add class for margins
@@ -95,6 +112,15 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
         scale: 2, // Higher resolution
         logging: false,
         backgroundColor: "#ffffff",
+        onclone: function(clonedDoc, element) {
+          // Additional manipulation on the cloned document
+          const skillsWrapper = element.querySelector('.skills-wrapper');
+          if (skillsWrapper) {
+            (skillsWrapper as HTMLElement).style.display = 'block';
+            (skillsWrapper as HTMLElement).style.visibility = 'visible';
+            (skillsWrapper as HTMLElement).style.opacity = '1';
+          }
+        }
       });
       
       document.body.removeChild(tempContainer);
