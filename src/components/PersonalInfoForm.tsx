@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { Link } from "lucide-react";
 
 interface PersonalInfoFormProps {
   onSave: (data: PersonalInfo) => void;
@@ -18,6 +19,7 @@ export interface PersonalInfo {
   phone: string;
   location: string;
   summary: string;
+  link?: string;
 }
 
 const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
@@ -29,6 +31,7 @@ const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
       phone: "",
       location: "",
       summary: "",
+      link: "",
     }
   );
 
@@ -99,6 +102,20 @@ const PersonalInfoForm = ({ onSave, initialData }: PersonalInfoFormProps) => {
               value={formData.location}
               onChange={handleChange}
               placeholder="City, State"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="link" className="flex items-center gap-2">
+              <Link className="h-4 w-4" /> Portfolio/Personal Website
+            </Label>
+            <Input
+              id="link"
+              name="link"
+              value={formData.link || ""}
+              onChange={handleChange}
+              placeholder="https://myportfolio.com"
+              type="url"
             />
           </div>
 
