@@ -11,9 +11,10 @@ interface ResumePdfExportProps {
   profile: Profile;
   jobTitle?: string;
   companyName?: string;
+  colorTheme?: string; // Added colorTheme prop
 }
 
-const ResumePdfExport = ({ profile, jobTitle, companyName }: ResumePdfExportProps) => {
+const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple" }: ResumePdfExportProps) => {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
 
