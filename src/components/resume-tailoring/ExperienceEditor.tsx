@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,6 +29,19 @@ const ExperienceEditor = ({
 }: ExperienceEditorProps) => {
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState<number | null>(null);
+
+  // Helper function to generate random action verbs
+  const getRandomActionVerb = (capitalized = false): string => {
+    const verbs = [
+      "improved", "increased", "reduced", "developed", "implemented",
+      "created", "established", "led", "managed", "coordinated",
+      "streamlined", "enhanced", "optimized", "accelerated", "achieved",
+      "designed", "deployed", "architected", "engineered", "delivered"
+    ];
+    
+    const verb = verbs[Math.floor(Math.random() * verbs.length)];
+    return capitalized ? verb.charAt(0).toUpperCase() + verb.slice(1) : verb;
+  };
 
   // Extract job responsibilities and requirements from the job description
   const extractJobResponsibilities = (jobDesc: string): string[] => {
