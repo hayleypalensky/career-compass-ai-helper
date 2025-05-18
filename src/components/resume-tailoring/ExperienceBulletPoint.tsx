@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, Pencil } from "lucide-react";
+import { X, MessageSquare, Pencil, RotateCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ExperienceBulletPointProps {
@@ -36,6 +36,16 @@ const ExperienceBulletPoint = ({
     toast({
       title: "Suggestion applied",
       description: "The bullet point has been updated with the suggested content.",
+    });
+  };
+
+  const replaceBullet = (suggestion: string) => {
+    onBulletChange(expIndex, bulletIndex, suggestion);
+    setShowSuggestions(false);
+    
+    toast({
+      title: "Bullet point replaced",
+      description: "Your bullet point has been replaced with the suggested content.",
     });
   };
 
@@ -78,14 +88,27 @@ const ExperienceBulletPoint = ({
           <div className="space-y-2">
             {generateSuggestions(expIndex, bulletIndex).map((suggestion, i) => (
               <div key={i} className="flex items-start gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="text-xs h-auto py-1 px-2"
-                  onClick={() => applySuggestion(suggestion)}
-                >
-                  Use
-                </Button>
+                <div className="flex gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-xs h-auto py-1 px-2"
+                    onClick={() => replaceBullet(suggestion)}
+                    title="Replace existing bullet with this suggestion"
+                  >
+                    <RotateCw className="h-3 w-3 mr-1" />
+                    Replace
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="text-xs h-auto py-1 px-2"
+                    onClick={() => applySuggestion(suggestion)}
+                    title="Use this suggestion (keeps your edits)"
+                  >
+                    Use
+                  </Button>
+                </div>
                 <p className="text-sm">{suggestion}</p>
               </div>
             ))}
