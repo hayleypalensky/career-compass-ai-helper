@@ -14,6 +14,31 @@ const ResumePreview = ({
   skillsToAdd, 
   relevantSkills 
 }: ResumePreviewProps) => {
+  // Helper function to format dates to show month before year
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return 'Present';
+    
+    try {
+      // Input format is YYYY-MM
+      const [year, month] = dateString.split('-');
+      
+      // Convert month number to month name
+      const monthNames = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
+      
+      const monthIndex = parseInt(month, 10) - 1;
+      const monthName = monthNames[monthIndex];
+      
+      // Return formatted date (e.g., "Jan 2023")
+      return `${monthName} ${year}`;
+    } catch (error) {
+      // If any error in parsing, return the original string
+      return dateString;
+    }
+  };
+
   return (
     <div className="space-y-4" id="resume-content">
       <div className="p-6 border rounded-lg bg-white max-w-[800px] mx-auto">
@@ -64,7 +89,7 @@ const ResumePreview = ({
                 <div key={edu.id} className="mb-1">
                   <div className="flex justify-between mb-0.5">
                     <h4 className="font-medium text-sm">{edu.degree} in {edu.field}</h4>
-                    <span className="text-gray-600 text-xs">{edu.startDate} - {edu.endDate || 'Present'}</span>
+                    <span className="text-gray-600 text-xs">{formatDate(edu.startDate)} - {edu.endDate ? formatDate(edu.endDate) : 'Present'}</span>
                   </div>
                   <p className="text-gray-700 text-sm">
                     {edu.school}
@@ -86,7 +111,7 @@ const ResumePreview = ({
                 <div key={exp.id} className="mb-2">
                   <div className="flex justify-between mb-0.5">
                     <h4 className="font-medium text-sm">{exp.title}</h4>
-                    <span className="text-gray-600 text-xs">{exp.startDate} - {exp.endDate || 'Present'}</span>
+                    <span className="text-gray-600 text-xs">{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}</span>
                   </div>
                   <p className="text-gray-700 text-sm mb-1">{exp.company}{exp.location ? `, ${exp.location}` : ''}</p>
                   <ul className="text-xs space-y-0.5 ml-4">
