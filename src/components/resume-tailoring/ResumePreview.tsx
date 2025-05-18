@@ -34,10 +34,10 @@ const ResumePreview = ({
                 <span className="ml-1">{profile.personalInfo.phone}</span>
               </span>
             )}
-            {'website' in profile.personalInfo && profile.personalInfo.website && (
+            {profile.personalInfo.website && (
               <span className="text-gray-700 flex items-center">
                 <span>🔗</span>
-                <span className="ml-1">{String(profile.personalInfo.website)}</span>
+                <span className="ml-1">{profile.personalInfo.website}</span>
               </span>
             )}
             {profile.personalInfo.location && (
@@ -77,33 +77,6 @@ const ResumePreview = ({
           </div>
         )}
         
-        {/* Skills section - Always display this section */}
-        <div className="mb-4">
-          <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Skills</h3>
-          <div className="flex flex-wrap gap-1 mb-1">
-            {profile.skills.map((skill) => (
-              <span 
-                key={skill.id} 
-                className={`px-2 py-0.5 rounded text-xs ${
-                  relevantSkills.includes(skill.name) 
-                    ? 'bg-green-100 text-green-800 font-medium' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}
-              >
-                {skill.name}
-              </span>
-            ))}
-            {skillsToAdd.map((skill) => (
-              <span key={skill} className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium">
-                {skill}*
-              </span>
-            ))}
-          </div>
-          {skillsToAdd.length > 0 && (
-            <p className="text-[10px] text-gray-500">* Skills added based on job requirements</p>
-          )}
-        </div>
-        
         {/* Experience section - Filter out any empty bullet points */}
         {experiences.length > 0 && (
           <div className="mb-4">
@@ -130,6 +103,33 @@ const ResumePreview = ({
             </div>
           </div>
         )}
+        
+        {/* Skills section - Moved to be last */}
+        <div className="mb-2">
+          <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Skills</h3>
+          <div className="flex flex-wrap gap-1 mb-1">
+            {profile.skills.map((skill) => (
+              <span 
+                key={skill.id} 
+                className={`px-2 py-0.5 rounded text-xs ${
+                  relevantSkills.includes(skill.name) 
+                    ? 'bg-green-100 text-green-800 font-medium' 
+                    : 'bg-gray-100 text-gray-800'
+                }`}
+              >
+                {skill.name}
+              </span>
+            ))}
+            {skillsToAdd.map((skill) => (
+              <span key={skill} className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium">
+                {skill}*
+              </span>
+            ))}
+          </div>
+          {skillsToAdd.length > 0 && (
+            <p className="text-[10px] text-gray-500">* Skills added based on job requirements</p>
+          )}
+        </div>
       </div>
     </div>
   );
