@@ -7,10 +7,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { X } from "lucide-react"; // Added import for the X icon
+import { X, MessageSquarePencil } from "lucide-react"; 
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface TailorResumeProps {
   profile: Profile;
@@ -31,6 +32,7 @@ const TailorResume = ({
   );
   const [userResponses, setUserResponses] = useState<Record<string, string>>({});
   const [skillsToAdd, setSkillsToAdd] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<Record<string, boolean>>({});
 
   // Handle changes to experience bullet points
   const handleBulletChange = (expIndex: number, bulletIndex: number, value: string) => {
@@ -94,6 +96,57 @@ const TailorResume = ({
       ...prev,
       [skill]: response,
     }));
+  };
+
+  // Generate suggestions for bullet points based on job description and relevant skills
+  const generateBulletSuggestions = (expIndex: number, bulletIndex: number) => {
+    const experience = tailoredExperiences[expIndex];
+    const currentBullet = experience.bullets[bulletIndex];
+    
+    // Generate suggestions based on relevant skills and current bullet point
+    // This is a simple implementation - in a real app, this would use more sophisticated NLP
+    const suggestions = relevantSkills.map(skill => {
+      if (!currentBullet.toLowerCase().includes(skill.toLowerCase())) {
+        return `${currentBullet} utilizing ${skill} to improve outcomes`;
+      }
+      return `Enhanced ${skill} expertise through ${experience.title} role, resulting in measurable improvements`;
+    });
+    
+    // Add quantifiable suggestions
+    suggestions.push(
+      `${currentBullet}, resulting in 20% improvement in efficiency`,
+      `Led initiative to ${currentBullet.replace(/^I /i, '').replace(/^Led /i, '')} that saved the company resources`,
+      `Collaborated with cross-functional teams to ${currentBullet.replace(/^I /i, '')}`
+    );
+    
+    // Filter out empty suggestions
+    return [...new Set(suggestions.filter(s => s && s !== currentBullet))].slice(0, 3);
+  };
+
+  // Toggle suggestions visibility for a specific bullet point
+  const toggleSuggestions = (expIndex: number, bulletIndex: number) => {
+    const key = `${expIndex}-${bulletIndex}`;
+    setShowSuggestions(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+  
+  // Apply a suggestion to a bullet point
+  const applySuggestion = (expIndex: number, bulletIndex: number, suggestion: string) => {
+    handleBulletChange(expIndex, bulletIndex, suggestion);
+    
+    // Close suggestions after applying
+    const key = `${expIndex}-${bulletIndex}`;
+    setShowSuggestions(prev => ({
+      ...prev,
+      [key]: false
+    }));
+    
+    toast({
+      title: "Suggestion applied",
+      description: "The bullet point has been updated with the suggested content.",
+    });
   };
 
   // Save the tailored resume
@@ -196,21 +249,57 @@ const TailorResume = ({
                 <div className="space-y-2">
                   <Label>Bullet Points</Label>
                   {exp.bullets.map((bullet, bulletIndex) => (
-                    <div key={bulletIndex} className="flex gap-2">
-                      <Textarea
-                        value={bullet}
-                        onChange={(e) =>
-                          handleBulletChange(expIndex, bulletIndex, e.target.value)
-                        }
-                        rows={2}
-                      />
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => removeBullet(expIndex, bulletIndex)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                    <div key={bulletIndex} className="space-y-2">
+                      <div className="flex gap-2">
+                        <Textarea
+                          value={bullet}
+                          onChange={(e) =>
+                            handleBulletChange(expIndex, bulletIndex, e.target.value)
+                          }
+                          rows={2}
+                          className="flex-1"
+                        />
+                        <div className="flex flex-col gap-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => toggleSuggestions(expIndex, bulletIndex)}
+                            title="Get suggestions"
+                          >
+                            <MessageSquarePencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => removeBullet(expIndex, bulletIndex)}
+                            title="Remove bullet point"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      {/* Suggestions Collapsible */}
+                      {showSuggestions[`${expIndex}-${bulletIndex}`] && (
+                        <div className="ml-2 bg-slate-50 p-3 rounded-md border border-slate-200">
+                          <h4 className="text-sm font-medium mb-2">Suggestions to improve ATS matching:</h4>
+                          <div className="space-y-2">
+                            {generateBulletSuggestions(expIndex, bulletIndex).map((suggestion, i) => (
+                              <div key={i} className="flex items-start gap-2">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  className="text-xs h-auto py-1 px-2"
+                                  onClick={() => applySuggestion(expIndex, bulletIndex, suggestion)}
+                                >
+                                  Use
+                                </Button>
+                                <p className="text-sm">{suggestion}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                   <Button
