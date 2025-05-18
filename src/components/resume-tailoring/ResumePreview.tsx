@@ -1,17 +1,20 @@
 
 import { Profile } from "@/types/profile";
+import { Skill } from "@/components/SkillsForm";
 
 interface ResumePreviewProps {
   profile: Profile;
   experiences: any[];
   skillsToAdd: string[];
+  skillsToRemove: string[];
   relevantSkills: string[];
 }
 
 const ResumePreview = ({ 
   profile, 
   experiences, 
-  skillsToAdd, 
+  skillsToAdd,
+  skillsToRemove,
   relevantSkills 
 }: ResumePreviewProps) => {
   // Helper function to format dates to show month before year
@@ -38,6 +41,11 @@ const ResumePreview = ({
       return dateString;
     }
   };
+
+  // Filter out skills that are marked for removal
+  const filteredSkills = profile.skills.filter(skill => 
+    !skillsToRemove.includes(skill.id)
+  );
 
   return (
     <div className="space-y-4" id="resume-content">
@@ -133,7 +141,7 @@ const ResumePreview = ({
         <div className="mb-2">
           <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Skills</h3>
           <div className="flex flex-wrap gap-1 mb-1">
-            {profile.skills.map((skill) => (
+            {filteredSkills.map((skill) => (
               <span 
                 key={skill.id} 
                 className={`px-2 py-0.5 rounded text-xs flex items-center justify-center ${

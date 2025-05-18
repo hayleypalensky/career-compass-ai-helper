@@ -11,6 +11,7 @@ import RelevantSkillsCard from "./resume-tailoring/RelevantSkillsCard";
 import MissingSkillsCard from "./resume-tailoring/MissingSkillsCard";
 import ExperienceEditor from "./resume-tailoring/ExperienceEditor";
 import ResumePreview from "./resume-tailoring/ResumePreview";
+import SkillManagement from "./resume-tailoring/SkillManagement";
 
 interface TailorResumeProps {
   profile: Profile;
@@ -33,6 +34,7 @@ const TailorResume = ({
   );
   const [userResponses, setUserResponses] = useState<Record<string, string>>({});
   const [skillsToAdd, setSkillsToAdd] = useState<string[]>([]);
+  const [skillsToRemove, setSkillsToRemove] = useState<string[]>([]);
 
   // Handle changes to experience bullet points
   const handleBulletChange = (expIndex: number, bulletIndex: number, value: string) => {
@@ -87,6 +89,15 @@ const TailorResume = ({
       prev.includes(skill)
         ? prev.filter((s) => s !== skill)
         : [...prev, skill]
+    );
+  };
+
+  // Toggle removal of a skill from profile
+  const toggleSkillRemoval = (skillId: string) => {
+    setSkillsToRemove((prev) =>
+      prev.includes(skillId)
+        ? prev.filter((id) => id !== skillId)
+        : [...prev, skillId]
     );
   };
 
@@ -358,7 +369,7 @@ const TailorResume = ({
   const saveTailoredResume = () => {
     // Create new skills from the selected missing skills
     const newSkills: Skill[] = [
-      ...profile.skills,
+      ...profile.skills.filter(skill => !skillsToRemove.includes(skill.id)),
       ...skillsToAdd.map((skillName) => ({
         id: crypto.randomUUID(),
         name: skillName,
@@ -378,12 +389,15 @@ const TailorResume = ({
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
 
-      <MissingSkillsCard 
+      {/* Replace the MissingSkillsCard with the new SkillManagement component */}
+      <SkillManagement
+        profileSkills={profile.skills}
+        relevantSkills={relevantSkills}
         missingSkills={missingSkills}
         skillsToAdd={skillsToAdd}
-        userResponses={userResponses}
-        onToggleSkill={toggleSkillSelection}
-        onUpdateResponse={updateResponse}
+        skillsToRemove={skillsToRemove}
+        onToggleSkillToAdd={toggleSkillSelection}
+        onToggleSkillToRemove={toggleSkillRemoval}
       />
 
       <ExperienceEditor 
@@ -400,6 +414,7 @@ const TailorResume = ({
         profile={profile}
         experiences={tailoredExperiences}
         skillsToAdd={skillsToAdd}
+        skillsToRemove={skillsToRemove}
         relevantSkills={relevantSkills}
       />
 
