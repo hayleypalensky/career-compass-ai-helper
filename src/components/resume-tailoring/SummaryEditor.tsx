@@ -29,14 +29,17 @@ const SummaryEditor = ({
     setIsGenerating(true);
     
     try {
-      // Extract key requirements from job description
+      // Extract key requirements from job description and current summary
       const requirements = extractRequirementsFromJobDescription(jobDescription);
+      
+      // Extract key phrases from current summary to maintain personal tone and background
+      const currentSummaryKeyPhrases = extractKeyPhrasesFromSummary(currentSummary);
       
       // Generate 3 different summary suggestions
       const newSuggestions = [
-        generateTargetedSummary(requirements, relevantSkills, "concise"),
-        generateTargetedSummary(requirements, relevantSkills, "achievement"),
-        generateTargetedSummary(requirements, relevantSkills, "collaborative")
+        generateTargetedSummary(requirements, relevantSkills, "concise", currentSummaryKeyPhrases),
+        generateTargetedSummary(requirements, relevantSkills, "achievement", currentSummaryKeyPhrases),
+        generateTargetedSummary(requirements, relevantSkills, "collaborative", currentSummaryKeyPhrases)
       ];
       
       setSuggestions(newSuggestions);
@@ -54,6 +57,59 @@ const SummaryEditor = ({
     } finally {
       setIsGenerating(false);
     }
+  };
+  
+  // Extract key phrases from current summary
+  const extractKeyPhrasesFromSummary = (summary: string): string[] => {
+    if (!summary) return [];
+    
+    const keyPhrases: string[] = [];
+    
+    // Look for years of experience
+    const yearsPattern = /(\d+)[+]?\s+years?/i;
+    const yearsMatch = summary.match(yearsPattern);
+    if (yearsMatch) {
+      keyPhrases.push(yearsMatch[0]);
+    }
+    
+    // Look for industries/domains mentioned
+    const industryWords = ["healthcare", "finance", "technology", "education", "manufacturing", 
+                          "retail", "government", "startup", "enterprise"];
+    
+    industryWords.forEach(industry => {
+      if (summary.toLowerCase().includes(industry)) {
+        keyPhrases.push(industry);
+      }
+    });
+    
+    // Look for specific qualifications
+    const qualificationPatterns = [
+      /certified\s+\w+/i,
+      /\w+\s+certified/i,
+      /\w+\s+degree/i,
+      /degree\s+in\s+\w+/i,
+      /expert\s+in\s+[\w\s]+/i,
+      /specialist\s+in\s+[\w\s]+/i
+    ];
+    
+    qualificationPatterns.forEach(pattern => {
+      const matches = summary.match(pattern);
+      if (matches) {
+        keyPhrases.push(matches[0]);
+      }
+    });
+    
+    // Look for personal qualities often mentioned in summaries
+    const personalQualities = ["detail-oriented", "team player", "self-motivated", "passionate",
+                              "innovative", "analytical", "creative", "results-driven", "strategic"];
+    
+    personalQualities.forEach(quality => {
+      if (summary.toLowerCase().includes(quality.toLowerCase())) {
+        keyPhrases.push(quality);
+      }
+    });
+    
+    return keyPhrases;
   };
   
   // Extract requirements and role details from job description
@@ -86,27 +142,38 @@ const SummaryEditor = ({
     return requirements;
   };
   
-  // Generate a targeted summary based on requirements and resume skills
+  // Generate a targeted summary based on requirements, resume skills, and current summary phrases
   const generateTargetedSummary = (
     requirements: string[], 
     skills: string[], 
-    style: "concise" | "achievement" | "collaborative"
+    style: "concise" | "achievement" | "collaborative",
+    currentSummaryPhrases: string[]
   ): string => {
     // Find the most relevant skills that match job requirements
     const relevantSkillsForSummary = skills.filter(skill => 
       requirements.some(req => req.toLowerCase().includes(skill.toLowerCase()))
     );
     
-    // Get years of experience from requirements
+    // Get years of experience from requirements or current summary
     const yearsPattern = /(\d+)[+]?\s+years?/i;
     const yearsMatches = requirements.map(req => {
       const match = req.match(yearsPattern);
       return match ? parseInt(match[1]) : null;
     }).filter(y => y !== null);
     
+    // Check current summary for years of experience
+    let yearsFromCurrentSummary = null;
+    for (const phrase of currentSummaryPhrases) {
+      const match = phrase.match(yearsPattern);
+      if (match) {
+        yearsFromCurrentSummary = parseInt(match[1]);
+        break;
+      }
+    }
+    
     const requestedYears = yearsMatches.length > 0 
       ? Math.max(...yearsMatches as number[]) 
-      : 3; // Default to 3 if no years specified
+      : (yearsFromCurrentSummary || 3); // Use years from current summary or default to 3
     
     // Identify the role/position from job description
     const roleKeywords = ["engineer", "developer", "designer", "manager", "lead", 
@@ -120,26 +187,50 @@ const SummaryEditor = ({
       }
     }
     
+    // Extract industry mentions from current summary phrases
+    const industryMentions = currentSummaryPhrases.filter(phrase => 
+      ["healthcare", "finance", "technology", "education", "manufacturing", 
+       "retail", "government", "startup", "enterprise"].some(industry => 
+         phrase.toLowerCase().includes(industry))
+    );
+    
+    // Get industry context if available
+    const industryContext = industryMentions.length > 0 
+      ? ` in the ${industryMentions[0]}` 
+      : "";
+    
+    // Get personal qualities from current summary
+    const personalQualityMatches = currentSummaryPhrases.filter(phrase => 
+      ["detail-oriented", "team player", "self-motivated", "passionate",
+       "innovative", "analytical", "creative", "results-driven", "strategic"].some(quality => 
+         phrase.toLowerCase().includes(quality.toLowerCase()))
+    );
+    
+    // Format personal qualities for inclusion
+    const personalQualityText = personalQualityMatches.length > 0 
+      ? ` and ${personalQualityMatches[0]}` 
+      : "";
+    
     // Generate different types of summaries based on style
     switch (style) {
       case "concise":
-        return `Results-driven ${roleTitle} with ${requestedYears}+ years of experience specializing in ${
+        return `Results-driven ${roleTitle} with ${requestedYears}+ years of experience${industryContext} specializing in ${
           relevantSkillsForSummary.slice(0, 3).join(", ")
         }${relevantSkillsForSummary.length > 3 ? ", and other technologies" : ""
-        }. Committed to delivering high-quality solutions that meet business objectives and exceed client expectations. Proven track record of ${
+        }. Committed to delivering high-quality solutions that meet business objectives and exceed client expectations${personalQualityText}. Proven track record of ${
           getRandomAccomplishment(roleTitle)
         } and ${
           getRandomStrength(roleTitle)
         }.`;
         
       case "achievement":
-        return `Accomplished ${roleTitle} with extensive experience in ${
+        return `Accomplished ${roleTitle} with ${requestedYears}+ years of extensive experience${industryContext} in ${
           relevantSkillsForSummary.slice(0, 2).join(" and ")
         }. Successfully delivered ${
           getRandomDeliverable(roleTitle)
         } resulting in ${
           getRandomOutcome()
-        }. Demonstrated expertise in ${
+        }${personalQualityText}. Demonstrated expertise in ${
           relevantSkillsForSummary.slice(2, 4).join(", ")
         } with a strong focus on ${
           getRandomFocus()
@@ -148,22 +239,22 @@ const SummaryEditor = ({
         }.`;
         
       case "collaborative":
-        return `Collaborative ${roleTitle} who thrives in team environments, bringing ${requestedYears}+ years of hands-on experience with ${
+        return `Collaborative ${roleTitle} who thrives in team environments, bringing ${requestedYears}+ years of hands-on experience${industryContext} with ${
           relevantSkillsForSummary.slice(0, 3).join(", ")
         } to deliver impactful solutions. Excels at ${
           getRandomStrength(roleTitle)
-        } while focusing on ${
+        }${personalQualityText} while focusing on ${
           getRandomFocus()
         }. Committed to continuous learning and staying current with industry trends to drive ${
           getRandomOutcome()
         }.`;
         
       default:
-        return `Experienced ${roleTitle} with a proven track record in ${
+        return `Experienced ${roleTitle} with a proven track record${industryContext} in ${
           relevantSkillsForSummary.slice(0, 3).join(", ")
         } and a passion for delivering high-quality solutions. Demonstrated ability to ${
           getRandomStrength(roleTitle)
-        } and drive results through ${
+        }${personalQualityText} and drive results through ${
           getRandomApproach()
         }.`;
     }

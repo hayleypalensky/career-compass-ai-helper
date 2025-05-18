@@ -41,8 +41,49 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       tempContainer.style.position = "absolute";
       tempContainer.style.left = "-9999px"; // Position off-screen
       
+      // Add specific styles for PDF export to ensure proper vertical alignment
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        .pdf-export-container .skills-item {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          height: 100% !important;
+          vertical-align: middle !important;
+        }
+        .pdf-export-container .skills-container {
+          display: flex !important;
+          flex-wrap: wrap !important;
+          gap: 8px !important;
+          margin: 0 10px !important;
+        }
+        .pdf-export-container .resume-content-inner {
+          padding: 25px !important;
+          margin: 15px !important;
+        }
+      `;
+      document.head.appendChild(styleElement);
+      
       // Clone the resume content
       const cloneContent = resumeElement.cloneNode(true) as HTMLElement;
+      
+      // Add classes to skills items in the clone for PDF export
+      const skillItems = cloneContent.querySelectorAll('.skill-item');
+      skillItems.forEach(item => {
+        item.classList.add('skills-item');
+      });
+      
+      const skillsContainer = cloneContent.querySelector('.skills-wrapper');
+      if (skillsContainer) {
+        skillsContainer.classList.add('skills-container');
+      }
+      
+      // Add class for margins
+      const resumeInner = cloneContent.querySelector('.resume-inner');
+      if (resumeInner) {
+        resumeInner.classList.add('resume-content-inner');
+      }
+      
       tempContainer.appendChild(cloneContent);
       document.body.appendChild(tempContainer);
 
@@ -54,6 +95,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       });
       
       document.body.removeChild(tempContainer);
+      document.head.removeChild(styleElement); // Clean up the style
 
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({

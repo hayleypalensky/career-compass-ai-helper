@@ -77,7 +77,7 @@ const ResumePreview = ({
 
   return (
     <div className="space-y-4" id="resume-content">
-      <div className="p-8 border rounded-lg bg-white max-w-[800px] mx-auto">
+      <div className="p-8 border rounded-lg bg-white max-w-[800px] mx-auto resume-inner">
         {/* Header section with simpler styling and portfolio website */}
         <div className="mb-6 pb-3 border-b">
           <h2 className={`text-2xl font-bold mb-3 ${theme.headingColor}`}>{profile.personalInfo.name}</h2>
@@ -166,24 +166,27 @@ const ResumePreview = ({
         )}
         
         {/* Skills section - Moved to be last, with center-aligned text */}
-        <div className="mb-2">
+        <div className="mb-2 skills-wrapper">
           <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Skills</h3>
           <div className="flex flex-wrap gap-2 mb-2">
             {filteredSkills.map((skill) => (
               <span 
                 key={skill.id} 
-                className={`px-2 py-0.5 rounded text-xs flex items-center justify-center ${
+                className={`px-2 py-0.5 rounded text-xs inline-flex items-center justify-center skill-item ${
                   relevantSkills.includes(skill.name) 
                     ? theme.accentColor
                     : 'bg-gray-100 text-gray-800'
                 }`}
               >
-                <span className="inline-flex items-center justify-center">{skill.name}</span>
+                {skill.name}
               </span>
             ))}
             {skillsToAdd.map((skill) => (
-              <span key={skill} className={`px-2 py-0.5 rounded text-xs font-medium flex items-center justify-center ${theme.accentColor}`}>
-                <span className="inline-flex items-center justify-center">{skill}*</span>
+              <span 
+                key={skill} 
+                className={`px-2 py-0.5 rounded text-xs font-medium inline-flex items-center justify-center skill-item ${theme.accentColor}`}
+              >
+                {skill}*
               </span>
             ))}
           </div>
