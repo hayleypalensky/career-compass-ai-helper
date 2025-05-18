@@ -48,6 +48,28 @@ const ResumePreview = ({
     }
   };
 
+  // Format phone number to include hyphens
+  const formatPhoneNumber = (phone: string | undefined): string => {
+    if (!phone) return '';
+    
+    // Remove any existing formatting (spaces, parentheses, hyphens, etc.)
+    const cleaned = phone.replace(/\D/g, '');
+    
+    // Format as XXX-XXX-XXXX
+    if (cleaned.length === 10) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6, 10)}`;
+    }
+    
+    // If it's not exactly 10 digits, return as is with hyphens where possible
+    if (cleaned.length > 6) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    } else if (cleaned.length > 3) {
+      return `${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
+    }
+    
+    return cleaned;
+  };
+
   // Filter out skills that are marked for removal
   const filteredSkills = profile.skills.filter(skill => 
     !skillsToRemove.includes(skill.id)
@@ -55,12 +77,12 @@ const ResumePreview = ({
 
   return (
     <div className="space-y-4" id="resume-content">
-      <div className="p-6 border rounded-lg bg-white max-w-[800px] mx-auto">
+      <div className="p-8 border rounded-lg bg-white max-w-[800px] mx-auto">
         {/* Header section with simpler styling and portfolio website */}
-        <div className="mb-4 pb-3 border-b">
-          <h2 className={`text-2xl font-bold mb-2 ${theme.headingColor}`}>{profile.personalInfo.name}</h2>
+        <div className="mb-6 pb-3 border-b">
+          <h2 className={`text-2xl font-bold mb-3 ${theme.headingColor}`}>{profile.personalInfo.name}</h2>
           
-          <div className="flex flex-wrap gap-2 text-sm">
+          <div className="flex flex-wrap gap-3 text-sm">
             {profile.personalInfo.email && (
               <span className="text-gray-700 flex items-center">
                 <span>Email:</span>
@@ -70,7 +92,7 @@ const ResumePreview = ({
             {profile.personalInfo.phone && (
               <span className="text-gray-700 flex items-center">
                 <span>Phone:</span>
-                <span className="ml-1">{profile.personalInfo.phone}</span>
+                <span className="ml-1">{formatPhoneNumber(profile.personalInfo.phone)}</span>
               </span>
             )}
             {profile.personalInfo.website && (
@@ -89,19 +111,19 @@ const ResumePreview = ({
         </div>
         
         {/* Professional Summary - with more compact spacing */}
-        <div className="mb-4">
-          <h3 className={`text-base font-semibold mb-1 ${theme.headingColor} border-b pb-1`}>Professional Summary</h3>
+        <div className="mb-6">
+          <h3 className={`text-base font-semibold mb-2 ${theme.headingColor} border-b pb-1`}>Professional Summary</h3>
           <p className="text-gray-800 text-sm">{profile.personalInfo.summary}</p>
         </div>
         
         {/* Education section - moved to after the professional summary */}
         {profile.education && profile.education.length > 0 && (
-          <div className="mb-4">
-            <h3 className={`text-base font-semibold border-b pb-1 mb-2 ${theme.headingColor}`}>Education</h3>
-            <div className="space-y-2">
+          <div className="mb-6">
+            <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Education</h3>
+            <div className="space-y-3">
               {profile.education.map((edu) => (
-                <div key={edu.id} className="mb-1">
-                  <div className="flex justify-between mb-0.5">
+                <div key={edu.id} className="mb-2">
+                  <div className="flex justify-between mb-1">
                     <h4 className="font-medium text-sm">{edu.degree} in {edu.field}</h4>
                     <span className="text-gray-600 text-xs">{formatDate(edu.startDate)} - {edu.endDate ? formatDate(edu.endDate) : 'Present'}</span>
                   </div>
@@ -109,7 +131,7 @@ const ResumePreview = ({
                     {edu.school}
                     {'location' in edu && edu.location ? `, ${String(edu.location)}` : ''}
                   </p>
-                  {edu.description && <p className="text-gray-600 text-xs mt-0.5">{edu.description}</p>}
+                  {edu.description && <p className="text-gray-600 text-xs mt-1">{edu.description}</p>}
                 </div>
               ))}
             </div>
@@ -118,17 +140,17 @@ const ResumePreview = ({
         
         {/* Experience section - Filter out any empty bullet points */}
         {experiences.length > 0 && (
-          <div className="mb-4">
-            <h3 className={`text-base font-semibold border-b pb-1 mb-2 ${theme.headingColor}`}>Experience</h3>
-            <div className="space-y-3">
+          <div className="mb-6">
+            <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Experience</h3>
+            <div className="space-y-4">
               {experiences.map((exp) => (
-                <div key={exp.id} className="mb-2">
-                  <div className="flex justify-between mb-0.5">
+                <div key={exp.id} className="mb-3">
+                  <div className="flex justify-between mb-1">
                     <h4 className="font-medium text-sm">{exp.title}</h4>
                     <span className="text-gray-600 text-xs">{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : 'Present'}</span>
                   </div>
-                  <p className="text-gray-700 text-sm mb-1">{exp.company}{exp.location ? `, ${exp.location}` : ''}</p>
-                  <ul className="text-xs space-y-0.5 ml-4">
+                  <p className="text-gray-700 text-sm mb-2">{exp.company}{exp.location ? `, ${exp.location}` : ''}</p>
+                  <ul className="text-xs space-y-1 ml-4">
                     {exp.bullets
                       .filter((bullet: string) => bullet.trim() !== "") // Filter out empty bullets
                       .map((bullet: string, idx: number) => (
@@ -145,8 +167,8 @@ const ResumePreview = ({
         
         {/* Skills section - Moved to be last, with center-aligned text */}
         <div className="mb-2">
-          <h3 className={`text-base font-semibold border-b pb-1 mb-2 ${theme.headingColor}`}>Skills</h3>
-          <div className="flex flex-wrap gap-1 mb-1">
+          <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Skills</h3>
+          <div className="flex flex-wrap gap-2 mb-2">
             {filteredSkills.map((skill) => (
               <span 
                 key={skill.id} 

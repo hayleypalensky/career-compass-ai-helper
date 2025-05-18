@@ -48,6 +48,13 @@ const colorThemes: ResumeColorTheme[] = [
     borderColor: "border-gold-200",
     accentColor: "bg-gold-100 text-gold-800",
   },
+  {
+    id: "black",
+    name: "Black",
+    headingColor: "text-black",
+    borderColor: "border-gray-400",
+    accentColor: "bg-gray-800 text-white",
+  },
 ];
 
 interface ResumeColorSelectorProps {
