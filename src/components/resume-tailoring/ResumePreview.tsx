@@ -1,6 +1,7 @@
 
 import { Profile } from "@/types/profile";
 import { Skill } from "@/components/SkillsForm";
+import { ResumeColorTheme, colorThemes } from "./ResumeColorSelector";
 
 interface ResumePreviewProps {
   profile: Profile;
@@ -8,6 +9,7 @@ interface ResumePreviewProps {
   skillsToAdd: string[];
   skillsToRemove: string[];
   relevantSkills: string[];
+  colorTheme?: string;
 }
 
 const ResumePreview = ({ 
@@ -15,8 +17,12 @@ const ResumePreview = ({
   experiences, 
   skillsToAdd,
   skillsToRemove,
-  relevantSkills 
+  relevantSkills,
+  colorTheme = "purple"
 }: ResumePreviewProps) => {
+  // Find the selected theme object
+  const theme: ResumeColorTheme = colorThemes.find(theme => theme.id === colorTheme) || colorThemes[0];
+  
   // Helper function to format dates to show month before year
   const formatDate = (dateString: string): string => {
     if (!dateString) return 'Present';
@@ -52,7 +58,7 @@ const ResumePreview = ({
       <div className="p-6 border rounded-lg bg-white max-w-[800px] mx-auto">
         {/* Header section with simpler styling and portfolio website */}
         <div className="mb-4 pb-3 border-b">
-          <h2 className="text-2xl font-bold mb-2 text-purple-800">{profile.personalInfo.name}</h2>
+          <h2 className={`text-2xl font-bold mb-2 ${theme.headingColor}`}>{profile.personalInfo.name}</h2>
           
           <div className="flex flex-wrap gap-2 text-sm">
             {profile.personalInfo.email && (
@@ -84,14 +90,14 @@ const ResumePreview = ({
         
         {/* Professional Summary - with more compact spacing */}
         <div className="mb-4">
-          <h3 className="text-base font-semibold mb-1 text-purple-700 border-b pb-1">Professional Summary</h3>
+          <h3 className={`text-base font-semibold mb-1 ${theme.headingColor} border-b pb-1`}>Professional Summary</h3>
           <p className="text-gray-800 text-sm">{profile.personalInfo.summary}</p>
         </div>
         
         {/* Education section - moved to after the professional summary */}
         {profile.education && profile.education.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Education</h3>
+            <h3 className={`text-base font-semibold border-b pb-1 mb-2 ${theme.headingColor}`}>Education</h3>
             <div className="space-y-2">
               {profile.education.map((edu) => (
                 <div key={edu.id} className="mb-1">
@@ -113,7 +119,7 @@ const ResumePreview = ({
         {/* Experience section - Filter out any empty bullet points */}
         {experiences.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Experience</h3>
+            <h3 className={`text-base font-semibold border-b pb-1 mb-2 ${theme.headingColor}`}>Experience</h3>
             <div className="space-y-3">
               {experiences.map((exp) => (
                 <div key={exp.id} className="mb-2">
@@ -139,14 +145,14 @@ const ResumePreview = ({
         
         {/* Skills section - Moved to be last, with center-aligned text */}
         <div className="mb-2">
-          <h3 className="text-base font-semibold border-b pb-1 mb-2 text-purple-700">Skills</h3>
+          <h3 className={`text-base font-semibold border-b pb-1 mb-2 ${theme.headingColor}`}>Skills</h3>
           <div className="flex flex-wrap gap-1 mb-1">
             {filteredSkills.map((skill) => (
               <span 
                 key={skill.id} 
                 className={`px-2 py-0.5 rounded text-xs flex items-center justify-center ${
                   relevantSkills.includes(skill.name) 
-                    ? 'bg-green-100 text-green-800 font-medium' 
+                    ? theme.accentColor
                     : 'bg-gray-100 text-gray-800'
                 }`}
               >
@@ -154,7 +160,7 @@ const ResumePreview = ({
               </span>
             ))}
             {skillsToAdd.map((skill) => (
-              <span key={skill} className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium flex items-center justify-center">
+              <span key={skill} className={`px-2 py-0.5 rounded text-xs font-medium flex items-center justify-center ${theme.accentColor}`}>
                 <span className="inline-flex items-center justify-center">{skill}*</span>
               </span>
             ))}

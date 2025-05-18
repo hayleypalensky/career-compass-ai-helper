@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -12,6 +11,7 @@ import MissingSkillsCard from "./resume-tailoring/MissingSkillsCard";
 import ExperienceEditor from "./resume-tailoring/ExperienceEditor";
 import ResumePreview from "./resume-tailoring/ResumePreview";
 import SkillManagement from "./resume-tailoring/SkillManagement";
+import ResumeColorSelector from "./resume-tailoring/ResumeColorSelector";
 
 interface TailorResumeProps {
   profile: Profile;
@@ -35,6 +35,7 @@ const TailorResume = ({
   const [userResponses, setUserResponses] = useState<Record<string, string>>({});
   const [skillsToAdd, setSkillsToAdd] = useState<string[]>([]);
   const [skillsToRemove, setSkillsToRemove] = useState<string[]>([]);
+  const [selectedTheme, setSelectedTheme] = useState<string>("purple");
 
   // Handle changes to experience bullet points
   const handleBulletChange = (expIndex: number, bulletIndex: number, value: string) => {
@@ -83,13 +84,31 @@ const TailorResume = ({
     });
   };
 
-  // Toggle missing skill selection
+  // Toggle missing skill selection (prevent duplicates)
   const toggleSkillSelection = (skill: string) => {
-    setSkillsToAdd((prev) =>
-      prev.includes(skill)
-        ? prev.filter((s) => s !== skill)
-        : [...prev, skill]
-    );
+    setSkillsToAdd((prev) => {
+      // Check if skill already exists in the profile (case insensitive)
+      const alreadyInProfile = profile.skills.some(
+        existingSkill => existingSkill.name.toLowerCase() === skill.toLowerCase()
+      );
+      
+      // If already in profile, don't add it to skillsToAdd
+      if (alreadyInProfile) {
+        toast({
+          title: "Skill already exists",
+          description: `"${skill}" is already in your profile.`,
+          variant: "default",
+        });
+        return prev.filter(s => s !== skill); // Remove it if it was previously added
+      }
+      
+      // Check if it's already in skillsToAdd list
+      if (prev.includes(skill)) {
+        return prev.filter(s => s !== skill);
+      } else {
+        return [...prev, skill];
+      }
+    });
   };
 
   // Toggle removal of a skill from profile
@@ -365,15 +384,30 @@ const TailorResume = ({
     return outcomes[Math.floor(Math.random() * outcomes.length)];
   };
 
+  // Handle color theme changes
+  const handleThemeChange = (themeId: string) => {
+    setSelectedTheme(themeId);
+  };
+
   // Save the tailored resume
   const saveTailoredResume = () => {
-    // Create new skills from the selected missing skills
+    // Create unique skills from the selected missing skills (prevent duplicates)
+    const existingSkillNames = profile.skills
+      .filter(skill => !skillsToRemove.includes(skill.id))
+      .map(skill => skill.name.toLowerCase());
+    
+    // Filter out skills to add that already exist in profile (case insensitive)
+    const uniqueSkillsToAdd = skillsToAdd.filter(skillName => 
+      !existingSkillNames.includes(skillName.toLowerCase())
+    );
+    
+    // Create new skills array
     const newSkills: Skill[] = [
       ...profile.skills.filter(skill => !skillsToRemove.includes(skill.id)),
-      ...skillsToAdd.map((skillName) => ({
+      ...uniqueSkillsToAdd.map((skillName) => ({
         id: crypto.randomUUID(),
         name: skillName,
-        category: "Technical", // Default category, could be improved
+        category: "Technical", // Default category
       })),
     ];
 
@@ -389,7 +423,6 @@ const TailorResume = ({
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
 
-      {/* Replace the MissingSkillsCard with the new SkillManagement component */}
       <SkillManagement
         profileSkills={profile.skills}
         relevantSkills={relevantSkills}
@@ -398,6 +431,11 @@ const TailorResume = ({
         skillsToRemove={skillsToRemove}
         onToggleSkillToAdd={toggleSkillSelection}
         onToggleSkillToRemove={toggleSkillRemoval}
+      />
+
+      <ResumeColorSelector 
+        selectedTheme={selectedTheme} 
+        onThemeChange={handleThemeChange}
       />
 
       <ExperienceEditor 
@@ -416,6 +454,7 @@ const TailorResume = ({
         skillsToAdd={skillsToAdd}
         skillsToRemove={skillsToRemove}
         relevantSkills={relevantSkills}
+        colorTheme={selectedTheme}
       />
 
       <Button

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -26,6 +25,7 @@ const TailorPage = () => {
   const [jobDescription, setJobDescription] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
   const [currentTab, setCurrentTab] = useState("tailor");
+  const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
 
   // Load profile from localStorage
   useEffect(() => {
@@ -169,6 +169,7 @@ const TailorPage = () => {
                     profile={profile}
                     jobTitle={jobTitle}
                     companyName={companyName}
+                    colorTheme={selectedColorTheme}
                   />
                   
                   <AddToJobTracker
