@@ -17,32 +17,32 @@ const ResumePreview = ({
   return (
     <div className="space-y-4" id="resume-content">
       <div className="p-6 border rounded-lg bg-white max-w-[800px] mx-auto">
-        {/* Header section with better styling and layout */}
+        {/* Header section with simpler styling and portfolio website */}
         <div className="mb-4 pb-3 border-b">
           <h2 className="text-2xl font-bold mb-2 text-purple-800">{profile.personalInfo.name}</h2>
           
           <div className="flex flex-wrap gap-2 text-sm">
             {profile.personalInfo.email && (
               <span className="text-gray-700 flex items-center">
-                <span>📧</span>
+                <span>Email:</span>
                 <span className="ml-1">{profile.personalInfo.email}</span>
               </span>
             )}
             {profile.personalInfo.phone && (
               <span className="text-gray-700 flex items-center">
-                <span>📱</span>
+                <span>Phone:</span>
                 <span className="ml-1">{profile.personalInfo.phone}</span>
               </span>
             )}
             {profile.personalInfo.website && (
               <span className="text-gray-700 flex items-center">
-                <span>🔗</span>
+                <span>Website:</span>
                 <span className="ml-1">{profile.personalInfo.website}</span>
               </span>
             )}
             {profile.personalInfo.location && (
               <span className="text-gray-700 flex items-center">
-                <span>📍</span>
+                <span>Location:</span>
                 <span className="ml-1">{profile.personalInfo.location}</span>
               </span>
             )}
@@ -63,7 +63,7 @@ const ResumePreview = ({
               {profile.education.map((edu) => (
                 <div key={edu.id} className="mb-1">
                   <div className="flex justify-between mb-0.5">
-                    <h4 className="font-medium text-sm">{edu.degree}</h4>
+                    <h4 className="font-medium text-sm">{edu.degree} in {edu.field}</h4>
                     <span className="text-gray-600 text-xs">{edu.startDate} - {edu.endDate || 'Present'}</span>
                   </div>
                   <p className="text-gray-700 text-sm">
@@ -117,12 +117,12 @@ const ResumePreview = ({
                     : 'bg-gray-100 text-gray-800'
                 }`}
               >
-                {skill.name}
+                <span className="inline-flex items-center justify-center">{skill.name}</span>
               </span>
             ))}
             {skillsToAdd.map((skill) => (
               <span key={skill} className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-800 font-medium flex items-center justify-center">
-                {skill}*
+                <span className="inline-flex items-center justify-center">{skill}*</span>
               </span>
             ))}
           </div>
