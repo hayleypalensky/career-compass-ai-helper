@@ -166,9 +166,18 @@ const ResumePreview = ({
         )}
         
         {/* Skills section - Always visible with explicit display styles */}
-        <div className="mb-2 skills-wrapper" style={{ display: "block", width: "100%" }}>
+        <div className="mb-2 skills-wrapper" style={{ 
+          display: "block", 
+          width: "100%",
+          visibility: "visible",
+          opacity: 1
+        }}>
           <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Skills</h3>
-          <div className="flex flex-wrap gap-2 mb-2">
+          <div className="flex flex-wrap gap-2 mb-2" style={{
+            display: "flex",
+            flexWrap: "wrap", 
+            gap: "8px"
+          }}>
             {filteredSkills.map((skill) => (
               <span 
                 key={skill.id} 
@@ -177,7 +186,14 @@ const ResumePreview = ({
                     ? theme.accentColor
                     : 'bg-gray-100 text-gray-800'
                 }`}
-                style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+                style={{ 
+                  display: "inline-flex", 
+                  alignItems: "center", 
+                  justifyContent: "center",
+                  height: "24px",
+                  visibility: "visible",
+                  opacity: 1
+                }}
               >
                 {skill.name}
               </span>
@@ -186,7 +202,14 @@ const ResumePreview = ({
               <span 
                 key={skill} 
                 className={`px-2 py-0.5 rounded text-xs font-medium inline-flex items-center justify-center skill-item ${theme.accentColor}`}
-                style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+                style={{ 
+                  display: "inline-flex", 
+                  alignItems: "center", 
+                  justifyContent: "center",
+                  height: "24px",
+                  visibility: "visible",
+                  opacity: 1
+                }}
               >
                 {skill}*
               </span>

@@ -35,40 +35,75 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       // Create a temporary clone with proper styling for PDF
       const tempContainer = document.createElement("div");
       tempContainer.className = "pdf-export-container";
-      tempContainer.style.width = "800px"; // Fixed width for PDF
-      tempContainer.style.padding = "40px";
+      tempContainer.style.width = "794px"; // A4 width in pixels (slightly adjusted)
+      tempContainer.style.padding = "30px";
       tempContainer.style.backgroundColor = "white";
       tempContainer.style.position = "absolute";
       tempContainer.style.left = "-9999px"; // Position off-screen
+      tempContainer.style.fontSize = "12px"; // Control font size to fit content
       
-      // Add specific styles for PDF export to ensure proper vertical alignment
+      // Add specific styles for PDF export to ensure proper layout
       const styleElement = document.createElement('style');
       styleElement.textContent = `
+        .pdf-export-container {
+          font-size: 12px !important;
+        }
+        .pdf-export-container h2 {
+          font-size: 18px !important;
+          margin-bottom: 8px !important;
+        }
+        .pdf-export-container h3 {
+          font-size: 14px !important;
+          margin-bottom: 6px !important;
+        }
         .pdf-export-container .skill-item {
           display: inline-flex !important;
           align-items: center !important;
           justify-content: center !important;
-          height: 32px !important; /* Fixed height */
-          margin: 4px !important;
-          padding: 0 12px !important;
+          height: 24px !important; /* Smaller height */
+          margin: 2px !important;
+          padding: 0 8px !important;
           vertical-align: middle !important;
-          line-height: 32px !important;
+          line-height: 24px !important;
+          font-size: 10px !important;
         }
         .pdf-export-container .skills-container {
           display: flex !important;
           flex-wrap: wrap !important;
-          gap: 8px !important;
-          margin: 0 10px !important;
+          gap: 4px !important;
+          margin: 0 5px !important;
         }
         .pdf-export-container .resume-content-inner {
-          padding: 25px !important;
-          margin: 15px !important;
+          padding: 15px !important;
+          margin: 10px !important;
         }
         /* Ensure the skills wrapper is visible */
         .pdf-export-container .skills-wrapper {
           display: block !important;
           width: 100% !important;
-          margin-bottom: 16px !important;
+          margin-bottom: 10px !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+        }
+        /* Reduce spacing between items */
+        .pdf-export-container .mb-6 {
+          margin-bottom: 12px !important;
+        }
+        .pdf-export-container .mb-3 {
+          margin-bottom: 6px !important;
+        }
+        .pdf-export-container .space-y-4 {
+          margin-top: 6px !important;
+        }
+        .pdf-export-container .space-y-3 {
+          margin-top: 4px !important;
+        }
+        /* Make text smaller for descriptions */
+        .pdf-export-container .text-xs {
+          font-size: 9px !important;
+        }
+        .pdf-export-container .text-sm {
+          font-size: 10px !important;
         }
       `;
       document.head.appendChild(styleElement);
@@ -76,32 +111,47 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       // Clone the resume content
       const cloneContent = resumeElement.cloneNode(true) as HTMLElement;
       
-      // Force display block on skills section
+      // Force display of skills section
       const skillsSection = cloneContent.querySelector('.skills-wrapper');
       if (skillsSection) {
-        skillsSection.setAttribute('style', 'display: block !important; width: 100% !important; margin-bottom: 16px !important;');
+        (skillsSection as HTMLElement).style.display = 'block';
+        (skillsSection as HTMLElement).style.width = '100%';
+        (skillsSection as HTMLElement).style.marginBottom = '10px';
+        (skillsSection as HTMLElement).style.visibility = 'visible';
+        (skillsSection as HTMLElement).style.opacity = '1';
+        (skillsSection as HTMLElement).style.position = 'relative';
       }
       
       // Add classes to skills items in the clone for PDF export
       const skillItems = cloneContent.querySelectorAll('.skill-item');
       skillItems.forEach(item => {
-        item.classList.add('skill-item'); // Make sure the class is applied
+        item.classList.add('skill-item'); 
         (item as HTMLElement).style.display = 'inline-flex';
         (item as HTMLElement).style.alignItems = 'center';
         (item as HTMLElement).style.justifyContent = 'center';
+        (item as HTMLElement).style.height = '24px';
+        (item as HTMLElement).style.fontSize = '10px';
       });
       
-      const skillsContainer = cloneContent.querySelector('.skills-wrapper');
+      const skillsContainer = cloneContent.querySelector('.skills-wrapper .flex');
       if (skillsContainer) {
         skillsContainer.classList.add('skills-container');
-        (skillsContainer as HTMLElement).style.display = 'block';
-        (skillsContainer as HTMLElement).style.width = '100%';
+        (skillsContainer as HTMLElement).style.display = 'flex';
+        (skillsContainer as HTMLElement).style.flexWrap = 'wrap';
+        (skillsContainer as HTMLElement).style.gap = '4px';
       }
+      
+      // Reduce spacing in the resume
+      const marginElements = cloneContent.querySelectorAll('.mb-6');
+      marginElements.forEach(el => {
+        (el as HTMLElement).style.marginBottom = '12px';
+      });
       
       // Add class for margins
       const resumeInner = cloneContent.querySelector('.resume-inner');
       if (resumeInner) {
         resumeInner.classList.add('resume-content-inner');
+        (resumeInner as HTMLElement).style.padding = '15px';
       }
       
       tempContainer.appendChild(cloneContent);
@@ -112,6 +162,8 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
         scale: 2, // Higher resolution
         logging: false,
         backgroundColor: "#ffffff",
+        useCORS: true,
+        allowTaint: true,
         onclone: function(clonedDoc, element) {
           // Additional manipulation on the cloned document
           const skillsWrapper = element.querySelector('.skills-wrapper');
@@ -120,6 +172,14 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
             (skillsWrapper as HTMLElement).style.visibility = 'visible';
             (skillsWrapper as HTMLElement).style.opacity = '1';
           }
+          
+          // Make sure all skill items are visible
+          const skillItems = element.querySelectorAll('.skill-item');
+          skillItems.forEach(item => {
+            (item as HTMLElement).style.display = 'inline-flex';
+            (item as HTMLElement).style.visibility = 'visible';
+            (item as HTMLElement).style.opacity = '1';
+          });
         }
       });
       
@@ -133,11 +193,18 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
         format: "a4",
       });
       
-      // Calculate dimensions
+      // Calculate dimensions to fit A4 page
       const imgWidth = 210; // A4 width in mm (portrait)
+      const pageHeight = 297; // A4 height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      // If the image height exceeds A4 height, scale it down
+      if (imgHeight > pageHeight) {
+        const scale = pageHeight / imgHeight * 0.95; // 95% of max height to add some margin
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth * scale, imgHeight * scale);
+      } else {
+        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      }
       
       // Generate filename with job info if available
       const filenameParts = ["tailored_resume"];
