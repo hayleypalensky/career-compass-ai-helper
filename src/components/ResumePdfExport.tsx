@@ -213,12 +213,11 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       if (companyName) filenameParts.push(companyName.toLowerCase().replace(/\s+/g, "_"));
       if (jobTitle) filenameParts.push(jobTitle.toLowerCase().replace(/\s+/g, "_"));
       
-      // Set PDF metadata to optimize file size
+      // Set PDF metadata to optimize file size - removed the 'producer' property
       pdf.setProperties({
         title: `Resume for ${profile.personalInfo.name || 'Candidate'}`,
         subject: `Tailored resume for ${jobTitle || 'position'} at ${companyName || 'company'}`,
-        creator: 'Resume Builder',
-        producer: 'Resume Builder',
+        creator: 'Resume Builder'
       });
       
       pdf.save(`${filenameParts.join("_")}.pdf`);
