@@ -190,7 +190,8 @@ const ResumePreview = ({
                   display: "inline-flex", 
                   alignItems: "center", 
                   justifyContent: "center",
-                  height: "24px",
+                  height: "24px", /* Fixed height */
+                  lineHeight: "1", /* Important for vertical centering */
                   visibility: "visible",
                   opacity: 1
                 }}
@@ -206,7 +207,8 @@ const ResumePreview = ({
                   display: "inline-flex", 
                   alignItems: "center", 
                   justifyContent: "center",
-                  height: "24px",
+                  height: "24px", /* Fixed height */
+                  lineHeight: "1", /* Important for vertical centering */
                   visibility: "visible",
                   opacity: 1
                 }}
