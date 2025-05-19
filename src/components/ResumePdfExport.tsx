@@ -157,13 +157,14 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       tempContainer.appendChild(cloneContent);
       document.body.appendChild(tempContainer);
 
-      // Generate PDF from the temporary container
+      // Generate PDF from the temporary container with optimized settings
       const canvas = await html2canvas(tempContainer, {
-        scale: 2, // Higher resolution
+        scale: 1.5, // Reduced from 2 to 1.5 for smaller file size
         logging: false,
         backgroundColor: "#ffffff",
         useCORS: true,
         allowTaint: true,
+        imageTimeout: 0, // No timeout
         onclone: function(clonedDoc, element) {
           // Additional manipulation on the cloned document
           const skillsWrapper = element.querySelector('.skills-wrapper');
@@ -186,11 +187,12 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       document.body.removeChild(tempContainer);
       document.head.removeChild(styleElement); // Clean up the style
 
-      const imgData = canvas.toDataURL("image/png");
+      const imgData = canvas.toDataURL("image/jpeg", 0.85); // Use JPEG with 85% quality instead of PNG
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
+        compress: true, // Enable PDF compression
       });
       
       // Calculate dimensions to fit A4 page
@@ -201,15 +203,23 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       // If the image height exceeds A4 height, scale it down
       if (imgHeight > pageHeight) {
         const scale = pageHeight / imgHeight * 0.95; // 95% of max height to add some margin
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth * scale, imgHeight * scale);
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth * scale, imgHeight * scale);
       } else {
-        pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
       }
       
       // Generate filename with job info if available
       const filenameParts = ["tailored_resume"];
       if (companyName) filenameParts.push(companyName.toLowerCase().replace(/\s+/g, "_"));
       if (jobTitle) filenameParts.push(jobTitle.toLowerCase().replace(/\s+/g, "_"));
+      
+      // Set PDF metadata to optimize file size
+      pdf.setProperties({
+        title: `Resume for ${profile.personalInfo.name || 'Candidate'}`,
+        subject: `Tailored resume for ${jobTitle || 'position'} at ${companyName || 'company'}`,
+        creator: 'Resume Builder',
+        producer: 'Resume Builder',
+      });
       
       pdf.save(`${filenameParts.join("_")}.pdf`);
       
