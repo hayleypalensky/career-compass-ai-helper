@@ -192,6 +192,7 @@ const ResumePreview = ({
                   justifyContent: "center",
                   height: "24px", /* Fixed height */
                   lineHeight: "1", /* Important for vertical centering */
+                  padding: "0px 8px",
                   visibility: "visible",
                   opacity: 1
                 }}
@@ -209,6 +210,7 @@ const ResumePreview = ({
                   justifyContent: "center",
                   height: "24px", /* Fixed height */
                   lineHeight: "1", /* Important for vertical centering */
+                  padding: "0px 8px",
                   visibility: "visible",
                   opacity: 1
                 }}
