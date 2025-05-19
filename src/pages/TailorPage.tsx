@@ -1,18 +1,16 @@
+
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
 import TailorResume from "@/components/TailorResume";
-import ResumePdfExport from "@/components/ResumePdfExport";
-import AddToJobTracker from "@/components/AddToJobTracker";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
+import ProfileNotFoundMessage from "@/components/resume-tailoring/ProfileNotFoundMessage";
+import IncompleteProfileCard from "@/components/resume-tailoring/IncompleteProfileCard";
+import TailorActionsRow from "@/components/resume-tailoring/TailorActionsRow";
 
 const TailorPage = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [relevantSkills, setRelevantSkills] = useState<string[]>([]);
@@ -86,16 +84,9 @@ const TailorPage = () => {
     setSelectedColorTheme(theme);
   };
 
+  // If there's no profile, show message to create one
   if (!profile) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4 py-12">
-        <h1>Complete Your Profile First</h1>
-        <p className="text-center text-gray-600 max-w-md">
-          Please complete your profile information before tailoring your resume for job applications.
-        </p>
-        <Button onClick={() => navigate("/profile")}>Go to Profile</Button>
-      </div>
-    );
+    return <ProfileNotFoundMessage />;
   }
 
   // Check if profile has minimum required information
@@ -107,31 +98,7 @@ const TailorPage = () => {
     profile.skills.length === 0;
 
   if (isProfileIncomplete) {
-    return (
-      <div className="flex flex-col items-center justify-center space-y-4 py-12">
-        <h1>Complete Your Profile</h1>
-        <Card className="max-w-md">
-          <CardContent className="pt-6">
-            <p className="text-center text-gray-600 mb-4">
-              Your profile is incomplete. Please make sure you have added:
-            </p>
-            <ul className="list-disc list-inside space-y-2 mb-4">
-              {!profile.personalInfo.name && <li>Your name</li>}
-              {!profile.personalInfo.email && <li>Your email address</li>}
-              {!profile.personalInfo.summary && <li>A professional summary</li>}
-              {profile.experiences.length === 0 && <li>At least one experience</li>}
-              {profile.skills.length === 0 && <li>Some skills</li>}
-            </ul>
-            <Button 
-              onClick={() => navigate("/profile")}
-              className="w-full"
-            >
-              Complete Your Profile
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <IncompleteProfileCard profile={profile} />;
   }
 
   return (
@@ -152,24 +119,17 @@ const TailorPage = () => {
               missingSkills={missingSkills}
               onUpdateResume={handleUpdateResume}
               jobDescription={jobDescription}
-              onColorThemeChange={handleColorThemeChange} // Add this prop
+              onColorThemeChange={handleColorThemeChange}
             />
             
             {isTailored && (
-              <div className="flex flex-col md:flex-row gap-4 mt-6">
-                <ResumePdfExport 
-                  profile={profile}
-                  jobTitle={jobTitle}
-                  companyName={companyName}
-                  colorTheme={selectedColorTheme}
-                />
-                
-                <AddToJobTracker
-                  jobTitle={jobTitle}
-                  companyName={companyName}
-                  jobDescription={jobDescription}
-                />
-              </div>
+              <TailorActionsRow
+                profile={profile}
+                jobTitle={jobTitle}
+                companyName={companyName}
+                jobDescription={jobDescription}
+                colorTheme={selectedColorTheme}
+              />
             )}
           </>
         )}
