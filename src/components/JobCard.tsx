@@ -30,6 +30,38 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
     });
   };
 
+  // Function to convert URLs in text to clickable links
+  const renderTextWithLinks = (text: string) => {
+    if (!text) return "No notes added yet.";
+    
+    // Regular expression to match URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    // Split by URLs and map parts to either text or anchor elements
+    const parts = text.split(urlRegex);
+    const matches = text.match(urlRegex) || [];
+    
+    return parts.map((part, index) => {
+      // Every even index is text, odd indices are URLs
+      if (index % 2 === 0) {
+        return <span key={index}>{part}</span>;
+      } else {
+        const url = matches[(index - 1) / 2];
+        return (
+          <a 
+            key={index}
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {url}
+          </a>
+        );
+      }
+    });
+  };
+
   return (
     <>
       <Card className={`transition-all duration-200 ${job.status === "archived" ? "opacity-75" : ""} ${isFullWidth ? "w-full" : ""}`}>
@@ -55,7 +87,7 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
           <div className="mb-4 text-sm">
             <h4 className="font-medium mb-1">Notes</h4>
             <div className="text-gray-700 whitespace-pre-wrap line-clamp-3">
-              {job.notes || "No notes added yet."}
+              {job.notes ? renderTextWithLinks(job.notes) : "No notes added yet."}
             </div>
           </div>
 
