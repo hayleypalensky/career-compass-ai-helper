@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Search } from "lucide-react";
 import JobCard from "@/components/JobCard";
 import AddJobForm from "@/components/AddJobForm";
@@ -45,7 +45,7 @@ const JobsPage = () => {
     
     toast({
       title: "Job updated",
-      description: `"${updatedJob.title}" status updated to ${updatedJob.status}.`,
+      description: `"${updatedJob.title}" has been updated.`,
     });
   };
 

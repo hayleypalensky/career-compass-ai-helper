@@ -14,7 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
+import JobEditDialog from "./JobEditDialog";
 
 interface JobCardProps {
   job: Job;
@@ -26,6 +27,7 @@ interface JobCardProps {
 const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   const handleStatusChange = (newStatus: JobStatus) => {
     onUpdate({
@@ -173,15 +175,27 @@ const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
               </Button>
             )}
             
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-red-500 text-red-600 hover:bg-red-50 ml-auto"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Trash2 className="h-4 w-4" />
-              <span className="sr-only">Delete</span>
-            </Button>
+            <div className="ml-auto flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-blue-500 text-blue-600 hover:bg-blue-50"
+                onClick={() => setEditDialogOpen(true)}
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="sr-only">Edit</span>
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-red-500 text-red-600 hover:bg-red-50"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -205,6 +219,13 @@ const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <JobEditDialog 
+        job={job}
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        onSave={onUpdate}
+      />
     </>
   );
 };
