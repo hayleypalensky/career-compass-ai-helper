@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { 
   Dialog,
   DialogContent,
@@ -25,10 +26,10 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
   const { toast } = useToast();
   const [editedJob, setEditedJob] = useState<Job>({ ...job });
 
-  // Reset the form when the job prop changes
-  useState(() => {
+  // Reset the form when the job prop changes or dialog opens
+  useEffect(() => {
     setEditedJob({ ...job });
-  });
+  }, [job, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
