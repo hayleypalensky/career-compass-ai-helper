@@ -81,13 +81,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (email: string, password: string) => {
     try {
+      // Using the correct options format supported by the current Supabase version
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
         options: {
-          // Enable leaked password protection
-          passwordProtection: {
-            disableLeakedPasswordProtection: false,
+          // Set security-related data even though we can't use passwordProtection directly
+          data: {
+            security_preference: "high" // Custom metadata to indicate security preference
           }
         }
       });
