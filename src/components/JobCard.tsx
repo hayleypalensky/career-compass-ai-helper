@@ -19,12 +19,13 @@ import JobEditDialog from "./JobEditDialog";
 
 interface JobCardProps {
   job: Job;
+  isFullWidth?: boolean;
   onUpdate: (updatedJob: Job) => void;
   onArchive: (jobId: string) => void;
   onDelete: (jobId: string) => void;
 }
 
-const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
+const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: JobCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -64,7 +65,7 @@ const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
 
   return (
     <>
-      <Card className={`transition-all duration-200 ${job.status === "archived" ? "opacity-75" : ""}`}>
+      <Card className={`transition-all duration-200 ${job.status === "archived" ? "opacity-75" : ""} ${isFullWidth ? "w-full" : ""}`}>
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
@@ -77,7 +78,7 @@ const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-gray-500 mb-3 flex items-center justify-between">
+          <div className="text-sm text-gray-500 mb-3 flex items-center justify-between flex-wrap gap-2">
             <span>
               {job.location}
               {job.remote && " (Remote)"}
@@ -110,7 +111,7 @@ const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
             </div>
           )}
 
-          <div className="flex flex-wrap gap-2 pt-3">
+          <div className={`flex ${isFullWidth ? 'flex-wrap' : 'flex-wrap'} gap-2 pt-3`}>
             <Button
               variant="outline"
               size="sm"
@@ -175,7 +176,7 @@ const JobCard = ({ job, onUpdate, onArchive, onDelete }: JobCardProps) => {
               </Button>
             )}
             
-            <div className="ml-auto flex gap-2">
+            <div className={`${isFullWidth ? 'ml-auto' : 'ml-auto'} flex gap-2`}>
               <Button
                 variant="outline"
                 size="sm"
