@@ -10,6 +10,7 @@ import JobsHeader from "@/components/jobs/JobsHeader";
 import StatusJobsTab from "@/components/jobs/StatusJobsTab";
 import { useJobManagement } from "@/hooks/useJobManagement";
 import { useJobsFiltering } from "@/hooks/useJobsFiltering";
+import { JobStatus } from "@/types/job";
 
 const JobsPage = () => {
   const { user } = useAuth();
@@ -79,7 +80,7 @@ const JobsPage = () => {
         <Tabs 
           defaultValue="applied" 
           value={activeTab}
-          onValueChange={setActiveTab}
+          onValueChange={(value) => setActiveTab(value as JobStatus)}
           className="w-full"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
