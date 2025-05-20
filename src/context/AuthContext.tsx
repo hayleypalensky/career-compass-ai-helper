@@ -14,6 +14,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   verifyOTP: (email: string, token: string) => Promise<void>;
   requestMFAOTP: (email: string) => Promise<void>;
+  setupTOTP: (email: string) => Promise<{ secret: string, qrCode: string }>;
+  verifyTOTP: (email: string, token: string) => Promise<void>;
   mfaEnabled: boolean;
 }
 
@@ -90,7 +92,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email, 
         password,
         options: {
-          // Set security-related data even though we can't use passwordProtection directly
           data: {
             security_preference: "high", // Custom metadata to indicate security preference
             mfa_enabled: true // Indicate that MFA should be enabled for this account
@@ -177,6 +178,65 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // New function to set up TOTP (Time-based One-Time Password)
+  const setupTOTP = async (email: string) => {
+    try {
+      // Note: This is a mock implementation since Supabase doesn't directly support TOTP
+      // In a real implementation, you would use a third-party library like otplib
+      // or make a request to your backend to generate a TOTP secret
+      
+      // Simulate TOTP setup
+      const mockSecret = "JBSWY3DPEHPK3PXP"; // Example secret
+      const mockQrCode = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="200" height="200">
+          <path d="M0,0 h100v100h-100z" fill="#FFFFFF"/>
+          <path d="M10,10 h10v10h-10z M30,10 h10v10h-10z M50,10 h10v10h-10z M70,10 h10v10h-10z M20,20 h10v10h-10z M40,20 h10v10h-10z M60,20 h10v10h-10z M80,20 h10v10h-10z" fill="#000000"/>
+          <text x="30" y="80" font-family="Arial" font-size="8" fill="#000000">Scan with Auth App</text>
+        </svg>`;
+      
+      // In a real implementation, you would store the association between the user and their TOTP secret
+      // in your database
+      
+      return { 
+        secret: mockSecret,
+        qrCode: mockQrCode
+      };
+    } catch (error: any) {
+      toast({
+        title: "Error setting up authenticator",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  // Function to verify TOTP codes
+  const verifyTOTP = async (email: string, token: string) => {
+    try {
+      // Note: This is a mock implementation
+      // In a real implementation, you would verify against the stored secret
+      
+      // Mock verification - accepts any 6-digit code for demo purposes
+      if (token.length === 6 && /^\d{6}$/.test(token)) {
+        toast({
+          title: "TOTP Verification successful",
+          description: "You have successfully verified using your authenticator app.",
+        });
+        return;
+      }
+      
+      throw new Error("Invalid TOTP code");
+    } catch (error: any) {
+      toast({
+        title: "TOTP Verification failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       session, 
@@ -187,6 +247,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signOut, 
       verifyOTP,
       requestMFAOTP,
+      setupTOTP,
+      verifyTOTP,
       mfaEnabled
     }}>
       {children}

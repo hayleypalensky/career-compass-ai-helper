@@ -91,6 +91,10 @@ const AuthPage = () => {
   const handleMFAVerified = () => {
     setShowMFA(false);
     navigate('/');
+    toast({
+      title: "Secure login successful",
+      description: "Multi-factor authentication complete.",
+    });
   };
 
   const handleCancelMFA = () => {
@@ -98,6 +102,11 @@ const AuthPage = () => {
     // User canceled MFA, but they are already logged in at this point,
     // so we'll let them proceed
     navigate('/');
+    toast({
+      title: "MFA skipped",
+      description: "You can enable MFA later in your profile settings.",
+      variant: "warning",
+    });
   };
 
   if (showMFA) {
@@ -155,7 +164,7 @@ const AuthPage = () => {
                     checked={enableMFA}
                     onCheckedChange={setEnableMFA}
                   />
-                  <Label htmlFor="enable-mfa">Use two-factor authentication</Label>
+                  <Label htmlFor="enable-mfa">Use multi-factor authentication</Label>
                 </div>
               </CardContent>
               <CardFooter>
@@ -199,7 +208,15 @@ const AuthPage = () => {
                     checked={enableMFA}
                     onCheckedChange={setEnableMFA}
                   />
-                  <Label htmlFor="enable-mfa-signup">Enable two-factor authentication</Label>
+                  <Label htmlFor="enable-mfa-signup">Enable multi-factor authentication</Label>
+                </div>
+                <div className="rounded-md bg-blue-50 p-3">
+                  <div className="flex">
+                    <div className="text-blue-800 text-sm">
+                      <p className="font-medium">Enhanced Security</p>
+                      <p>Multi-factor authentication adds an extra layer of security to your account by requiring a second verification step.</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter>
