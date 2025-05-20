@@ -12,6 +12,9 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  verifyOTP: (email: string, token: string) => Promise<void>;
+  requestMFAOTP: (email: string) => Promise<void>;
+  mfaEnabled: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,6 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mfaEnabled, setMfaEnabled] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,7 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         options: {
           // Set security-related data even though we can't use passwordProtection directly
           data: {
-            security_preference: "high" // Custom metadata to indicate security preference
+            security_preference: "high", // Custom metadata to indicate security preference
+            mfa_enabled: true // Indicate that MFA should be enabled for this account
           }
         }
       });
@@ -121,8 +126,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const requestMFAOTP = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({ 
+        email,
+        options: {
+          shouldCreateUser: false // Don't create a new user if they don't exist
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Verification code sent",
+        description: "Please check your email for the verification code.",
+      });
+      
+      setMfaEnabled(true);
+    } catch (error: any) {
+      toast({
+        title: "Error sending verification code",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
+  const verifyOTP = async (email: string, token: string) => {
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'email'
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Verification successful",
+        description: "You have successfully verified your identity.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Verification failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ session, user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      session, 
+      user, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      verifyOTP,
+      requestMFAOTP,
+      mfaEnabled
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,14 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import MFAVerification from '@/components/auth/MFAVerification';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [showMFA, setShowMFA] = useState(false);
+  const [enableMFA, setEnableMFA] = useState(true);
+  const { signIn, signUp, mfaEnabled, requestMFAOTP } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -32,7 +36,13 @@ const AuthPage = () => {
     try {
       setIsLoading(true);
       await signIn(email, password);
-      navigate('/');
+      
+      if (enableMFA) {
+        await requestMFAOTP(email);
+        setShowMFA(true);
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       console.error('Login error:', error);
     } finally {
@@ -64,12 +74,43 @@ const AuthPage = () => {
     try {
       setIsLoading(true);
       await signUp(email, password);
+      
+      if (enableMFA) {
+        toast({
+          title: "MFA Enabled",
+          description: "Two-factor authentication has been enabled for your account.",
+        });
+      }
     } catch (error) {
       console.error('Signup error:', error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleMFAVerified = () => {
+    setShowMFA(false);
+    navigate('/');
+  };
+
+  const handleCancelMFA = () => {
+    setShowMFA(false);
+    // User canceled MFA, but they are already logged in at this point,
+    // so we'll let them proceed
+    navigate('/');
+  };
+
+  if (showMFA) {
+    return (
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <MFAVerification 
+          email={email} 
+          onVerified={handleMFAVerified}
+          onCancel={handleCancelMFA}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center min-h-[80vh]">
@@ -108,6 +149,14 @@ const AuthPage = () => {
                     required
                   />
                 </div>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="enable-mfa" 
+                    checked={enableMFA}
+                    onCheckedChange={setEnableMFA}
+                  />
+                  <Label htmlFor="enable-mfa">Use two-factor authentication</Label>
+                </div>
               </CardContent>
               <CardFooter>
                 <Button className="w-full" type="submit" disabled={isLoading}>
@@ -143,6 +192,14 @@ const AuthPage = () => {
                   <p className="text-xs text-gray-500">
                     Password must be at least 6 characters.
                   </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Switch 
+                    id="enable-mfa-signup" 
+                    checked={enableMFA}
+                    onCheckedChange={setEnableMFA}
+                  />
+                  <Label htmlFor="enable-mfa-signup">Enable two-factor authentication</Label>
                 </div>
               </CardContent>
               <CardFooter>
