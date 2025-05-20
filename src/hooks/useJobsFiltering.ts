@@ -18,15 +18,15 @@ export const useJobsFiltering = (jobs: Job[], defaultActiveTab: JobStatus = "app
     });
   }, [jobs, searchTerm]);
 
-  // Sort jobs by application date (newest first), then alphabetically by company name
+  // Sort jobs by application date (newest first), then by creation order (using ID)
   const sortedJobs = useMemo(() => {
     return [...filteredJobs].sort((a, b) => {
       // First sort by date (newest first)
       const dateComparison = new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime();
       
-      // If dates are the same, sort alphabetically by company name
+      // If dates are the same, sort by ID (which reflects the order of creation)
       if (dateComparison === 0) {
-        return a.company.localeCompare(b.company);
+        return a.id.localeCompare(b.id);
       }
       
       return dateComparison;
