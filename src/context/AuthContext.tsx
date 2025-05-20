@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             title: "Signed in",
             description: "You have successfully signed in.",
           });
-          navigate('/');
+          navigate('/jobs'); // Redirect to jobs page instead of home
         } else if (event === 'SIGNED_OUT') {
           toast({
             title: "Signed out",
@@ -64,6 +63,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       setLoading(false);
+      
+      // If user is already logged in, redirect to jobs page
+      if (currentSession?.user) {
+        navigate('/jobs');
+      }
     });
 
     return () => {

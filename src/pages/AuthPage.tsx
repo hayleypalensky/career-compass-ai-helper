@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,16 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showMFA, setShowMFA] = useState(false);
   const [enableMFA, setEnableMFA] = useState(true);
-  const { signIn, signUp, mfaEnabled, requestMFAOTP } = useAuth();
+  const { signIn, signUp, mfaEnabled, requestMFAOTP, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // Redirect to jobs page if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate('/jobs');
+    }
+  }, [user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +47,7 @@ const AuthPage = () => {
         await requestMFAOTP(email);
         setShowMFA(true);
       } else {
-        navigate('/');
+        navigate('/jobs');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -89,7 +96,7 @@ const AuthPage = () => {
 
   const handleMFAVerified = () => {
     setShowMFA(false);
-    navigate('/');
+    navigate('/jobs');
     toast({
       title: "Secure login successful",
       description: "Multi-factor authentication complete.",
@@ -100,7 +107,7 @@ const AuthPage = () => {
     setShowMFA(false);
     // User canceled MFA, but they are already logged in at this point,
     // so we'll let them proceed
-    navigate('/');
+    navigate('/jobs');
     toast({
       title: "MFA skipped",
       description: "You can enable MFA later in your profile settings.",

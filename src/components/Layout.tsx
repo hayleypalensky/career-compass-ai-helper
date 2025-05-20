@@ -2,6 +2,7 @@
 import { Link, Outlet } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { HelpCircle } from "lucide-react";
 
 const Layout = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +23,10 @@ const Layout = () => {
                   <Link to="/profile" className="text-navy-600 hover:text-navy-800">Profile</Link>
                   <Link to="/tailor" className="text-navy-600 hover:text-navy-800">Tailor Resume</Link>
                   <Link to="/jobs" className="text-navy-600 hover:text-navy-800">Job Tracker</Link>
+                  <Link to="/help" className="text-navy-600 hover:text-navy-800 flex items-center">
+                    <HelpCircle size={16} className="mr-1" />
+                    Help
+                  </Link>
                   <Button 
                     variant="ghost" 
                     size="sm" 
