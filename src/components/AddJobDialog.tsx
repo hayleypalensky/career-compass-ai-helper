@@ -58,7 +58,7 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
     e.preventDefault();
     
     // Validate required fields
-    if (!newJob.title.trim() || !newJob.company.trim() || !newJob.location.trim()) {
+    if (!newJob.title.trim() || !newJob.company.trim()) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
@@ -131,14 +131,13 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="location">Location *</Label>
+              <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
                 name="location"
                 value={newJob.location}
                 onChange={handleInputChange}
                 placeholder="San Francisco, CA"
-                required
               />
             </div>
             

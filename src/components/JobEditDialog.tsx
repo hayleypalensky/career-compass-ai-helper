@@ -39,7 +39,7 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
     e.preventDefault();
     
     // Validate required fields
-    if (!editedJob.title.trim() || !editedJob.company.trim() || !editedJob.location.trim()) {
+    if (!editedJob.title.trim() || !editedJob.company.trim()) {
       toast({
         title: "Missing information",
         description: "Please fill in all required fields.",
@@ -101,13 +101,12 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="location">Location *</Label>
+            <Label htmlFor="location">Location</Label>
             <Input
               id="location"
               name="location"
               value={editedJob.location}
               onChange={handleInputChange}
-              required
             />
           </div>
           
