@@ -3,7 +3,7 @@ import { Job, JobStatus } from "@/types/job";
 import JobsList from "./JobsList";
 
 interface StatusJobsTabProps {
-  jobs: Job[];
+  jobs: Job[]; // These jobs are already filtered by status and sorted by date (newest first)
   status: JobStatus;
   viewMode: "list" | "grid";
   onUpdate: (job: Job) => void;
@@ -42,7 +42,7 @@ const StatusJobsTab = ({
   return (
     <div className="space-y-4">
       <JobsList 
-        jobs={jobs}
+        jobs={jobs} // Passing the already sorted jobs
         isFullWidth={viewMode === "list"}
         onUpdate={onUpdate}
         onArchive={onArchive}

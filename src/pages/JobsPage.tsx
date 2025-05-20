@@ -34,7 +34,7 @@ const JobsPage = () => {
     setSearchTerm,
     activeTab,
     setActiveTab,
-    filteredJobs
+    filteredJobs // This already contains the sorted jobs (newest first)
   } = useJobsFiltering(jobs, "applied"); // Default to "applied" tab
   
   // Load view preference from localStorage
