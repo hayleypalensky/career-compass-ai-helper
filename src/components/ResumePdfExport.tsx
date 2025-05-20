@@ -23,18 +23,19 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
     try {
       toast({
         title: "Generating ATS-friendly PDF",
-        description: "Please wait while we create a text-based PDF that's optimized for applicant tracking systems...",
+        description: "Please wait while we create your professionally formatted PDF...",
       });
       
       await generatePdf({
         profile,
         jobTitle,
-        companyName
+        companyName,
+        colorTheme
       });
       
       toast({
-        title: "ATS-friendly PDF exported successfully",
-        description: "Your resume has been exported as a text-based PDF that's optimized for applicant tracking systems.",
+        title: "PDF exported successfully",
+        description: "Your resume has been exported as a professionally formatted, ATS-friendly PDF document.",
       });
     } catch (error) {
       console.error("PDF export error:", error);
