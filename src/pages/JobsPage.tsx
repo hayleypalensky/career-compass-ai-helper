@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -86,7 +85,8 @@ const JobsPage = () => {
     if (!user) return;
     
     try {
-      // Format the job data for Supabase
+      // Format the job data for Supabase but preserve the date exactly as entered
+      // by the user, without any timezone manipulations
       const { data, error } = await supabase
         .from('jobs')
         .insert([{
@@ -97,7 +97,7 @@ const JobsPage = () => {
           remote: newJob.remote,
           description: newJob.description,
           status: newJob.status,
-          application_date: newJob.appliedDate,
+          application_date: newJob.appliedDate, // Preserve exactly as entered
         }])
         .select();
         
@@ -111,7 +111,7 @@ const JobsPage = () => {
           company: data[0].company,
           location: data[0].location || '',
           remote: data[0].remote || false,
-          appliedDate: data[0].application_date,
+          appliedDate: data[0].application_date, // Keep the exact date format
           status: data[0].status as JobStatus,
           description: data[0].description || '',
           notes: '',
@@ -142,7 +142,7 @@ const JobsPage = () => {
           location: updatedJob.location,
           description: updatedJob.description,
           status: updatedJob.status,
-          application_date: updatedJob.appliedDate,
+          application_date: updatedJob.appliedDate, // Keep exact date format
         })
         .eq('id', updatedJob.id);
         

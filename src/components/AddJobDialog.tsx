@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog,
@@ -30,7 +29,7 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
     remote: false,
     description: "",
     notes: "",
-    appliedDate: new Date().toISOString().split("T")[0],
+    appliedDate: new Date().toISOString().split('T')[0],
   });
 
   const resetForm = () => {
@@ -41,7 +40,7 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
       remote: false,
       description: "",
       notes: "",
-      appliedDate: new Date().toISOString().split("T")[0],
+      appliedDate: new Date().toISOString().split('T')[0],
     });
   };
 
@@ -67,13 +66,10 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
       return;
     }
     
-    // Ensure we use the exact date provided by the user
-    const appliedDate = newJob.appliedDate;
-    
-    // Create new job
+    // Create new job - preserve the exact date string from the input
+    // without any timezone conversion or manipulation
     const jobToAdd: Job = {
       ...newJob,
-      appliedDate: appliedDate,
       id: crypto.randomUUID(),
       status: "applied",
       updatedAt: new Date().toISOString(),

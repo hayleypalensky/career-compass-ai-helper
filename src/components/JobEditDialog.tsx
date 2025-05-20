@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   Dialog,
@@ -26,6 +25,11 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
   const { toast } = useToast();
   const [editedJob, setEditedJob] = useState<Job>({ ...job });
 
+  // Reset the form when the job prop changes
+  useState(() => {
+    setEditedJob({ ...job });
+  });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditedJob((prev) => ({ ...prev, [name]: value }));
@@ -48,19 +52,12 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
       return;
     }
     
-    // Handle date to ensure it's saved correctly without timezone issues
-    let updatedJob = { ...editedJob };
-    
-    // If the date has changed, make sure it's saved properly
-    if (editedJob.appliedDate) {
-      // For date inputs, we get YYYY-MM-DD format
-      // Ensure we preserve the user's selected date exactly as entered
-      const dateComponents = editedJob.appliedDate.split('T')[0];
-      updatedJob.appliedDate = dateComponents;
-    }
-    
-    // Update the job with the current timestamp
-    updatedJob.updatedAt = new Date().toISOString();
+    // Preserve the exact input date format without timezone conversion
+    // Simply pass through the date as a string
+    const updatedJob = { 
+      ...editedJob,
+      updatedAt: new Date().toISOString(),
+    };
     
     onSave(updatedJob);
     onOpenChange(false);

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -55,14 +54,9 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
       }
     }
     
-    // Ensure the date is preserved correctly without timezone issues
-    const appliedDate = formData.appliedDate;
-    
-    // Create new job
+    // Create new job - preserve the date string exactly as entered
     const newJob: Job = {
       ...formData,
-      // Use the exact date string provided by the user
-      appliedDate: appliedDate,
       id: crypto.randomUUID(),
       status: "applied",
       updatedAt: new Date().toISOString(),
