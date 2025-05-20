@@ -5,10 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
-// Import our new components
+// Import our components
 import JobsHeader from "@/components/jobs/JobsHeader";
-import ActiveJobsTab from "@/components/jobs/ActiveJobsTab";
-import ArchivedJobsTab from "@/components/jobs/ArchivedJobsTab";
+import StatusJobsTab from "@/components/jobs/StatusJobsTab";
 import { useJobManagement } from "@/hooks/useJobManagement";
 import { useJobsFiltering } from "@/hooks/useJobsFiltering";
 
@@ -33,13 +32,9 @@ const JobsPage = () => {
     setSearchTerm,
     activeTab,
     setActiveTab,
-    sortedJobs,
-    groupedActiveJobs
-  } = useJobsFiltering(jobs);
+    filteredJobs
+  } = useJobsFiltering(jobs, "applied"); // Default to "applied" tab
   
-  // Status groups in specific order
-  const statusOrder = ["interviewing", "applied", "offered", "rejected"];
-
   // Load view preference from localStorage
   useEffect(() => {
     const savedViewMode = localStorage.getItem("jobsViewMode") as "list" | "grid" | null;
@@ -66,6 +61,9 @@ const JobsPage = () => {
     );
   }
 
+  // Filter jobs based on the current tab
+  const tabJobs = filteredJobs.filter(job => job.status === activeTab);
+
   return (
     <div className="space-y-8">
       <h1>Job Applications Tracker</h1>
@@ -79,14 +77,17 @@ const JobsPage = () => {
         />
         
         <Tabs 
-          defaultValue="active" 
+          defaultValue="applied" 
           value={activeTab}
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <div className="flex items-center justify-between mb-4">
-            <TabsList>
-              <TabsTrigger value="active">Active</TabsTrigger>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <TabsList className="flex-wrap">
+              <TabsTrigger value="applied">Applied</TabsTrigger>
+              <TabsTrigger value="interviewing">Interviewing</TabsTrigger>
+              <TabsTrigger value="offered">Offered</TabsTrigger>
+              <TabsTrigger value="rejected">Rejected</TabsTrigger>
               <TabsTrigger value="archived">Archived</TabsTrigger>
             </TabsList>
             
@@ -101,24 +102,58 @@ const JobsPage = () => {
             </div>
           </div>
           
-          <TabsContent value="active" className="space-y-8">
-            <ActiveJobsTab 
-              groupedJobs={groupedActiveJobs}
-              statusOrder={statusOrder}
+          <TabsContent value="applied">
+            <StatusJobsTab 
+              jobs={tabJobs}
               viewMode={viewMode}
               onUpdate={updateJob}
               onArchive={archiveJob}
               onDelete={deleteJob}
+              status="applied"
             />
           </TabsContent>
           
-          <TabsContent value="archived" className="space-y-4">
-            <ArchivedJobsTab 
-              jobs={sortedJobs}
+          <TabsContent value="interviewing">
+            <StatusJobsTab 
+              jobs={tabJobs}
               viewMode={viewMode}
               onUpdate={updateJob}
               onArchive={archiveJob}
               onDelete={deleteJob}
+              status="interviewing"
+            />
+          </TabsContent>
+          
+          <TabsContent value="offered">
+            <StatusJobsTab 
+              jobs={tabJobs}
+              viewMode={viewMode}
+              onUpdate={updateJob}
+              onArchive={archiveJob}
+              onDelete={deleteJob}
+              status="offered"
+            />
+          </TabsContent>
+          
+          <TabsContent value="rejected">
+            <StatusJobsTab 
+              jobs={tabJobs}
+              viewMode={viewMode}
+              onUpdate={updateJob}
+              onArchive={archiveJob}
+              onDelete={deleteJob}
+              status="rejected"
+            />
+          </TabsContent>
+          
+          <TabsContent value="archived">
+            <StatusJobsTab 
+              jobs={tabJobs}
+              viewMode={viewMode}
+              onUpdate={updateJob}
+              onArchive={archiveJob}
+              onDelete={deleteJob}
+              status="archived"
             />
           </TabsContent>
         </Tabs>
