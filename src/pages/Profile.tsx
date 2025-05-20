@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInfoForm from "@/components/PersonalInfoForm";
@@ -62,12 +61,27 @@ const ProfilePage = () => {
         }
 
         if (profileData && profileData.resume_data) {
-          setProfile(profileData.resume_data as ProfileType);
+          // Safely cast the JSON data to our ProfileType
+          const resumeData = profileData.resume_data as any;
+          
+          // Validate that the data has the required structure before setting it
+          if (resumeData && 
+              typeof resumeData === 'object' && 
+              'personalInfo' in resumeData && 
+              'experiences' in resumeData &&
+              'skills' in resumeData &&
+              'education' in resumeData) {
+            setProfile(resumeData as ProfileType);
+          } else {
+            console.error("Resume data from Supabase doesn't match expected format");
+          }
         } else if (loadedProfile) {
           // If we have a local profile but not in Supabase, save it
           await supabase
             .from('profiles')
-            .update({ resume_data: loadedProfile })
+            .update({ 
+              resume_data: loadedProfile as unknown as Record<string, unknown>
+            })
             .eq('id', user.id);
         }
       } catch (error) {
@@ -92,10 +106,12 @@ const ProfilePage = () => {
       localStorage.setItem("resumeProfile", JSON.stringify(profile));
       
       try {
-        // Save to Supabase
+        // Save to Supabase - convert profile to a format compatible with Json type
         const { error } = await supabase
           .from('profiles')
-          .update({ resume_data: profile })
+          .update({ 
+            resume_data: profile as unknown as Record<string, unknown>
+          })
           .eq('id', user.id);
           
         if (error) throw error;
@@ -158,7 +174,9 @@ const ProfilePage = () => {
         try {
           const { error } = await supabase
             .from('profiles')
-            .update({ resume_data: newProfile })
+            .update({ 
+              resume_data: newProfile as unknown as Record<string, unknown>
+            })
             .eq('id', user.id);
             
           if (error) throw error;
