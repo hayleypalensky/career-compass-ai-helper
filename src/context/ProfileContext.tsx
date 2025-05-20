@@ -2,7 +2,7 @@
 import { createContext, useContext, ReactNode } from "react";
 import { Profile, PersonalInfo } from "@/types/profile";
 import { useProfileManager } from "@/hooks/useProfileManager";
-import { defaultProfile } from "@/hooks/useProfileData";
+import { defaultProfile } from "@/utils/profileDefaults";
 
 interface ProfileContextType {
   profile: Profile;

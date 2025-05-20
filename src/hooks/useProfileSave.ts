@@ -1,9 +1,9 @@
-
 import { useEffect } from "react";
 import { supabase, Json } from "@/integrations/supabase/client";
 import { Profile, PersonalInfo } from "@/types/profile";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/use-toast";
+import { defaultProfile } from "@/utils/profileDefaults";
 
 export function useProfileSave(profile: Profile, setProfile: React.Dispatch<React.SetStateAction<Profile>>) {
   const { user } = useAuth();
@@ -99,6 +99,3 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
     handleResetProfile
   };
 }
-
-// Import the default profile from useProfileData to avoid duplication
-import { defaultProfile } from "./useProfileData";

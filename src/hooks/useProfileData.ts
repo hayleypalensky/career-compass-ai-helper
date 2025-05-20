@@ -1,24 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { supabase, Json } from "@/integrations/supabase/client";
 import { Profile } from "@/types/profile";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
+import { defaultProfile } from "@/utils/profileDefaults";
 
-// Default profile state
-export const defaultProfile: Profile = {
-  personalInfo: {
-    name: "",
-    email: "",
-    phone: "",
-    location: "",
-    summary: "",
-    website: "",
-  },
-  experiences: [],
-  skills: [],
-  education: [],
-};
+// Re-export defaultProfile so other files that import from useProfileData can still work
+export { defaultProfile };
 
 export function useProfileData() {
   const { user } = useAuth();
