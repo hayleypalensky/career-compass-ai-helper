@@ -123,8 +123,8 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
-    // Set 0.25 inch margins
-    const margin = 0.25;
+    // Set smaller margins for more content space (0.15 inches)
+    const margin = 0.15;
     const availableWidth = 8.5 - (margin * 2);
     const availableHeight = 11 - (margin * 2);
     

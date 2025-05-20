@@ -1,4 +1,3 @@
-
 /**
  * PDF export styling utilities
  * Contains styling constants and helper functions for PDF export
@@ -12,7 +11,7 @@ export const applyPdfStyles = (element: HTMLElement): void => {
   // Set container styles
   element.className = "pdf-export-container";
   element.style.width = "794px"; // A4 width in pixels (slightly adjusted)
-  element.style.padding = "20px"; // Reduced padding to fit more content
+  element.style.padding = "15px"; // Reduced padding for smaller margins
   element.style.backgroundColor = "white";
   element.style.position = "absolute";
   element.style.left = "-9999px"; // Position off-screen
@@ -42,7 +41,7 @@ export const getPdfStylesContent = (): string => {
       -webkit-font-smoothing: antialiased !important;
       -moz-osx-font-smoothing: grayscale !important;
       letter-spacing: -0.01em !important;
-      padding: 0.25in !important; /* 0.25 inch padding on all sides */
+      padding: 0.15in !important; /* 0.15 inch padding on all sides */
     }
     .pdf-export-container h2 {
       font-size: 18px !important; /* Reduced size */
@@ -78,29 +77,29 @@ export const getPdfStylesContent = (): string => {
       margin: 0 3px !important; /* Reduced margin */
     }
     .pdf-export-container .resume-content-inner {
-      padding: 15px !important; /* Reduced padding */
+      padding: 10px !important; /* Further reduced padding */
       margin: 0 !important;
     }
     /* Ensure the skills wrapper is visible */
     .pdf-export-container .skills-wrapper {
       display: block !important;
       width: 100% !important;
-      margin-bottom: 10px !important; /* Reduced margin */
+      margin-bottom: 8px !important; /* Reduced margin */
       visibility: visible !important;
       opacity: 1 !important;
     }
     /* Reduce spacing between items */
     .pdf-export-container .mb-6 {
-      margin-bottom: 12px !important; /* Reduced margin */
+      margin-bottom: 10px !important; /* Reduced margin */
     }
     .pdf-export-container .mb-3 {
-      margin-bottom: 6px !important; /* Reduced margin */
+      margin-bottom: 5px !important; /* Reduced margin */
     }
     .pdf-export-container .space-y-4 {
-      margin-top: 8px !important; /* Reduced margin */
+      margin-top: 6px !important; /* Reduced margin */
     }
     .pdf-export-container .space-y-3 {
-      margin-top: 6px !important; /* Reduced margin */
+      margin-top: 4px !important; /* Reduced margin */
     }
     /* Make text more readable but compact */
     .pdf-export-container .text-xs {
@@ -123,13 +122,13 @@ export const getPdfStylesContent = (): string => {
     }
     /* Reduce bullet point spacing */
     .pdf-export-container li {
-      margin-bottom: 2px !important;
-      line-height: 1.3 !important;
+      margin-bottom: 1px !important; /* Further reduced margin */
+      line-height: 1.25 !important; /* Even tighter line height */
     }
     /* Make sure section headers have proper spacing */
     .pdf-export-container .section-header {
-      margin-top: 10px !important;
-      margin-bottom: 4px !important;
+      margin-top: 8px !important; /* Reduced margin */
+      margin-bottom: 3px !important; /* Reduced margin */
     }
     /* Ensure content wrapping */
     .pdf-export-container .experience-item {
@@ -148,7 +147,7 @@ export const styleSkillsForPdf = (element: HTMLElement): void => {
   if (skillsSection) {
     (skillsSection as HTMLElement).style.display = 'block';
     (skillsSection as HTMLElement).style.width = '100%';
-    (skillsSection as HTMLElement).style.marginBottom = '10px'; // Reduced margin
+    (skillsSection as HTMLElement).style.marginBottom = '8px'; /* Reduced margin */
     (skillsSection as HTMLElement).style.visibility = 'visible';
     (skillsSection as HTMLElement).style.opacity = '1';
     (skillsSection as HTMLElement).style.position = 'relative';
@@ -161,11 +160,11 @@ export const styleSkillsForPdf = (element: HTMLElement): void => {
     (item as HTMLElement).style.display = 'inline-flex';
     (item as HTMLElement).style.alignItems = 'center';
     (item as HTMLElement).style.justifyContent = 'center';
-    (item as HTMLElement).style.height = '24px'; // Reduced height
-    (item as HTMLElement).style.fontSize = '11px'; // Smaller font
+    (item as HTMLElement).style.height = '22px'; /* Even smaller height */
+    (item as HTMLElement).style.fontSize = '11px'; /* Smaller font */
     (item as HTMLElement).style.fontWeight = '500';
-    (item as HTMLElement).style.margin = '2px'; // Reduced margin
-    (item as HTMLElement).style.padding = '0 8px'; // Reduced padding
+    (item as HTMLElement).style.margin = '1px'; /* Reduced margin */
+    (item as HTMLElement).style.padding = '0 6px'; /* Reduced padding */
   });
   
   // Style skills container for PDF export
@@ -174,21 +173,21 @@ export const styleSkillsForPdf = (element: HTMLElement): void => {
     skillsContainer.classList.add('skills-container');
     (skillsContainer as HTMLElement).style.display = 'flex';
     (skillsContainer as HTMLElement).style.flexWrap = 'wrap';
-    (skillsContainer as HTMLElement).style.gap = '3px'; // Reduced gap
-    (skillsContainer as HTMLElement).style.margin = '0 3px'; // Reduced margin
+    (skillsContainer as HTMLElement).style.gap = '2px'; /* Reduced gap */
+    (skillsContainer as HTMLElement).style.margin = '0 2px'; /* Reduced margin */
   }
   
   // Reduce spacing in the resume
   const marginElements = element.querySelectorAll('.mb-6');
   marginElements.forEach(el => {
-    (el as HTMLElement).style.marginBottom = '12px'; // Reduced margin
+    (el as HTMLElement).style.marginBottom = '10px'; /* Reduced margin */
   });
   
   // Add class for margins
   const resumeInner = element.querySelector('.resume-inner');
   if (resumeInner) {
     resumeInner.classList.add('resume-content-inner');
-    (resumeInner as HTMLElement).style.padding = '15px'; // Reduced padding
+    (resumeInner as HTMLElement).style.padding = '10px'; /* Reduced padding */
     (resumeInner as HTMLElement).style.margin = '0';
   }
   
@@ -196,15 +195,15 @@ export const styleSkillsForPdf = (element: HTMLElement): void => {
   const sectionHeaders = element.querySelectorAll('h2');
   sectionHeaders.forEach(header => {
     header.classList.add('section-header');
-    (header as HTMLElement).style.marginBottom = '4px'; // Reduced margin
-    (header as HTMLElement).style.marginTop = '10px'; // Reduced margin
+    (header as HTMLElement).style.marginBottom = '3px'; /* Reduced margin */
+    (header as HTMLElement).style.marginTop = '8px'; /* Reduced margin */
   });
   
   // Reduce bullet point spacing
   const bulletPoints = element.querySelectorAll('li, .bullet-point');
   bulletPoints.forEach(bullet => {
-    (bullet as HTMLElement).style.marginBottom = '2px'; // Very small margin
-    (bullet as HTMLElement).style.lineHeight = '1.3'; // Tight line height
+    (bullet as HTMLElement).style.marginBottom = '1px'; /* Reduced margin */
+    (bullet as HTMLElement).style.lineHeight = '1.25'; /* Tighter line height */
   });
   
   // Improve text rendering for all text elements
