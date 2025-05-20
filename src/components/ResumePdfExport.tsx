@@ -23,7 +23,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
     try {
       toast({
         title: "Generating PDF",
-        description: "Please wait while we create a high-quality PDF...",
+        description: "Please wait while we create a high-quality PDF with equal margins...",
       });
       
       await generatePdf({
@@ -34,7 +34,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       
       toast({
         title: "PDF exported successfully",
-        description: "Your tailored resume has been exported as a high-quality PDF",
+        description: "Your tailored resume has been exported with equal 0.15-inch margins on all sides",
       });
     } catch (error) {
       console.error("PDF export error:", error);

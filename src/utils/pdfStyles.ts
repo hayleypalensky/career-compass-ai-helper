@@ -1,3 +1,4 @@
+
 /**
  * PDF export styling utilities
  * Contains styling constants and helper functions for PDF export
@@ -11,7 +12,7 @@ export const applyPdfStyles = (element: HTMLElement): void => {
   // Set container styles
   element.className = "pdf-export-container";
   element.style.width = "794px"; // A4 width in pixels (slightly adjusted)
-  element.style.padding = "15px"; // Reduced padding for smaller margins
+  element.style.padding = "0"; // Remove padding to allow precise margin control in PDF
   element.style.backgroundColor = "white";
   element.style.position = "absolute";
   element.style.left = "-9999px"; // Position off-screen
@@ -41,7 +42,7 @@ export const getPdfStylesContent = (): string => {
       -webkit-font-smoothing: antialiased !important;
       -moz-osx-font-smoothing: grayscale !important;
       letter-spacing: -0.01em !important;
-      padding: 0.15in !important; /* 0.15 inch padding on all sides */
+      padding: 0 !important; /* No padding to allow precise PDF margins */
     }
     .pdf-export-container h2 {
       font-size: 18px !important; /* Reduced size */
@@ -77,7 +78,7 @@ export const getPdfStylesContent = (): string => {
       margin: 0 3px !important; /* Reduced margin */
     }
     .pdf-export-container .resume-content-inner {
-      padding: 10px !important; /* Further reduced padding */
+      padding: 0 !important; /* No padding for more content space */
       margin: 0 !important;
     }
     /* Ensure the skills wrapper is visible */
@@ -133,6 +134,10 @@ export const getPdfStylesContent = (): string => {
     /* Ensure content wrapping */
     .pdf-export-container .experience-item {
       page-break-inside: avoid !important;
+    }
+    /* Adjust resume inner spacing */
+    .pdf-export-container .p-8 {
+      padding: 10px !important; /* Reduced padding for more content space */
     }
   `;
 };

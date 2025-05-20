@@ -123,7 +123,7 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
-    // Set smaller margins for more content space (0.15 inches)
+    // Set consistent 0.15 inch margins on all sides
     const margin = 0.15;
     const availableWidth = 8.5 - (margin * 2);
     const availableHeight = 11 - (margin * 2);
@@ -145,8 +145,8 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     }
     
     // Center the image on the page
-    const xOffset = margin + (availableWidth - scaledWidth) / 2;
-    const yOffset = margin + (availableHeight - scaledHeight) / 2;
+    const xOffset = margin;
+    const yOffset = margin;
     
     // Add the image to the PDF
     pdf.addImage(imgData, "PNG", xOffset, yOffset, scaledWidth, scaledHeight);
