@@ -26,6 +26,7 @@ export const renderEducationSection = (
     yPos = layoutData.topBottomMargIn + 0.2;
   }
   
+  // Section header
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
@@ -36,7 +37,10 @@ export const renderEducationSection = (
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += 0.15;
+  yPos += 0.2;
+  
+  // Consistent spacing between education items
+  const itemSpacing = 0.2;
   
   for (const edu of profile.education) {
     pdf.setFontSize(11);
@@ -64,10 +68,10 @@ export const renderEducationSection = (
       pdf.setFontSize(9);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * 0.15) + 0.1;
+      yPos += (splitDesc.length * 0.13); // Slightly reduced line height
     }
     
-    yPos += 0.15;
+    yPos += itemSpacing;
   }
   
   return yPos;

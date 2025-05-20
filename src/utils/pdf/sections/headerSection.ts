@@ -16,11 +16,11 @@ export const renderHeaderSection = (
   let { yPos } = layoutData;
   
   // Add header - Name with theme color
-  pdf.setFontSize(20);
+  pdf.setFontSize(16); // Reduced from 20 for consistency
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
-  yPos += 0.25;
+  yPos += 0.22; // Consistent spacing
   
   // Add horizontal line with theme color
   pdf.setDrawColor(themeColors.border);
@@ -43,7 +43,7 @@ export const renderHeaderSection = (
   const contactText = contactItems.join(" | ");
   const splitContactInfo = pdf.splitTextToSize(contactText, pageWidth);
   pdf.text(splitContactInfo, leftMargin, yPos);
-  yPos += (splitContactInfo.length * 0.15) + 0.25;
+  yPos += (splitContactInfo.length * 0.15) + 0.22;
   
   // Add summary if available
   if (profile.personalInfo.summary) {
@@ -51,14 +51,14 @@ export const renderHeaderSection = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(themeColors.heading);
     pdf.text("Professional Summary", leftMargin, yPos);
-    yPos += 0.2;
+    yPos += 0.18; // Consistent spacing
     
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
     const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
     pdf.text(splitSummary, leftMargin, yPos);
-    yPos += (splitSummary.length * 0.15) + 0.3;
+    yPos += (splitSummary.length * 0.13) + 0.25; // Consistent line spacing
   }
   
   return yPos;
