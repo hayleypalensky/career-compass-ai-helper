@@ -2,7 +2,7 @@
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { applyPdfStyles, getPdfStylesContent, styleSkillsForPdf } from "./pdfStyles";
+import { applyPdfStyles, getPdfStylesContent, styleSkillsForPdf } from "@/utils/pdf";
 
 export interface PdfExportOptions {
   profile: Profile;
