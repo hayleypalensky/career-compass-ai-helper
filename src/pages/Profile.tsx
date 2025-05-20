@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PersonalInfoForm from "@/components/PersonalInfoForm";
@@ -80,7 +81,7 @@ const ProfilePage = () => {
           await supabase
             .from('profiles')
             .update({ 
-              resume_data: loadedProfile as unknown as Record<string, unknown>
+              resume_data: loadedProfile as unknown as Json
             })
             .eq('id', user.id);
         }
@@ -110,7 +111,7 @@ const ProfilePage = () => {
         const { error } = await supabase
           .from('profiles')
           .update({ 
-            resume_data: profile as unknown as Record<string, unknown>
+            resume_data: profile as unknown as Json
           })
           .eq('id', user.id);
           
@@ -175,7 +176,7 @@ const ProfilePage = () => {
           const { error } = await supabase
             .from('profiles')
             .update({ 
-              resume_data: newProfile as unknown as Record<string, unknown>
+              resume_data: newProfile as unknown as Json
             })
             .eq('id', user.id);
             
