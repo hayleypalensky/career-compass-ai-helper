@@ -84,10 +84,12 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
         // Apply font improvements for better text clarity
         const allTextElements = element.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6, li');
         allTextElements.forEach(el => {
-          (el as HTMLElement).style.fontSmoothing = 'antialiased';
-          (el as HTMLElement).style.webkitFontSmoothing = 'antialiased';
-          (el as HTMLElement).style.textRendering = 'optimizeLegibility';
-          (el as HTMLElement).style.letterSpacing = '-0.01em';
+          const element = el as HTMLElement;
+          // Use setProperty method for non-standard CSS properties
+          element.style.setProperty('text-rendering', 'optimizeLegibility');
+          element.style.setProperty('-webkit-font-smoothing', 'antialiased');
+          element.style.setProperty('-moz-osx-font-smoothing', 'grayscale');
+          element.style.letterSpacing = '-0.01em';
         });
       }
     });
