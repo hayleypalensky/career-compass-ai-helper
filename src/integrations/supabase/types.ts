@@ -17,6 +17,7 @@ export type Database = {
           description: string | null
           id: string
           location: string | null
+          notes: string | null
           position: string
           remote: boolean | null
           status: string
@@ -30,6 +31,7 @@ export type Database = {
           description?: string | null
           id?: string
           location?: string | null
+          notes?: string | null
           position: string
           remote?: boolean | null
           status: string
@@ -43,6 +45,7 @@ export type Database = {
           description?: string | null
           id?: string
           location?: string | null
+          notes?: string | null
           position?: string
           remote?: boolean | null
           status?: string
