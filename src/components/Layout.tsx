@@ -1,10 +1,11 @@
 
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
 const Layout = () => {
   const { user, signOut } = useAuth();
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -19,10 +20,28 @@ const Layout = () => {
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
-                  <Link to="/profile" className="text-navy-600 hover:text-navy-800">Profile</Link>
-                  <Link to="/tailor" className="text-navy-600 hover:text-navy-800">Tailor Resume</Link>
-                  <Link to="/jobs" className="text-navy-600 hover:text-navy-800">Job Tracker</Link>
-                  <Link to="/help" className="text-navy-600 hover:text-navy-800">
+                  <Link 
+                    to="/profile" 
+                    className={`${location.pathname === '/profile' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
+                  >
+                    Profile
+                  </Link>
+                  <Link 
+                    to="/tailor" 
+                    className={`${location.pathname === '/tailor' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
+                  >
+                    Tailor Resume
+                  </Link>
+                  <Link 
+                    to="/jobs" 
+                    className={`${location.pathname === '/jobs' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
+                  >
+                    Job Tracker
+                  </Link>
+                  <Link 
+                    to="/help" 
+                    className={`${location.pathname === '/help' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
+                  >
                     Help
                   </Link>
                   <Button 
