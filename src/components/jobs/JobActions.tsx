@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Job, JobStatus } from "@/types/job";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, Undo } from "lucide-react";
 
 interface JobActionsProps {
   job: Job;
@@ -36,11 +36,24 @@ const JobActions = ({
 
       {job.status !== "archived" && (
         <>
+          {/* Show "Return to Applied" button if the job is not in applied status */}
+          {job.status !== "applied" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-blue-500 text-blue-600 hover:bg-blue-50 flex items-center gap-1"
+              onClick={() => onStatusChange("applied")}
+            >
+              <Undo className="h-3 w-3" />
+              Return to Applied
+            </Button>
+          )}
+          
           {job.status !== "interviewing" && (
             <Button
               variant="outline"
               size="sm"
-              className="border-gold-500 text-gold-600 hover:bg-gold-50"
+              className="border-amber-500 text-amber-600 hover:bg-amber-50"
               onClick={() => onStatusChange("interviewing")}
             >
               Mark Interviewing
@@ -85,7 +98,9 @@ const JobActions = ({
           variant="outline"
           size="sm"
           onClick={() => onStatusChange("applied")}
+          className="flex items-center gap-1"
         >
+          <Undo className="h-3 w-3" />
           Unarchive
         </Button>
       )}

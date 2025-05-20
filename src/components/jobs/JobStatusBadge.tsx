@@ -10,17 +10,17 @@ const JobStatusBadge = ({ status }: JobStatusBadgeProps) => {
   const getStatusColor = (status: JobStatus) => {
     switch (status) {
       case "applied":
-        return "bg-blue-500";
+        return "bg-blue-500 hover:bg-blue-600";
       case "interviewing":
-        return "bg-gold-500";
+        return "bg-amber-500 hover:bg-amber-600";
       case "offered":
-        return "bg-green-500";
+        return "bg-green-500 hover:bg-green-600";
       case "rejected":
-        return "bg-gray-500";
+        return "bg-red-500 hover:bg-red-600";
       case "archived":
-        return "bg-gray-400";
+        return "bg-gray-500 hover:bg-gray-600";
       default:
-        return "bg-gray-500";
+        return "bg-gray-500 hover:bg-gray-600";
     }
   };
 
