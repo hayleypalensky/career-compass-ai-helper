@@ -1,8 +1,11 @@
 
+import { Loader2 } from "lucide-react";
+
 const JobsLoading = () => {
   return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy-600"></div>
+    <div className="flex flex-col justify-center items-center h-64">
+      <Loader2 className="h-12 w-12 animate-spin text-navy-600" />
+      <p className="mt-4 text-gray-500">Loading your job applications...</p>
     </div>
   );
 };
