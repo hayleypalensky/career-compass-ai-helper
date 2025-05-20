@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,11 +54,24 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
     }
   };
 
+  // Modified formatDate function to properly handle the date string
   const formatDate = (dateString: string) => {
+    // If the date string is in YYYY-MM-DD format (from form inputs)
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      // Parse the date without timezone concerns
+      const [year, month, day] = dateString.split('-').map(Number);
+      return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+    
+    // Fallback to standard date parsing for other formats
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
-      year: "numeric",
       day: "numeric",
+      year: "numeric",
     });
   };
 
