@@ -123,10 +123,12 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
-    // Set consistent 0.15 inch margins on all sides
-    const margin = 0.15;
-    const availableWidth = 8.5 - (margin * 2);
-    const availableHeight = 11 - (margin * 2);
+    // Set different margins for sides vs top/bottom
+    const sideMargIn = 0.15;
+    const topBottomMargIn = 0.075; // Half of the side margin
+    
+    const availableWidth = 8.5 - (sideMargIn * 2);
+    const availableHeight = 11 - (topBottomMargIn * 2);
     
     // Calculate scaling to fit content to page with margins
     const contentAspectRatio = canvas.width / canvas.height;
@@ -145,8 +147,8 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     }
     
     // Center the image on the page
-    const xOffset = margin;
-    const yOffset = margin;
+    const xOffset = sideMargIn;
+    const yOffset = topBottomMargIn;
     
     // Add the image to the PDF
     pdf.addImage(imgData, "PNG", xOffset, yOffset, scaledWidth, scaledHeight);

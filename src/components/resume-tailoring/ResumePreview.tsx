@@ -30,7 +30,7 @@ const ResumePreview = ({
 
   return (
     <div className="space-y-4" id="resume-content">
-      <div className="p-6 border rounded-lg bg-white max-w-[800px] mx-auto resume-inner">
+      <div className="p-4 border rounded-lg bg-white max-w-[800px] mx-auto resume-inner">
         {/* Header Section */}
         <ResumeHeader personalInfo={profile.personalInfo} theme={theme} />
         
