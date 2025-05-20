@@ -109,6 +109,17 @@ const SummaryEditor = ({
       }
     });
     
+    // Look for potential role indicators to avoid default engineering roles
+    const roleIndicators = ["manager", "coordinator", "director", "assistant", "specialist", 
+                           "consultant", "analyst", "designer", "developer", "administrator", 
+                           "associate", "representative", "agent", "advisor"];
+    
+    roleIndicators.forEach(role => {
+      if (summary.toLowerCase().includes(role.toLowerCase())) {
+        keyPhrases.push(role);
+      }
+    });
+    
     return keyPhrases;
   };
   
@@ -175,15 +186,57 @@ const SummaryEditor = ({
       ? Math.max(...yearsMatches as number[]) 
       : (yearsFromCurrentSummary || 3); // Use years from current summary or default to 3
     
-    // Identify the role/position from job description
-    const roleKeywords = ["engineer", "developer", "designer", "manager", "lead", 
-                        "specialist", "director", "coordinator", "analyst"];
+    // IMPROVED: Identify the role/position from job description and existing summary
+    // This is the part where we need to be more careful to prevent defaulting to "engineer"
+    const roleKeywords = [
+      "engineer", "developer", "designer", "manager", "lead", "specialist", 
+      "director", "coordinator", "analyst", "assistant", "consultant", 
+      "administrator", "associate", "representative", "agent", "advisor"
+    ];
     
-    let roleTitle = "professional";
-    for (const keyword of roleKeywords) {
-      if (requirements.some(req => req.toLowerCase().includes(keyword))) {
-        roleTitle = keyword;
-        break;
+    // First check if any role keyword is in the existing summary
+    const summaryRoles = currentSummaryPhrases.filter(phrase => 
+      roleKeywords.some(role => phrase.toLowerCase().includes(role))
+    );
+    
+    // Then check job description for role keywords
+    const jobRoles = requirements.filter(req => 
+      roleKeywords.some(role => req.toLowerCase().includes(role))
+    );
+    
+    // Then check job description title if available
+    const jobTitleMatch = jobDescription.match(/job title:?\s*([^.,:;\n]+)/i) || 
+                          jobDescription.match(/position:?\s*([^.,:;\n]+)/i) ||
+                          jobDescription.match(/role:?\s*([^.,:;\n]+)/i);
+    
+    let roleTitle = "professional"; // Default to generic "professional"
+    
+    // Try to find role from existing summary first (most accurate)
+    if (summaryRoles.length > 0) {
+      for (const keyword of roleKeywords) {
+        if (summaryRoles.some(role => role.toLowerCase().includes(keyword))) {
+          roleTitle = keyword;
+          break;
+        }
+      }
+    } 
+    // Then try job description requirements
+    else if (jobRoles.length > 0) {
+      for (const keyword of roleKeywords) {
+        if (jobRoles.some(role => role.toLowerCase().includes(keyword))) {
+          roleTitle = keyword;
+          break;
+        }
+      }
+    }
+    // Then try job title if found
+    else if (jobTitleMatch && jobTitleMatch[1]) {
+      const jobTitle = jobTitleMatch[1].toLowerCase();
+      for (const keyword of roleKeywords) {
+        if (jobTitle.includes(keyword)) {
+          roleTitle = keyword;
+          break;
+        }
       }
     }
     
@@ -215,7 +268,7 @@ const SummaryEditor = ({
     switch (style) {
       case "concise":
         return `Results-driven ${roleTitle} with ${requestedYears}+ years of experience${industryContext} specializing in ${
-          relevantSkillsForSummary.slice(0, 3).join(", ")
+          relevantSkillsForSummary.slice(0, 3).join(", ") || "relevant industry skills"
         }${relevantSkillsForSummary.length > 3 ? ", and other technologies" : ""
         }. Committed to delivering high-quality solutions that meet business objectives and exceed client expectations${personalQualityText}. Proven track record of ${
           getRandomAccomplishment(roleTitle)
@@ -225,13 +278,13 @@ const SummaryEditor = ({
         
       case "achievement":
         return `Accomplished ${roleTitle} with ${requestedYears}+ years of extensive experience${industryContext} in ${
-          relevantSkillsForSummary.slice(0, 2).join(" and ")
+          relevantSkillsForSummary.slice(0, 2).join(" and ") || "key industry domains"
         }. Successfully delivered ${
           getRandomDeliverable(roleTitle)
         } resulting in ${
           getRandomOutcome()
         }${personalQualityText}. Demonstrated expertise in ${
-          relevantSkillsForSummary.slice(2, 4).join(", ")
+          relevantSkillsForSummary.slice(2, 4).join(", ") || "critical business areas"
         } with a strong focus on ${
           getRandomFocus()
         }. Passionate about ${
@@ -240,7 +293,7 @@ const SummaryEditor = ({
         
       case "collaborative":
         return `Collaborative ${roleTitle} who thrives in team environments, bringing ${requestedYears}+ years of hands-on experience${industryContext} with ${
-          relevantSkillsForSummary.slice(0, 3).join(", ")
+          relevantSkillsForSummary.slice(0, 3).join(", ") || "industry-relevant capabilities"
         } to deliver impactful solutions. Excels at ${
           getRandomStrength(roleTitle)
         }${personalQualityText} while focusing on ${
@@ -251,7 +304,7 @@ const SummaryEditor = ({
         
       default:
         return `Experienced ${roleTitle} with a proven track record${industryContext} in ${
-          relevantSkillsForSummary.slice(0, 3).join(", ")
+          relevantSkillsForSummary.slice(0, 3).join(", ") || "key professional areas"
         } and a passion for delivering high-quality solutions. Demonstrated ability to ${
           getRandomStrength(roleTitle)
         }${personalQualityText} and drive results through ${
@@ -260,113 +313,285 @@ const SummaryEditor = ({
     }
   };
   
-  // Helper functions to generate random professional phrases
+  // IMPROVED: Helper functions to generate role-appropriate phrases
   const getRandomAccomplishment = (role: string): string => {
-    const accomplishments = [
-      "successfully delivering complex projects on time and within budget",
-      "optimizing processes that resulted in significant efficiency improvements",
-      "leading cross-functional teams to achieve business objectives",
-      "designing innovative solutions for challenging business problems"
+    // Define role-specific accomplishments
+    const roleSpecificAccomplishments: Record<string, string[]> = {
+      "engineer": [
+        "successfully delivering complex technical projects on time and within budget",
+        "optimizing systems that resulted in significant performance improvements",
+        "developing innovative solutions to challenging technical problems",
+        "implementing scalable architectures that support business growth"
+      ],
+      "manager": [
+        "leading teams to exceed targets and objectives",
+        "developing and implementing strategic initiatives that improved operational efficiency",
+        "building high-performing teams that consistently delivered results",
+        "successfully managing complex projects with multiple stakeholders"
+      ],
+      "analyst": [
+        "delivering data-driven insights that informed key business decisions",
+        "identifying trends and patterns that led to process improvements",
+        "creating comprehensive reports that guided strategic planning",
+        "developing analytical frameworks that enhanced decision-making"
+      ],
+      "designer": [
+        "creating user-centered designs that enhanced user experience",
+        "developing design systems that improved brand consistency",
+        "crafting visual solutions that effectively communicated complex information",
+        "leading design projects that received positive client feedback"
+      ],
+      "consultant": [
+        "providing strategic recommendations that improved client outcomes",
+        "identifying and resolving business challenges for diverse clients",
+        "delivering transformational solutions across multiple industries",
+        "developing frameworks that enhanced client capabilities"
+      ]
+    };
+    
+    // Default accomplishments for any role
+    const genericAccomplishments = [
+      "successfully delivering projects that met or exceeded expectations",
+      "optimizing processes that resulted in significant improvements",
+      "demonstrating adaptability across diverse challenges and environments",
+      "consistently meeting objectives while maintaining high quality standards"
     ];
-    return accomplishments[Math.floor(Math.random() * accomplishments.length)];
+    
+    // Check if we have specific accomplishments for this role
+    for (const [roleKey, accomplishments] of Object.entries(roleSpecificAccomplishments)) {
+      if (role.toLowerCase().includes(roleKey)) {
+        return accomplishments[Math.floor(Math.random() * accomplishments.length)];
+      }
+    }
+    
+    // Fall back to generic accomplishments
+    return genericAccomplishments[Math.floor(Math.random() * genericAccomplishments.length)];
   };
   
+  // IMPROVED: Generate role-appropriate strengths
   const getRandomStrength = (role: string): string => {
-    if (role.includes("engineer") || role.includes("developer")) {
-      const techStrengths = [
+    // Define role-specific strengths
+    const roleSpecificStrengths: Record<string, string[]> = {
+      "engineer": [
         "architecting scalable solutions",
         "optimizing code performance",
         "implementing efficient algorithms",
         "translating business requirements into technical specifications"
-      ];
-      return techStrengths[Math.floor(Math.random() * techStrengths.length)];
-    } else if (role.includes("manager") || role.includes("lead")) {
-      const leadershipStrengths = [
+      ],
+      "manager": [
         "building and mentoring high-performing teams",
         "managing complex projects with multiple stakeholders",
         "developing strategic roadmaps aligned with business goals",
         "fostering collaboration across departments"
-      ];
-      return leadershipStrengths[Math.floor(Math.random() * leadershipStrengths.length)];
-    } else {
-      const generalStrengths = [
-        "problem-solving in fast-paced environments",
-        "adapting quickly to changing priorities",
-        "communicating complex concepts to diverse audiences",
-        "balancing quality and efficiency in deliverables"
-      ];
-      return generalStrengths[Math.floor(Math.random() * generalStrengths.length)];
+      ],
+      "analyst": [
+        "extracting meaningful insights from complex data",
+        "creating comprehensive reports and visualizations",
+        "identifying trends and patterns to solve business problems",
+        "translating data into actionable recommendations"
+      ],
+      "designer": [
+        "creating user-centered experiences",
+        "developing design systems that ensure consistency",
+        "translating requirements into visual solutions",
+        "balancing aesthetics with functionality"
+      ],
+      "consultant": [
+        "diagnosing complex business challenges",
+        "developing tailored solutions for diverse clients",
+        "delivering recommendations that drive measurable results",
+        "building strong client relationships"
+      ],
+      "coordinator": [
+        "managing complex schedules and priorities",
+        "ensuring smooth communication between stakeholders",
+        "organizing resources efficiently",
+        "anticipating needs and resolving issues proactively"
+      ],
+      "specialist": [
+        "applying deep domain knowledge to solve complex problems",
+        "staying current with industry developments",
+        "developing specialized solutions",
+        "serving as a subject matter expert"
+      ]
+    };
+    
+    // General strengths for any role
+    const generalStrengths = [
+      "problem-solving in fast-paced environments",
+      "adapting quickly to changing priorities",
+      "communicating complex concepts to diverse audiences",
+      "balancing quality and efficiency in deliverables",
+      "building collaborative relationships with stakeholders"
+    ];
+    
+    // Check if we have specific strengths for this role
+    for (const [roleKey, strengths] of Object.entries(roleSpecificStrengths)) {
+      if (role.toLowerCase().includes(roleKey)) {
+        return strengths[Math.floor(Math.random() * strengths.length)];
+      }
     }
+    
+    // Fall back to general strengths
+    return generalStrengths[Math.floor(Math.random() * generalStrengths.length)];
   };
   
+  // IMPROVED: Generate role-appropriate deliverables
   const getRandomDeliverable = (role: string): string => {
-    if (role.includes("engineer") || role.includes("developer")) {
-      const techDeliverables = [
+    // Define role-specific deliverables
+    const roleSpecificDeliverables: Record<string, string[]> = {
+      "engineer": [
         "enterprise-level applications",
         "scalable cloud infrastructure",
         "performance optimization solutions",
         "integrated data pipelines"
-      ];
-      return techDeliverables[Math.floor(Math.random() * techDeliverables.length)];
-    } else if (role.includes("designer")) {
-      const designDeliverables = [
+      ],
+      "designer": [
         "user-centered interfaces",
         "comprehensive design systems",
         "interactive prototypes",
         "brand identity packages"
-      ];
-      return designDeliverables[Math.floor(Math.random() * designDeliverables.length)];
-    } else {
-      const generalDeliverables = [
-        "strategic initiatives",
-        "business process improvements",
-        "cross-functional projects",
-        "customer-focused solutions"
-      ];
-      return generalDeliverables[Math.floor(Math.random() * generalDeliverables.length)];
+      ],
+      "manager": [
+        "strategic business initiatives",
+        "team restructuring programs",
+        "process improvement frameworks",
+        "cross-departmental collaboration projects"
+      ],
+      "analyst": [
+        "comprehensive business reports",
+        "data-driven recommendations",
+        "analytical frameworks",
+        "performance tracking systems"
+      ],
+      "consultant": [
+        "strategic transformation initiatives",
+        "client-specific solutions",
+        "advisory frameworks",
+        "implementation roadmaps"
+      ],
+      "specialist": [
+        "specialized solutions",
+        "expert recommendations",
+        "domain-specific frameworks",
+        "targeted improvement initiatives"
+      ],
+      "coordinator": [
+        "streamlined operational processes",
+        "cross-functional programs",
+        "communication frameworks",
+        "resource optimization plans"
+      ]
+    };
+    
+    // General deliverables for any role
+    const generalDeliverables = [
+      "strategic initiatives",
+      "business process improvements",
+      "cross-functional projects",
+      "customer-focused solutions",
+      "efficiency-enhancing programs"
+    ];
+    
+    // Check if we have specific deliverables for this role
+    for (const [roleKey, deliverables] of Object.entries(roleSpecificDeliverables)) {
+      if (role.toLowerCase().includes(roleKey)) {
+        return deliverables[Math.floor(Math.random() * deliverables.length)];
+      }
     }
+    
+    // Fall back to general deliverables
+    return generalDeliverables[Math.floor(Math.random() * generalDeliverables.length)];
   };
   
+  // Helper function to generate random outcomes
   const getRandomOutcome = (): string => {
     const outcomes = [
       "increased efficiency by 30%",
       "reduced costs while improving quality",
       "accelerated time-to-market by 25%",
       "enhanced customer satisfaction scores",
-      "streamlined operations across departments"
+      "streamlined operations across departments",
+      "improved team collaboration and productivity",
+      "strengthened client relationships and retention"
     ];
     return outcomes[Math.floor(Math.random() * outcomes.length)];
   };
   
+  // Helper function to generate random focus areas
   const getRandomFocus = (): string => {
     const focuses = [
-      "delivering exceptional user experiences",
+      "delivering exceptional results",
       "continuous improvement and innovation",
       "quality and performance optimization",
       "solving complex business challenges",
-      "sustainable and maintainable solutions"
+      "sustainable and practical solutions",
+      "client satisfaction and relationship building",
+      "effective communication and collaboration"
     ];
     return focuses[Math.floor(Math.random() * focuses.length)];
   };
   
+  // IMPROVED: Generate role-appropriate passions
   const getRandomPassion = (role: string): string => {
-    const passions = [
-      "leveraging technology to solve real-world problems",
+    // Define role-specific passions
+    const roleSpecificPassions: Record<string, string[]> = {
+      "engineer": [
+        "leveraging technology to solve real-world problems",
+        "building scalable and maintainable systems",
+        "exploring new technologies and approaches",
+        "optimizing performance and efficiency"
+      ],
+      "manager": [
+        "developing team members' skills and careers",
+        "aligning operational activities with strategic goals",
+        "building high-performing, collaborative teams",
+        "driving organizational transformation"
+      ],
+      "analyst": [
+        "uncovering insights from complex data",
+        "translating data into strategic recommendations",
+        "optimizing decision-making processes",
+        "identifying opportunities for improvement through analysis"
+      ],
+      "designer": [
+        "creating intuitive and impactful user experiences",
+        "solving complex problems through design thinking",
+        "balancing aesthetics with functionality",
+        "advocating for user-centered approaches"
+      ]
+    };
+    
+    // General passions for any role
+    const generalPassions = [
+      "delivering high-quality work that makes a difference",
       "continuous learning and professional development",
-      "creating intuitive and efficient solutions",
-      "collaborating with diverse teams to drive innovation",
-      "staying at the forefront of industry developments"
+      "collaborating with diverse teams to achieve common goals",
+      "staying at the forefront of industry developments",
+      "finding innovative solutions to business challenges"
     ];
-    return passions[Math.floor(Math.random() * passions.length)];
+    
+    // Check if we have specific passions for this role
+    for (const [roleKey, passions] of Object.entries(roleSpecificPassions)) {
+      if (role.toLowerCase().includes(roleKey)) {
+        return passions[Math.floor(Math.random() * passions.length)];
+      }
+    }
+    
+    // Fall back to general passions
+    return generalPassions[Math.floor(Math.random() * generalPassions.length)];
   };
   
+  // Helper function to generate random approaches
   const getRandomApproach = (): string => {
     const approaches = [
-      "agile methodologies",
+      "methodical planning and execution",
       "data-driven decision making",
       "innovative problem-solving",
       "collaborative teamwork",
-      "attention to detail and quality"
+      "attention to detail and quality",
+      "effective communication and transparency",
+      "adaptability and continuous improvement"
     ];
     return approaches[Math.floor(Math.random() * approaches.length)];
   };
