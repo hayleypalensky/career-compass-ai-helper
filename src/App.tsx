@@ -14,53 +14,56 @@ import HelpPage from "./pages/HelpPage";
 import NotFound from "./pages/NotFound";
 import RequireAuth from "./components/RequireAuth";
 import { AuthProvider } from "./context/AuthContext";
+import { StrictMode } from "react";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route element={<Layout />}>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/help" element={
-                <RequireAuth>
-                  <HelpPage />
-                </RequireAuth>
-              } />
-              <Route path="/profile" element={
-                <RequireAuth>
-                  <Profile />
-                </RequireAuth>
-              } />
-              <Route path="/tailor" element={
-                <RequireAuth>
-                  <TailorPage />
-                </RequireAuth>
-              } />
-              <Route path="/jobs" element={
-                <RequireAuth>
-                  <JobsPage />
-                </RequireAuth>
-              } />
-              {/* Redirect from /auth to /jobs if already authenticated */}
-              <Route path="/auth/redirect" element={
-                <RequireAuth>
-                  <Navigate to="/jobs" replace />
-                </RequireAuth>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Index />} />
+                <Route path="auth" element={<AuthPage />} />
+                <Route path="help" element={
+                  <RequireAuth>
+                    <HelpPage />
+                  </RequireAuth>
+                } />
+                <Route path="profile" element={
+                  <RequireAuth>
+                    <Profile />
+                  </RequireAuth>
+                } />
+                <Route path="tailor" element={
+                  <RequireAuth>
+                    <TailorPage />
+                  </RequireAuth>
+                } />
+                <Route path="jobs" element={
+                  <RequireAuth>
+                    <JobsPage />
+                  </RequireAuth>
+                } />
+                {/* Redirect from /auth to /jobs if already authenticated */}
+                <Route path="auth/redirect" element={
+                  <RequireAuth>
+                    <Navigate to="/jobs" replace />
+                  </RequireAuth>
+                } />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </StrictMode>
 );
 
 export default App;

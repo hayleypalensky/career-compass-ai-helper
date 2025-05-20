@@ -1,11 +1,25 @@
 
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 const Layout = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Debug the current route
+  useEffect(() => {
+    console.log("Current pathname:", location.pathname);
+  }, [location.pathname]);
+
+  // Handle navigation explicitly to ensure routes work
+  const handleNavigation = (path: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log("Navigating to:", path);
+    navigate(path);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -22,24 +36,28 @@ const Layout = () => {
                 <>
                   <Link 
                     to="/profile" 
+                    onClick={handleNavigation('/profile')}
                     className={`${location.pathname === '/profile' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
                   >
                     Profile
                   </Link>
                   <Link 
                     to="/tailor" 
+                    onClick={handleNavigation('/tailor')}
                     className={`${location.pathname === '/tailor' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
                   >
                     Tailor Resume
                   </Link>
                   <Link 
                     to="/jobs" 
+                    onClick={handleNavigation('/jobs')}
                     className={`${location.pathname === '/jobs' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
                   >
                     Job Tracker
                   </Link>
                   <Link 
                     to="/help" 
+                    onClick={handleNavigation('/help')}
                     className={`${location.pathname === '/help' ? 'text-navy-800 font-medium' : 'text-navy-600 hover:text-navy-800'}`}
                   >
                     Help
