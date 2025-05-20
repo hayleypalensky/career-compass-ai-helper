@@ -41,7 +41,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
           appliedDate: job.application_date,
           status: job.status as JobStatus,
           description: job.description || '',
-          notes: '',
+          notes: job.notes || '', // Ensure notes are included here
           updatedAt: job.updated_at
         }));
         
@@ -74,6 +74,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
           location: newJob.location,
           remote: newJob.remote,
           description: newJob.description,
+          notes: newJob.notes, // Include notes here
           status: newJob.status,
           application_date: newJob.appliedDate, // Preserve exactly as entered
         }])
@@ -92,7 +93,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
           appliedDate: data[0].application_date, // Keep the exact date format
           status: data[0].status as JobStatus,
           description: data[0].description || '',
-          notes: '',
+          notes: data[0].notes || '', // Include notes here
           updatedAt: data[0].updated_at
         };
         
@@ -118,9 +119,12 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
           position: updatedJob.title,
           company: updatedJob.company,
           location: updatedJob.location,
+          remote: updatedJob.remote, // Add remote field
           description: updatedJob.description,
+          notes: updatedJob.notes, // Add notes field
           status: updatedJob.status,
           application_date: updatedJob.appliedDate, // Keep exact date format
+          updated_at: updatedJob.updatedAt, // Include the updated timestamp
         })
         .eq('id', updatedJob.id);
         
