@@ -56,9 +56,9 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
   const { tempContainer, styleElement } = prepareElementForExport(resumeElement);
 
   try {
-    // Generate PDF from the temporary container with optimized settings
+    // Generate PDF from the temporary container with optimized settings for higher quality
     const canvas = await html2canvas(tempContainer, {
-      scale: 1.5, // Reduced from 2 to 1.5 for smaller file size
+      scale: 2.5, // Increased from 1.5 to 2.5 for higher resolution
       logging: false,
       backgroundColor: "#ffffff",
       useCORS: true,
@@ -80,10 +80,18 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
           (item as HTMLElement).style.visibility = 'visible';
           (item as HTMLElement).style.opacity = '1';
         });
+        
+        // Remove asterisks from added skills in PDF export
+        const addedSkills = element.querySelectorAll('.skill-item');
+        addedSkills.forEach(item => {
+          item.textContent = item.textContent?.replace('*', '');
+        });
       }
     });
     
-    const imgData = canvas.toDataURL("image/jpeg", 0.85); // Use JPEG with 85% quality instead of PNG
+    // Use higher quality settings for image data
+    const imgData = canvas.toDataURL("image/png", 1.0); // Use PNG with 100% quality instead of JPEG
+    
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
@@ -98,10 +106,10 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     
     // If the image height exceeds A4 height, scale it down
     if (imgHeight > pageHeight) {
-      const scale = pageHeight / imgHeight * 0.95; // 95% of max height to add some margin
-      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth * scale, imgHeight * scale);
+      const scale = pageHeight / imgHeight * 0.98; // 98% of max height to add some margin
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth * scale, imgHeight * scale);
     } else {
-      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
     }
     
     // Generate filename with job info if available
