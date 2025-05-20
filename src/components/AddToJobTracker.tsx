@@ -165,6 +165,8 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
                 onChange={handleChange}
                 placeholder="Brief summary of the job description..."
                 rows={3}
+                className="font-mono text-sm"
+                style={{ whiteSpace: "pre-wrap" }}
               />
             </div>
 
@@ -177,6 +179,8 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
                 onChange={handleChange}
                 placeholder="Any notes about the application, contacts, etc."
                 rows={2}
+                className="font-mono text-sm"
+                style={{ whiteSpace: "pre-wrap" }}
               />
             </div>
 

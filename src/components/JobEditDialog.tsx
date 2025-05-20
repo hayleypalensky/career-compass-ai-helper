@@ -140,6 +140,8 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
               value={editedJob.description || ""}
               onChange={handleInputChange}
               rows={4}
+              className="font-mono text-sm"
+              style={{ whiteSpace: "pre-wrap" }}
             />
           </div>
           
@@ -151,6 +153,8 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
               value={editedJob.notes || ""}
               onChange={handleInputChange}
               rows={3}
+              className="font-mono text-sm"
+              style={{ whiteSpace: "pre-wrap" }}
             />
           </div>
           

@@ -170,8 +170,10 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
                 name="description"
                 value={newJob.description || ""}
                 onChange={handleInputChange}
-                placeholder="Brief summary of the job description..."
+                placeholder="Paste the full job description here..."
                 rows={4}
+                className="font-mono text-sm"
+                style={{ whiteSpace: "pre-wrap" }}
               />
             </div>
             
@@ -184,6 +186,8 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
                 onChange={handleInputChange}
                 placeholder="Any notes about the application, contacts, etc."
                 rows={3}
+                className="font-mono text-sm"
+                style={{ whiteSpace: "pre-wrap" }}
               />
             </div>
             

@@ -91,15 +91,17 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
               {job.description && (
                 <div>
                   <h4 className="font-medium mb-1">Description</h4>
-                  <p className="text-gray-700 text-sm">{job.description}</p>
+                  <div className="text-gray-700 text-sm whitespace-pre-wrap">
+                    {job.description}
+                  </div>
                 </div>
               )}
 
               <div>
                 <h4 className="font-medium mb-1">Notes</h4>
-                <p className="text-gray-700 text-sm">
+                <div className="text-gray-700 text-sm whitespace-pre-wrap">
                   {job.notes || "No notes added yet."}
-                </p>
+                </div>
               </div>
 
               <div>
