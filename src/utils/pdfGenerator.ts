@@ -58,7 +58,7 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
   try {
     // Generate PDF from the temporary container with optimized settings for higher quality
     const canvas = await html2canvas(tempContainer, {
-      scale: 2.5, // Increased from 1.5 to 2.5 for higher resolution
+      scale: 4, // Increased from 2.5 to 4 for much higher resolution
       logging: false,
       backgroundColor: "#ffffff",
       useCORS: true,
@@ -81,22 +81,26 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
           (item as HTMLElement).style.opacity = '1';
         });
         
-        // Remove asterisks from added skills in PDF export
-        const addedSkills = element.querySelectorAll('.skill-item');
-        addedSkills.forEach(item => {
-          item.textContent = item.textContent?.replace('*', '');
+        // Apply font improvements for better text clarity
+        const allTextElements = element.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6, li');
+        allTextElements.forEach(el => {
+          (el as HTMLElement).style.fontSmoothing = 'antialiased';
+          (el as HTMLElement).style.webkitFontSmoothing = 'antialiased';
+          (el as HTMLElement).style.textRendering = 'optimizeLegibility';
+          (el as HTMLElement).style.letterSpacing = '-0.01em';
         });
       }
     });
     
     // Use higher quality settings for image data
-    const imgData = canvas.toDataURL("image/png", 1.0); // Use PNG with 100% quality instead of JPEG
+    const imgData = canvas.toDataURL("image/png", 1.0); // Use PNG with 100% quality
     
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
-      compress: true, // Enable PDF compression
+      compress: false, // Disable compression for better quality
+      hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
     // Calculate dimensions to fit A4 page

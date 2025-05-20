@@ -21,6 +21,11 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
     setIsExporting(true);
     
     try {
+      toast({
+        title: "Generating PDF",
+        description: "Please wait while we create a high-quality PDF...",
+      });
+      
       await generatePdf({
         profile,
         jobTitle,
@@ -29,7 +34,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       
       toast({
         title: "PDF exported successfully",
-        description: "Your tailored resume has been exported as a PDF",
+        description: "Your tailored resume has been exported as a high-quality PDF",
       });
     } catch (error) {
       console.error("PDF export error:", error);
@@ -51,7 +56,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       className="flex items-center gap-2"
     >
       <FileText className="h-4 w-4" />
-      {isExporting ? "Exporting..." : "Export to PDF"}
+      {isExporting ? "Generating PDF..." : "Export to PDF"}
     </Button>
   );
 };
