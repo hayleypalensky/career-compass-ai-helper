@@ -14,22 +14,28 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
     const saveProfile = async () => {
       if (!user) return;
       
-      // Save to localStorage as a backup
-      localStorage.setItem("resumeProfile", JSON.stringify(profile));
-      
       try {
+        // Save to localStorage as a backup
+        console.log("Saving profile to localStorage:", profile);
+        localStorage.setItem("resumeProfile", JSON.stringify(profile));
+        
+        // Log the experiences to verify they're being saved correctly
+        console.log("Experiences to save:", profile.experiences);
+        
         // Save to Supabase - convert profile to a format compatible with Json type
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .update({ 
             resume_data: profile as unknown as Json
           })
-          .eq('id', user.id);
+          .eq('id', user.id)
+          .select();
           
         if (error) {
           console.error("Error saving profile to Supabase:", error);
           if (error.code === 'PGRST116') {
             // Profile doesn't exist, create it
+            console.log("Profile doesn't exist, creating new profile");
             const { error: insertError } = await supabase
               .from('profiles')
               .insert({ 
@@ -40,23 +46,50 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
               
             if (insertError) {
               console.error("Error creating profile:", insertError);
+              toast({
+                title: "Error saving profile",
+                description: "There was an error saving your profile. Please try again.",
+                variant: "destructive",
+              });
+            } else {
+              console.log("Successfully created new profile");
             }
+          } else {
+            toast({
+              title: "Error saving profile",
+              description: "There was an error saving your profile. Please try again.",
+              variant: "destructive",
+            });
           }
+        } else {
+          console.log("Profile saved successfully to Supabase");
         }
       } catch (error) {
-        console.error("Error saving profile to Supabase:", error);
-        // We don't show a toast here to avoid spamming the user on every change
+        console.error("Exception saving profile to Supabase:", error);
+        toast({
+          title: "Error saving profile",
+          description: "There was an unexpected error saving your profile. Please try again.",
+          variant: "destructive",
+        });
       }
     };
 
-    saveProfile();
+    // Add a small debounce to avoid too many save operations
+    const timeoutId = setTimeout(() => {
+      saveProfile();
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
   }, [profile, user]);
 
   const handlePersonalInfoSave = (data: PersonalInfo) => {
-    setProfile((prev) => ({
-      ...prev,
-      personalInfo: data,
-    }));
+    setProfile((prev) => {
+      console.log("Saving personal info:", data);
+      return {
+        ...prev,
+        personalInfo: data,
+      };
+    });
     
     toast({
       title: "Personal information saved",
@@ -65,10 +98,20 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
   };
 
   const handleExperiencesSave = (experiences: any[]) => {
+    console.log("Saving experiences:", experiences);
     setProfile((prev) => ({
       ...prev,
       experiences,
     }));
+    
+    // Verify that the state is updated correctly
+    setTimeout(() => {
+      const savedProfile = localStorage.getItem("resumeProfile");
+      if (savedProfile) {
+        const parsedProfile = JSON.parse(savedProfile);
+        console.log("Verified experiences in localStorage:", parsedProfile.experiences);
+      }
+    }, 100);
     
     toast({
       title: "Experiences saved",
@@ -77,6 +120,7 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
   };
 
   const handleSkillsSave = (skills: any[]) => {
+    console.log("Saving skills:", skills);
     setProfile((prev) => ({
       ...prev,
       skills,
@@ -89,6 +133,7 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
   };
 
   const handleEducationSave = (education: any[]) => {
+    console.log("Saving education:", education);
     setProfile((prev) => ({
       ...prev,
       education,
