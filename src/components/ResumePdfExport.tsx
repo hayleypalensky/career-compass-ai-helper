@@ -22,8 +22,8 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
     
     try {
       toast({
-        title: "Generating PDF",
-        description: "Please wait while we create a high-quality PDF with reduced margins...",
+        title: "Generating ATS-friendly PDF",
+        description: "Please wait while we create a text-based PDF that's optimized for applicant tracking systems...",
       });
       
       await generatePdf({
@@ -33,8 +33,8 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       });
       
       toast({
-        title: "PDF exported successfully",
-        description: "Your tailored resume has been exported with 0.15-inch side margins and 0.075-inch top/bottom margins",
+        title: "ATS-friendly PDF exported successfully",
+        description: "Your resume has been exported as a text-based PDF that's optimized for applicant tracking systems.",
       });
     } catch (error) {
       console.error("PDF export error:", error);
@@ -56,7 +56,7 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       className="flex items-center gap-2"
     >
       <FileText className="h-4 w-4" />
-      {isExporting ? "Generating PDF..." : "Export to PDF"}
+      {isExporting ? "Generating PDF..." : "Export ATS-friendly PDF"}
     </Button>
   );
 };

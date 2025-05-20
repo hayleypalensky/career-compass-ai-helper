@@ -1,8 +1,7 @@
 
-import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { applyPdfStyles, getPdfStylesContent, styleSkillsForPdf } from "@/utils/pdf";
+import { FONT_FAMILY, FONT_SIZES, LINE_HEIGHTS } from "@/utils/pdf/constants";
 
 export interface PdfExportOptions {
   profile: Profile;
@@ -11,162 +10,211 @@ export interface PdfExportOptions {
 }
 
 /**
- * Prepares the DOM element for PDF export
- * @param resumeElement The original resume element
- * @returns A temporary container with the cloned content
- */
-export const prepareElementForExport = (resumeElement: HTMLElement): { 
-  tempContainer: HTMLElement; 
-  styleElement: HTMLStyleElement;
-} => {
-  // Create a temporary clone with proper styling for PDF
-  const tempContainer = document.createElement("div");
-  applyPdfStyles(tempContainer);
-  
-  // Add specific styles for PDF export to ensure proper layout
-  const styleElement = document.createElement('style');
-  styleElement.textContent = getPdfStylesContent();
-  document.head.appendChild(styleElement);
-  
-  // Clone the resume content
-  const cloneContent = resumeElement.cloneNode(true) as HTMLElement;
-  
-  // Apply styles to ensure skills are visible in the PDF
-  styleSkillsForPdf(cloneContent);
-  
-  tempContainer.appendChild(cloneContent);
-  document.body.appendChild(tempContainer);
-
-  return { tempContainer, styleElement };
-};
-
-/**
- * Generates a PDF file from the resume element
+ * Generates an ATS-friendly PDF file from the resume data
  * @param options The PDF export options
  * @returns A promise that resolves when the PDF is generated
  */
 export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
   const { profile, jobTitle, companyName } = options;
-  const resumeElement = document.getElementById("resume-content");
   
-  if (!resumeElement) {
-    throw new Error("Could not find resume content to export");
-  }
-
-  const { tempContainer, styleElement } = prepareElementForExport(resumeElement);
-
   try {
-    // Generate PDF from the temporary container with optimized settings for higher quality
-    const canvas = await html2canvas(tempContainer, {
-      scale: 3, // Adjusted from 4 to 3 to better fit on a page
-      logging: false,
-      backgroundColor: "#ffffff",
-      useCORS: true,
-      allowTaint: true,
-      imageTimeout: 0, // No timeout
-      onclone: function(clonedDoc, element) {
-        // Additional manipulation on the cloned document
-        const skillsWrapper = element.querySelector('.skills-wrapper');
-        if (skillsWrapper) {
-          (skillsWrapper as HTMLElement).style.display = 'block';
-          (skillsWrapper as HTMLElement).style.visibility = 'visible';
-          (skillsWrapper as HTMLElement).style.opacity = '1';
-        }
-        
-        // Make sure all skill items are visible
-        const skillItems = element.querySelectorAll('.skill-item');
-        skillItems.forEach(item => {
-          (item as HTMLElement).style.display = 'inline-flex';
-          (item as HTMLElement).style.visibility = 'visible';
-          (item as HTMLElement).style.opacity = '1';
-        });
-        
-        // Apply font improvements for better text clarity
-        const allTextElements = element.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6, li');
-        allTextElements.forEach(el => {
-          const element = el as HTMLElement;
-          // Use setProperty method for non-standard CSS properties
-          element.style.setProperty('text-rendering', 'optimizeLegibility');
-          element.style.setProperty('-webkit-font-smoothing', 'antialiased');
-          element.style.setProperty('-moz-osx-font-smoothing', 'grayscale');
-          element.style.letterSpacing = '-0.01em';
-        });
-        
-        // Adjust spacing to fit better on one page
-        const sectionHeaders = element.querySelectorAll('h2');
-        sectionHeaders.forEach(header => {
-          (header as HTMLElement).style.marginBottom = '4px';
-        });
-        
-        const experienceItems = element.querySelectorAll('.experience-item');
-        experienceItems.forEach(item => {
-          (item as HTMLElement).style.marginBottom = '8px';
-        });
-        
-        const bulletPoints = element.querySelectorAll('.bullet-point');
-        bulletPoints.forEach(bullet => {
-          (bullet as HTMLElement).style.marginBottom = '2px';
-          (bullet as HTMLElement).style.lineHeight = '1.3';
-        });
-      }
-    });
-    
-    // Use higher quality settings for image data
-    const imgData = canvas.toDataURL("image/png", 1.0); // Use PNG with 100% quality
-    
     // Create PDF with US Letter dimensions (8.5 x 11 inches)
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "in",
       format: "letter", // US Letter (8.5 x 11 inches)
-      compress: false, // Disable compression for better quality
-      hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
-    // Set consistent margins on all sides at 0.15 inches
+    // Set consistent margins
     const sideMargIn = 0.15;
     const topBottomMargIn = 0.075; // Half of the side margin
+
+    // Set font for the entire document
+    pdf.setFont("helvetica");
     
-    const availableWidth = 8.5 - (sideMargIn * 2);
-    const availableHeight = 11 - (topBottomMargIn * 2);
+    // Current y position tracker
+    let yPos = topBottomMargIn + 0.2;
+    const leftMargin = sideMargIn;
+    const pageWidth = 8.5 - (sideMargIn * 2);
     
-    // Calculate scaling to fit content to page with margins
-    const contentAspectRatio = canvas.width / canvas.height;
-    const pageAspectRatio = availableWidth / availableHeight;
+    // Add header - Name
+    pdf.setFontSize(18);
+    pdf.setFont("helvetica", "bold");
+    pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
+    yPos += 0.3;
     
-    let scaledWidth, scaledHeight;
+    // Add contact information
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
     
-    if (contentAspectRatio > pageAspectRatio) {
-      // Content is wider than page (relative to height)
-      scaledWidth = availableWidth;
-      scaledHeight = availableWidth / contentAspectRatio;
-    } else {
-      // Content is taller than page (relative to width)
-      scaledHeight = availableHeight;
-      scaledWidth = availableHeight * contentAspectRatio;
+    let contactInfo = "";
+    if (profile.personalInfo.email) contactInfo += `Email: ${profile.personalInfo.email} `;
+    if (profile.personalInfo.phone) contactInfo += `Phone: ${profile.personalInfo.phone} `;
+    if (profile.personalInfo.website) contactInfo += `Website: ${profile.personalInfo.website} `;
+    if (profile.personalInfo.location) contactInfo += `Location: ${profile.personalInfo.location}`;
+    
+    // Split the contact info into multiple lines if needed
+    const splitContactInfo = pdf.splitTextToSize(contactInfo, pageWidth);
+    pdf.text(splitContactInfo, leftMargin, yPos);
+    yPos += (splitContactInfo.length * 0.15) + 0.2;
+    
+    // Add horizontal line
+    pdf.setLineWidth(0.01);
+    pdf.line(leftMargin, yPos, 8.5 - sideMargIn, yPos);
+    yPos += 0.15;
+    
+    // Add summary if available
+    if (profile.personalInfo.summary) {
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Professional Summary", leftMargin, yPos);
+      yPos += 0.2;
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
+      pdf.text(splitSummary, leftMargin, yPos);
+      yPos += (splitSummary.length * 0.15) + 0.2;
     }
     
-    // Add the image to the PDF - this is the important part for margin application
-    pdf.addImage(imgData, "PNG", sideMargIn, topBottomMargIn, scaledWidth, scaledHeight);
+    // Add experience section
+    if (profile.experience && profile.experience.length > 0) {
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Experience", leftMargin, yPos);
+      yPos += 0.2;
+      
+      for (const exp of profile.experience) {
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(exp.title, leftMargin, yPos);
+        
+        // Company and dates on the same line, with dates right-aligned
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        const dateText = `${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`;
+        const dateWidth = pdf.getTextWidth(dateText);
+        pdf.text(exp.company + (exp.location ? `, ${exp.location}` : ''), leftMargin, yPos + 0.15);
+        pdf.text(dateText, 8.5 - sideMargIn - dateWidth, yPos + 0.15);
+        
+        yPos += 0.3;
+        
+        // Add bullet points
+        pdf.setFontSize(9);
+        const bulletPoints = exp.bullets.filter(bullet => bullet.trim() !== "");
+        for (const bullet of bulletPoints) {
+          // Handle bullet points that may need multiple lines
+          const bulletText = "• " + bullet;
+          const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.1);
+          
+          // Check if we need to add a new page
+          if (yPos + (splitBullet.length * 0.15) > 11 - topBottomMargIn) {
+            pdf.addPage();
+            yPos = topBottomMargIn + 0.2;
+          }
+          
+          pdf.text(splitBullet, leftMargin + 0.1, yPos);
+          yPos += (splitBullet.length * 0.15) + 0.1;
+        }
+        
+        yPos += 0.1;
+      }
+    }
+    
+    // Check if we need a new page before education
+    if (yPos > 9) {
+      pdf.addPage();
+      yPos = topBottomMargIn + 0.2;
+    }
+    
+    // Add education section
+    if (profile.education && profile.education.length > 0) {
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Education", leftMargin, yPos);
+      yPos += 0.2;
+      
+      for (const edu of profile.education) {
+        pdf.setFontSize(11);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
+        
+        // School and dates on the same line
+        pdf.setFontSize(10);
+        pdf.setFont("helvetica", "normal");
+        const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
+        const dateWidth = pdf.getTextWidth(dateText);
+        pdf.text(edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : ''), leftMargin, yPos + 0.15);
+        pdf.text(dateText, 8.5 - sideMargIn - dateWidth, yPos + 0.15);
+        
+        yPos += 0.3;
+        
+        if (edu.description) {
+          pdf.setFontSize(9);
+          const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
+          pdf.text(splitDesc, leftMargin, yPos);
+          yPos += (splitDesc.length * 0.15) + 0.1;
+        }
+        
+        yPos += 0.1;
+      }
+    }
+    
+    // Check if we need a new page before skills
+    if (yPos > 9.5) {
+      pdf.addPage();
+      yPos = topBottomMargIn + 0.2;
+    }
+    
+    // Add skills section
+    if (profile.skills && profile.skills.length > 0) {
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Skills", leftMargin, yPos);
+      yPos += 0.2;
+      
+      pdf.setFontSize(10);
+      pdf.setFont("helvetica", "normal");
+      
+      // Group skills together as a comma-separated list
+      const skillNames = profile.skills.map(skill => skill.name);
+      const skillsText = skillNames.join(", ");
+      
+      const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
+      pdf.text(splitSkills, leftMargin, yPos);
+      yPos += (splitSkills.length * 0.15) + 0.2;
+    }
+    
+    // Set PDF metadata
+    pdf.setProperties({
+      title: `ATS-Friendly Resume for ${profile.personalInfo.name || 'Candidate'}`,
+      subject: `Tailored resume for ${jobTitle || 'position'} at ${companyName || 'company'}`,
+      creator: 'Resume Builder',
+      keywords: 'resume, ats-friendly, job application'
+    });
     
     // Generate filename with job info if available
-    const filenameParts = ["tailored_resume"];
+    const filenameParts = ["ats_friendly_resume"];
     if (companyName) filenameParts.push(companyName.toLowerCase().replace(/\s+/g, "_"));
     if (jobTitle) filenameParts.push(jobTitle.toLowerCase().replace(/\s+/g, "_"));
-    
-    // Set PDF metadata to optimize file size
-    pdf.setProperties({
-      title: `Resume for ${profile.personalInfo.name || 'Candidate'}`,
-      subject: `Tailored resume for ${jobTitle || 'position'} at ${companyName || 'company'}`,
-      creator: 'Resume Builder'
-    });
     
     pdf.save(`${filenameParts.join("_")}.pdf`);
     
     return Promise.resolve();
-  } finally {
-    // Clean up
-    document.body.removeChild(tempContainer);
-    document.head.removeChild(styleElement);
+  } catch (error) {
+    console.error("PDF generation error:", error);
+    return Promise.reject(error);
+  }
+};
+
+/**
+ * Helper function to format dates for the resume
+ */
+const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  } catch (e) {
+    return dateString;
   }
 };
