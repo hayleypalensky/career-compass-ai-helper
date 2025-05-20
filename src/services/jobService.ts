@@ -86,7 +86,7 @@ export const updateJobById = async (jobId: string, job: Job) => {
       notes: job.notes,
       status: job.status,
       application_date: job.appliedDate,
-      updated_at: job.updatedAt,
+      updated_at: new Date().toISOString(),
     })
     .eq('id', jobId);
     

@@ -28,6 +28,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
     
     try {
       const loadedJobs = await fetchJobs(user.id);
+      console.log("Loaded jobs:", loadedJobs);
       setJobs(loadedJobs);
     } catch (error) {
       console.error('Error fetching jobs:', error);

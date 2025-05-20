@@ -28,7 +28,10 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
 
   // Reset the form when the job prop changes or dialog opens
   useEffect(() => {
-    setEditedJob({ ...job });
+    if (open) {
+      setEditedJob({ ...job });
+      console.log("Dialog opened with job:", job);
+    }
   }, [job, open]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
