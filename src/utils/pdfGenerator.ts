@@ -58,7 +58,7 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
   try {
     // Generate PDF from the temporary container with optimized settings for higher quality
     const canvas = await html2canvas(tempContainer, {
-      scale: 4, // Increased from 2.5 to 4 for much higher resolution
+      scale: 3, // Adjusted from 4 to 3 to better fit on a page
       logging: false,
       backgroundColor: "#ffffff",
       useCORS: true,
@@ -91,32 +91,65 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
           element.style.setProperty('-moz-osx-font-smoothing', 'grayscale');
           element.style.letterSpacing = '-0.01em';
         });
+        
+        // Adjust spacing to fit better on one page
+        const sectionHeaders = element.querySelectorAll('h2');
+        sectionHeaders.forEach(header => {
+          (header as HTMLElement).style.marginBottom = '4px';
+        });
+        
+        const experienceItems = element.querySelectorAll('.experience-item');
+        experienceItems.forEach(item => {
+          (item as HTMLElement).style.marginBottom = '8px';
+        });
+        
+        const bulletPoints = element.querySelectorAll('.bullet-point');
+        bulletPoints.forEach(bullet => {
+          (bullet as HTMLElement).style.marginBottom = '2px';
+          (bullet as HTMLElement).style.lineHeight = '1.3';
+        });
       }
     });
     
     // Use higher quality settings for image data
     const imgData = canvas.toDataURL("image/png", 1.0); // Use PNG with 100% quality
     
+    // Create PDF with US Letter dimensions (8.5 x 11 inches)
     const pdf = new jsPDF({
       orientation: "portrait",
-      unit: "mm",
-      format: "a4",
+      unit: "in",
+      format: "letter", // US Letter (8.5 x 11 inches)
       compress: false, // Disable compression for better quality
       hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
-    // Calculate dimensions to fit A4 page
-    const imgWidth = 210; // A4 width in mm (portrait)
-    const pageHeight = 297; // A4 height in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    // Set 0.25 inch margins
+    const margin = 0.25;
+    const availableWidth = 8.5 - (margin * 2);
+    const availableHeight = 11 - (margin * 2);
     
-    // If the image height exceeds A4 height, scale it down
-    if (imgHeight > pageHeight) {
-      const scale = pageHeight / imgHeight * 0.98; // 98% of max height to add some margin
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth * scale, imgHeight * scale);
+    // Calculate scaling to fit content to page with margins
+    const contentAspectRatio = canvas.width / canvas.height;
+    const pageAspectRatio = availableWidth / availableHeight;
+    
+    let scaledWidth, scaledHeight;
+    
+    if (contentAspectRatio > pageAspectRatio) {
+      // Content is wider than page (relative to height)
+      scaledWidth = availableWidth;
+      scaledHeight = availableWidth / contentAspectRatio;
     } else {
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      // Content is taller than page (relative to width)
+      scaledHeight = availableHeight;
+      scaledWidth = availableHeight * contentAspectRatio;
     }
+    
+    // Center the image on the page
+    const xOffset = margin + (availableWidth - scaledWidth) / 2;
+    const yOffset = margin + (availableHeight - scaledHeight) / 2;
+    
+    // Add the image to the PDF
+    pdf.addImage(imgData, "PNG", xOffset, yOffset, scaledWidth, scaledHeight);
     
     // Generate filename with job info if available
     const filenameParts = ["tailored_resume"];
