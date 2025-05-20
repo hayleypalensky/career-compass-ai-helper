@@ -1,17 +1,17 @@
 
 import { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Tabs } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
-import { Badge } from "@/components/ui/badge";
 
 // Import our components
 import JobsHeader from "@/components/jobs/JobsHeader";
-import StatusJobsTab from "@/components/jobs/StatusJobsTab";
 import { useJobManagement } from "@/hooks/useJobManagement";
 import { useJobsFiltering } from "@/hooks/useJobsFiltering";
 import { JobStatus } from "@/types/job";
+import JobStatusCounts from "@/components/jobs/JobStatusCounts";
+import JobSearchBar from "@/components/jobs/JobSearchBar";
+import JobTabsContent from "@/components/jobs/JobTabsContent";
+import JobsLoading from "@/components/jobs/JobsLoading";
 
 const JobsPage = () => {
   const { user } = useAuth();
@@ -34,8 +34,8 @@ const JobsPage = () => {
     setSearchTerm,
     activeTab,
     setActiveTab,
-    filteredJobs // This already contains the sorted jobs (newest first)
-  } = useJobsFiltering(jobs, "applied"); // Default to "applied" tab
+    filteredJobs
+  } = useJobsFiltering(jobs, "applied");
   
   // Load view preference from localStorage
   useEffect(() => {
@@ -56,11 +56,7 @@ const JobsPage = () => {
   }, [user]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy-600"></div>
-      </div>
-    );
+    return <JobsLoading />;
   }
 
   // Filter jobs based on the current tab
@@ -94,104 +90,25 @@ const JobsPage = () => {
           className="w-full"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <TabsList className="flex-wrap">
-              <TabsTrigger value="applied">
-                Applied
-                <Badge variant="secondary" className="ml-2 bg-slate-200">
-                  {statusCounts.applied}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="interviewing">
-                Interviewing
-                <Badge variant="secondary" className="ml-2 bg-slate-200">
-                  {statusCounts.interviewing}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="offered">
-                Offered
-                <Badge variant="secondary" className="ml-2 bg-slate-200">
-                  {statusCounts.offered}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="rejected">
-                Rejected
-                <Badge variant="secondary" className="ml-2 bg-slate-200">
-                  {statusCounts.rejected}
-                </Badge>
-              </TabsTrigger>
-              <TabsTrigger value="archived">
-                Archived
-                <Badge variant="secondary" className="ml-2 bg-slate-200">
-                  {statusCounts.archived}
-                </Badge>
-              </TabsTrigger>
-            </TabsList>
+            <JobStatusCounts 
+              statusCounts={statusCounts}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
             
-            <div className="relative max-w-sm">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search jobs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
-              />
-            </div>
+            <JobSearchBar 
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+            />
           </div>
           
-          <TabsContent value="applied">
-            <StatusJobsTab 
-              jobs={tabJobs}
-              viewMode={viewMode}
-              onUpdate={updateJob}
-              onArchive={archiveJob}
-              onDelete={deleteJob}
-              status="applied"
-            />
-          </TabsContent>
-          
-          <TabsContent value="interviewing">
-            <StatusJobsTab 
-              jobs={tabJobs}
-              viewMode={viewMode}
-              onUpdate={updateJob}
-              onArchive={archiveJob}
-              onDelete={deleteJob}
-              status="interviewing"
-            />
-          </TabsContent>
-          
-          <TabsContent value="offered">
-            <StatusJobsTab 
-              jobs={tabJobs}
-              viewMode={viewMode}
-              onUpdate={updateJob}
-              onArchive={archiveJob}
-              onDelete={deleteJob}
-              status="offered"
-            />
-          </TabsContent>
-          
-          <TabsContent value="rejected">
-            <StatusJobsTab 
-              jobs={tabJobs}
-              viewMode={viewMode}
-              onUpdate={updateJob}
-              onArchive={archiveJob}
-              onDelete={deleteJob}
-              status="rejected"
-            />
-          </TabsContent>
-          
-          <TabsContent value="archived">
-            <StatusJobsTab 
-              jobs={tabJobs}
-              viewMode={viewMode}
-              onUpdate={updateJob}
-              onArchive={archiveJob}
-              onDelete={deleteJob}
-              status="archived"
-            />
-          </TabsContent>
+          <JobTabsContent 
+            tabJobs={tabJobs}
+            viewMode={viewMode}
+            onUpdate={updateJob}
+            onArchive={archiveJob}
+            onDelete={deleteJob}
+          />
         </Tabs>
       </div>
     </div>
