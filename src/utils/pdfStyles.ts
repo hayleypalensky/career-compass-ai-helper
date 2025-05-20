@@ -42,7 +42,7 @@ export const getPdfStylesContent = (): string => {
       -webkit-font-smoothing: antialiased !important;
       -moz-osx-font-smoothing: grayscale !important;
       letter-spacing: -0.01em !important;
-      padding: 0.5in !important; /* 0.5 inch padding on all sides */
+      padding: 0.25in !important; /* 0.25 inch padding on all sides */
     }
     .pdf-export-container h2 {
       font-size: 18px !important; /* Reduced size */
