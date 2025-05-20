@@ -8,7 +8,7 @@ import EducationForm, { Education } from "@/components/EducationForm";
 import { Profile as ProfileType, PersonalInfo } from "@/types/profile";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, Json } from "@/integrations/supabase/client";
 
 const ProfilePage = () => {
   const { user } = useAuth();
