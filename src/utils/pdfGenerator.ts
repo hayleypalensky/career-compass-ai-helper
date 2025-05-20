@@ -123,7 +123,7 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       hotfixes: ["px_scaling"], // Apply hotfixes for better rendering
     });
     
-    // Set different margins for sides vs top/bottom
+    // Set consistent margins on all sides at 0.15 inches
     const sideMargIn = 0.15;
     const topBottomMargIn = 0.075; // Half of the side margin
     
@@ -146,12 +146,8 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       scaledWidth = availableHeight * contentAspectRatio;
     }
     
-    // Center the image on the page
-    const xOffset = sideMargIn;
-    const yOffset = topBottomMargIn;
-    
-    // Add the image to the PDF
-    pdf.addImage(imgData, "PNG", xOffset, yOffset, scaledWidth, scaledHeight);
+    // Add the image to the PDF - this is the important part for margin application
+    pdf.addImage(imgData, "PNG", sideMargIn, topBottomMargIn, scaledWidth, scaledHeight);
     
     // Generate filename with job info if available
     const filenameParts = ["tailored_resume"];
