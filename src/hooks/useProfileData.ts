@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase, Json } from "@/integrations/supabase/client";
 import { Profile } from "@/types/profile";
@@ -45,6 +46,25 @@ export function useProfileData() {
 
         if (error) {
           console.error("Error fetching profile:", error);
+          
+          // Check if the error is because the profile doesn't exist yet
+          if (error.code === 'PGRST116') {
+            // Profile doesn't exist, create it
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({ 
+                id: user.id, 
+                email: user.email,
+                resume_data: defaultProfile as unknown as Json
+              });
+              
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+            } else {
+              setProfile(defaultProfile);
+            }
+          }
+          
           setIsLoading(false);
           return;
         }

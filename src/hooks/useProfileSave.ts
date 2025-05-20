@@ -1,3 +1,4 @@
+
 import { useEffect } from "react";
 import { supabase, Json } from "@/integrations/supabase/client";
 import { Profile, PersonalInfo } from "@/types/profile";
@@ -25,7 +26,23 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
           })
           .eq('id', user.id);
           
-        if (error) throw error;
+        if (error) {
+          console.error("Error saving profile to Supabase:", error);
+          if (error.code === 'PGRST116') {
+            // Profile doesn't exist, create it
+            const { error: insertError } = await supabase
+              .from('profiles')
+              .insert({ 
+                id: user.id, 
+                email: user.email,
+                resume_data: profile as unknown as Json
+              });
+              
+            if (insertError) {
+              console.error("Error creating profile:", insertError);
+            }
+          }
+        }
       } catch (error) {
         console.error("Error saving profile to Supabase:", error);
         // We don't show a toast here to avoid spamming the user on every change
@@ -40,6 +57,11 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
       ...prev,
       personalInfo: data,
     }));
+    
+    toast({
+      title: "Personal information saved",
+      description: "Your personal information has been saved successfully.",
+    });
   };
 
   const handleExperiencesSave = (experiences: any[]) => {
@@ -47,6 +69,11 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
       ...prev,
       experiences,
     }));
+    
+    toast({
+      title: "Experiences saved",
+      description: "Your experiences have been saved successfully.",
+    });
   };
 
   const handleSkillsSave = (skills: any[]) => {
@@ -54,6 +81,11 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
       ...prev,
       skills,
     }));
+    
+    toast({
+      title: "Skills saved",
+      description: "Your skills have been saved successfully.",
+    });
   };
 
   const handleEducationSave = (education: any[]) => {
@@ -61,6 +93,11 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
       ...prev,
       education,
     }));
+    
+    toast({
+      title: "Education saved",
+      description: "Your education information has been saved successfully.",
+    });
   };
 
   const handleResetProfile = async () => {
