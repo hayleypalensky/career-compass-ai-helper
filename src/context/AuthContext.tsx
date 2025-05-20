@@ -84,6 +84,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
+        options: {
+          // Enable leaked password protection
+          passwordProtection: {
+            disableLeakedPasswordProtection: false,
+          }
+        }
       });
       
       if (error) throw error;
