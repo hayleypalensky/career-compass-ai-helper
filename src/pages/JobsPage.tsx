@@ -1,14 +1,12 @@
 
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Search } from "lucide-react";
 import JobCard from "@/components/JobCard";
-import AddJobForm from "@/components/AddJobForm";
 import { Job } from "@/types/job";
+import AddJobDialog from "@/components/AddJobDialog";
 
 const JobsPage = () => {
   const { toast } = useToast();
@@ -116,89 +114,87 @@ const JobsPage = () => {
     <div className="space-y-8">
       <h1>Job Applications Tracker</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="md:col-span-1">
-          <AddJobForm onAddJob={handleAddJob} />
+      <div className="flex flex-col space-y-8">
+        <div className="w-full max-w-xs">
+          <AddJobDialog onAddJob={handleAddJob} />
         </div>
         
-        <div className="md:col-span-2">
-          <Tabs 
-            defaultValue="active" 
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="w-full"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <TabsList>
-                <TabsTrigger value="active">Active</TabsTrigger>
-                <TabsTrigger value="archived">Archived</TabsTrigger>
-              </TabsList>
-              
-              <div className="relative max-w-sm">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search jobs..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
+        <Tabs 
+          defaultValue="active" 
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <TabsList>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="archived">Archived</TabsTrigger>
+            </TabsList>
+            
+            <div className="relative max-w-sm">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search jobs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8"
+              />
             </div>
-            
-            <TabsContent value="active" className="space-y-8">
-              {Object.keys(groupedActiveJobs).length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">No active job applications yet.</p>
-                  <p className="text-gray-400">Add your first job application above.</p>
-                </div>
-              ) : (
-                statusOrder.map((status) => {
-                  const statusJobs = groupedActiveJobs[status] || [];
-                  if (statusJobs.length === 0) return null;
-                  
-                  return (
-                    <div key={status} className="space-y-4">
-                      <h2 className="text-xl font-semibold capitalize">
-                        {status} ({statusJobs.length})
-                      </h2>
-                      <div className="grid grid-cols-1 gap-4">
-                        {statusJobs.map((job) => (
-                          <JobCard
-                            key={job.id}
-                            job={job}
-                            onUpdate={handleUpdateJob}
-                            onArchive={handleArchiveJob}
-                            onDelete={handleDeleteJob}
-                          />
-                        ))}
-                      </div>
+          </div>
+          
+          <TabsContent value="active" className="space-y-8">
+            {Object.keys(groupedActiveJobs).length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No active job applications yet.</p>
+                <p className="text-gray-400">Add your first job application using the button above.</p>
+              </div>
+            ) : (
+              statusOrder.map((status) => {
+                const statusJobs = groupedActiveJobs[status] || [];
+                if (statusJobs.length === 0) return null;
+                
+                return (
+                  <div key={status} className="space-y-4">
+                    <h2 className="text-xl font-semibold capitalize">
+                      {status} ({statusJobs.length})
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {statusJobs.map((job) => (
+                        <JobCard
+                          key={job.id}
+                          job={job}
+                          onUpdate={handleUpdateJob}
+                          onArchive={handleArchiveJob}
+                          onDelete={handleDeleteJob}
+                        />
+                      ))}
                     </div>
-                  );
-                })
-              )}
-            </TabsContent>
-            
-            <TabsContent value="archived" className="space-y-4">
-              {sortedJobs.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">No archived job applications yet.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-4">
-                  {sortedJobs.map((job) => (
-                    <JobCard
-                      key={job.id}
-                      job={job}
-                      onUpdate={handleUpdateJob}
-                      onArchive={handleArchiveJob}
-                      onDelete={handleDeleteJob}
-                    />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
+                  </div>
+                );
+              })
+            )}
+          </TabsContent>
+          
+          <TabsContent value="archived" className="space-y-4">
+            {sortedJobs.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No archived job applications yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {sortedJobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    onUpdate={handleUpdateJob}
+                    onArchive={handleArchiveJob}
+                    onDelete={handleDeleteJob}
+                  />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
