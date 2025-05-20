@@ -48,11 +48,19 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
       return;
     }
     
+    // Handle date to ensure it's saved correctly without timezone issues
+    let updatedJob = { ...editedJob };
+    
+    // If the date has changed, make sure it's saved properly
+    if (editedJob.appliedDate) {
+      // For date inputs, we get YYYY-MM-DD format
+      // Ensure we preserve the user's selected date exactly as entered
+      const dateComponents = editedJob.appliedDate.split('T')[0];
+      updatedJob.appliedDate = dateComponents;
+    }
+    
     // Update the job with the current timestamp
-    const updatedJob = {
-      ...editedJob,
-      updatedAt: new Date().toISOString(),
-    };
+    updatedJob.updatedAt = new Date().toISOString();
     
     onSave(updatedJob);
     onOpenChange(false);
@@ -110,6 +118,18 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
               onCheckedChange={handleRemoteChange}
             />
             <Label htmlFor="remote">Remote Position</Label>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="appliedDate">Application Date *</Label>
+            <Input
+              id="appliedDate"
+              name="appliedDate"
+              type="date"
+              value={editedJob.appliedDate.split('T')[0]}
+              onChange={handleInputChange}
+              required
+            />
           </div>
           
           <div className="space-y-2">

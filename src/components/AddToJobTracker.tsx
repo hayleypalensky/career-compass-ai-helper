@@ -55,9 +55,14 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
       }
     }
     
+    // Ensure the date is preserved correctly without timezone issues
+    const appliedDate = formData.appliedDate;
+    
     // Create new job
     const newJob: Job = {
       ...formData,
+      // Use the exact date string provided by the user
+      appliedDate: appliedDate,
       id: crypto.randomUUID(),
       status: "applied",
       updatedAt: new Date().toISOString(),
