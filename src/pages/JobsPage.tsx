@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Search, LayoutList, LayoutGrid } from "lucide-react";
 import JobCard from "@/components/JobCard";
-import { Job } from "@/types/job";
+import { Job, JobStatus } from "@/types/job";
 import AddJobDialog from "@/components/AddJobDialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -57,8 +57,9 @@ const JobsPage = () => {
             title: job.position,
             company: job.company,
             location: job.location || '',
+            remote: job.remote || false,
             appliedDate: job.application_date,
-            status: job.status,
+            status: job.status as JobStatus,
             description: job.description || '',
             notes: '',
             updatedAt: job.updated_at
@@ -93,6 +94,7 @@ const JobsPage = () => {
           position: newJob.title,
           company: newJob.company,
           location: newJob.location,
+          remote: newJob.remote,
           description: newJob.description,
           status: newJob.status,
           application_date: newJob.appliedDate,
@@ -108,8 +110,9 @@ const JobsPage = () => {
           title: data[0].position,
           company: data[0].company,
           location: data[0].location || '',
+          remote: data[0].remote || false,
           appliedDate: data[0].application_date,
-          status: data[0].status,
+          status: data[0].status as JobStatus,
           description: data[0].description || '',
           notes: '',
           updatedAt: data[0].updated_at

@@ -50,13 +50,18 @@ const ProfilePage = () => {
         }
 
         // Check if we have the profile in Supabase
-        const { data: profileData } = await supabase
+        const { data: profileData, error } = await supabase
           .from('profiles')
-          .select('resume_data')
+          .select('*')
           .eq('id', user.id)
           .single();
 
-        if (profileData?.resume_data) {
+        if (error) {
+          console.error("Error fetching profile:", error);
+          return;
+        }
+
+        if (profileData && profileData.resume_data) {
           setProfile(profileData.resume_data as ProfileType);
         } else if (loadedProfile) {
           // If we have a local profile but not in Supabase, save it

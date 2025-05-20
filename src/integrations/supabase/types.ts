@@ -18,6 +18,7 @@ export type Database = {
           id: string
           location: string | null
           position: string
+          remote: boolean | null
           status: string
           updated_at: string
           user_id: string
@@ -30,6 +31,7 @@ export type Database = {
           id?: string
           location?: string | null
           position: string
+          remote?: boolean | null
           status: string
           updated_at?: string
           user_id: string
@@ -42,6 +44,7 @@ export type Database = {
           id?: string
           location?: string | null
           position?: string
+          remote?: boolean | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -53,18 +56,21 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          resume_data: Json | null
           updated_at: string
         }
         Insert: {
           created_at?: string
           email: string
           id: string
+          resume_data?: Json | null
           updated_at?: string
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
+          resume_data?: Json | null
           updated_at?: string
         }
         Relationships: []
