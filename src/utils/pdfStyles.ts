@@ -20,8 +20,10 @@ export const applyPdfStyles = (element: HTMLElement): void => {
   element.style.fontFamily = "'Helvetica', 'Arial', sans-serif"; // Use web-safe fonts
   element.style.color = "#000"; // Ensure sharp text
   element.style.textRendering = "optimizeLegibility"; // Improve text rendering
-  element.style.webkitFontSmoothing = "antialiased"; // Better text anti-aliasing
-  element.style.mozOsxFontSmoothing = "grayscale"; // Better text anti-aliasing for Firefox
+  
+  // Add vendor-specific CSS properties with proper TypeScript handling
+  (element.style as any)["-webkit-font-smoothing"] = "antialiased";
+  (element.style as any)["-moz-osx-font-smoothing"] = "grayscale";
 };
 
 /**
@@ -174,8 +176,12 @@ export const styleSkillsForPdf = (element: HTMLElement): void => {
   const textElements = element.querySelectorAll('p, span, div, h1, h2, h3, h4, h5, h6');
   textElements.forEach(el => {
     (el as HTMLElement).style.textRendering = 'optimizeLegibility';
-    (el as HTMLElement).style.webkitFontSmoothing = 'antialiased';
-    (el as HTMLElement).style.mozOsxFontSmoothing = 'grayscale';
-    (el as HTMLElement).style.color = '#000';
+    
+    // Use type casting to set vendor-specific properties
+    const element = el as HTMLElement;
+    (element.style as any)["-webkit-font-smoothing"] = "antialiased";
+    (element.style as any)["-moz-osx-font-smoothing"] = "grayscale";
+    
+    element.style.color = '#000';
   });
 };
