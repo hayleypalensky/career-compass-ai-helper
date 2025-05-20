@@ -47,7 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             title: "Signed in",
             description: "You have successfully signed in.",
           });
-          navigate('/jobs'); // Redirect to jobs page instead of home
+          // Don't automatically redirect - let the Link component handle routing
+          // This might be causing the issue
         } else if (event === 'SIGNED_OUT') {
           toast({
             title: "Signed out",
@@ -64,10 +65,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(currentSession?.user ?? null);
       setLoading(false);
       
-      // If user is already logged in, redirect to jobs page
-      if (currentSession?.user) {
-        navigate('/jobs');
-      }
+      // Don't automatically redirect to jobs page if user is already logged in
+      // This auto-redirect might be causing issues with navigation
     });
 
     return () => {
