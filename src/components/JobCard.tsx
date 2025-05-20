@@ -51,12 +51,20 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
             <span>Applied: {formatDate(job.appliedDate)}</span>
           </div>
 
+          {/* Notes section always visible */}
+          <div className="mb-4 text-sm">
+            <h4 className="font-medium mb-1">Notes</h4>
+            <div className="text-gray-700 whitespace-pre-wrap line-clamp-3">
+              {job.notes || "No notes added yet."}
+            </div>
+          </div>
+
           {isExpanded && (
             <JobDetails
               description={job.description}
-              notes={job.notes}
               updatedAt={job.updatedAt}
               appliedDate={job.appliedDate}
+              showNotes={false}
             />
           )}
 

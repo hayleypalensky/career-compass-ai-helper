@@ -6,9 +6,10 @@ interface JobDetailsProps {
   notes?: string;
   updatedAt?: string;
   appliedDate: string;
+  showNotes?: boolean;
 }
 
-const JobDetails = ({ description, notes, updatedAt, appliedDate }: JobDetailsProps) => {
+const JobDetails = ({ description, notes, updatedAt, appliedDate, showNotes = true }: JobDetailsProps) => {
   return (
     <div className="space-y-3 my-3 border-t border-b py-3">
       {description && (
@@ -20,12 +21,14 @@ const JobDetails = ({ description, notes, updatedAt, appliedDate }: JobDetailsPr
         </div>
       )}
 
-      <div>
-        <h4 className="font-medium mb-1">Notes</h4>
-        <div className="text-gray-700 text-sm whitespace-pre-wrap">
-          {notes || "No notes added yet."}
+      {showNotes && (
+        <div>
+          <h4 className="font-medium mb-1">Notes</h4>
+          <div className="text-gray-700 text-sm whitespace-pre-wrap">
+            {notes || "No notes added yet."}
+          </div>
         </div>
-      </div>
+      )}
 
       <div>
         <h4 className="font-medium mb-1">Last Updated</h4>
