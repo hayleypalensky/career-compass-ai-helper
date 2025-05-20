@@ -71,7 +71,7 @@ const ResumeSkills = ({ skills, skillsToAdd, skillsToRemove, relevantSkills, the
         ))}
       </div>
       {skillsToAdd.length > 0 && (
-        <p className="text-[10px] text-gray-500">* Skills matching position requirements</p>
+        <p className="text-[10px] text-gray-500">Skills matching position requirements</p>
       )}
     </div>
   );
