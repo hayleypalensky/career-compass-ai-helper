@@ -8,6 +8,10 @@ interface JobCardNotesProps {
 }
 
 const JobCardNotes = ({ notes, isCollapsed = true }: JobCardNotesProps) => {
+  if (!notes || notes.trim() === "") {
+    return null;
+  }
+  
   return (
     <div className="mb-4 text-sm">
       <h4 className="font-medium mb-1">Notes</h4>
