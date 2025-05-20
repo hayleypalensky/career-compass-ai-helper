@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -105,7 +104,7 @@ const AuthPage = () => {
     toast({
       title: "MFA skipped",
       description: "You can enable MFA later in your profile settings.",
-      variant: "warning",
+      variant: "default",
     });
   };
 
