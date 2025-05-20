@@ -1,8 +1,14 @@
 
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Job, JobStatus } from "@/types/job";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  fetchJobs, 
+  createJob, 
+  updateJobById, 
+  updateJobStatus, 
+  deleteJobById 
+} from "@/services/jobService";
 
 interface UseJobManagementProps {
   user: { id: string } | null;
@@ -21,32 +27,8 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
     }
     
     try {
-      const { data, error } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('application_date', { ascending: false });
-        
-      if (error) {
-        throw error;
-      }
-      
-      if (data) {
-        // Format the jobs to match our application's Job type
-        const formattedJobs: Job[] = data.map(job => ({
-          id: job.id,
-          title: job.position,
-          company: job.company,
-          location: job.location || '',
-          remote: job.remote || false,
-          appliedDate: job.application_date,
-          status: job.status as JobStatus,
-          description: job.description || '',
-          notes: job.notes || '', // Ensure notes are included here
-          updatedAt: job.updated_at
-        }));
-        
-        setJobs(formattedJobs);
-      }
+      const loadedJobs = await fetchJobs(user.id);
+      setJobs(loadedJobs);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       toast({
@@ -63,41 +45,9 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
     if (!user) return;
     
     try {
-      // Format the job data for Supabase but preserve the date exactly as entered
-      // by the user, without any timezone manipulations
-      const { data, error } = await supabase
-        .from('jobs')
-        .insert([{
-          user_id: user.id,
-          position: newJob.title,
-          company: newJob.company,
-          location: newJob.location,
-          remote: newJob.remote,
-          description: newJob.description,
-          notes: newJob.notes, // Include notes here
-          status: newJob.status,
-          application_date: newJob.appliedDate, // Preserve exactly as entered
-        }])
-        .select();
-        
-      if (error) throw error;
-      
-      if (data && data[0]) {
-        // Add the new job to the state
-        const formattedJob: Job = {
-          id: data[0].id,
-          title: data[0].position,
-          company: data[0].company,
-          location: data[0].location || '',
-          remote: data[0].remote || false,
-          appliedDate: data[0].application_date, // Keep the exact date format
-          status: data[0].status as JobStatus,
-          description: data[0].description || '',
-          notes: data[0].notes || '', // Include notes here
-          updatedAt: data[0].updated_at
-        };
-        
-        setJobs((prevJobs) => [formattedJob, ...prevJobs]);
+      const createdJob = await createJob(user.id, newJob);
+      if (createdJob) {
+        setJobs((prevJobs) => [createdJob, ...prevJobs]);
       }
     } catch (error) {
       console.error('Error adding job:', error);
@@ -113,22 +63,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
     if (!user) return;
     
     try {
-      const { error } = await supabase
-        .from('jobs')
-        .update({
-          position: updatedJob.title,
-          company: updatedJob.company,
-          location: updatedJob.location,
-          remote: updatedJob.remote, // Add remote field
-          description: updatedJob.description,
-          notes: updatedJob.notes, // Add notes field
-          status: updatedJob.status,
-          application_date: updatedJob.appliedDate, // Keep exact date format
-          updated_at: updatedJob.updatedAt, // Include the updated timestamp
-        })
-        .eq('id', updatedJob.id);
-        
-      if (error) throw error;
+      await updateJobById(updatedJob.id, updatedJob);
       
       // Update the job in the state
       setJobs((prevJobs) =>
@@ -157,14 +92,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
       
       if (!jobToArchive) return;
       
-      const { error } = await supabase
-        .from('jobs')
-        .update({
-          status: 'archived',
-        })
-        .eq('id', jobId);
-        
-      if (error) throw error;
+      await updateJobStatus(jobId, 'archived');
       
       // Update the job in the state
       setJobs((prevJobs) =>
@@ -195,12 +123,7 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
     try {
       const jobToDelete = jobs.find(job => job.id === jobId);
       
-      const { error } = await supabase
-        .from('jobs')
-        .delete()
-        .eq('id', jobId);
-        
-      if (error) throw error;
+      await deleteJobById(jobId);
       
       // Remove the job from the state
       setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
