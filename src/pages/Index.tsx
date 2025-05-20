@@ -1,9 +1,11 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
@@ -12,55 +14,70 @@ const Index = () => {
         Tailor your resume for each job application with AI-powered insights. Track your job applications and boost your chances of landing your dream job.
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl mb-12">
-        <div className="resume-card flex flex-col items-center p-6">
-          <div className="w-12 h-12 bg-navy-100 rounded-full flex items-center justify-center mb-4">
-            <span className="text-navy-800 text-xl font-bold">1</span>
+      {user ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-4xl mb-12">
+          <div className="resume-card flex flex-col items-center p-6">
+            <div className="w-12 h-12 bg-navy-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-navy-800 text-xl font-bold">1</span>
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Create Your Profile</h3>
+            <p className="text-gray-600 text-center mb-4">
+              Build your base resume with personal details, experience, and skills
+            </p>
+            <Button 
+              onClick={() => navigate("/profile")}
+              className="mt-auto w-full bg-navy-600 hover:bg-navy-700"
+            >
+              Create Profile
+            </Button>
           </div>
-          <h3 className="font-semibold text-lg mb-2">Create Your Profile</h3>
-          <p className="text-gray-600 text-center mb-4">
-            Build your base resume with personal details, experience, and skills
-          </p>
-          <Button 
-            onClick={() => navigate("/profile")}
-            className="mt-auto w-full bg-navy-600 hover:bg-navy-700"
-          >
-            Create Profile
-          </Button>
-        </div>
 
-        <div className="resume-card flex flex-col items-center p-6">
-          <div className="w-12 h-12 bg-navy-100 rounded-full flex items-center justify-center mb-4">
-            <span className="text-navy-800 text-xl font-bold">2</span>
+          <div className="resume-card flex flex-col items-center p-6">
+            <div className="w-12 h-12 bg-navy-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-navy-800 text-xl font-bold">2</span>
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Tailor Your Resume</h3>
+            <p className="text-gray-600 text-center mb-4">
+              Analyze job descriptions and customize your resume for each application
+            </p>
+            <Button 
+              onClick={() => navigate("/tailor")}
+              className="mt-auto w-full bg-navy-600 hover:bg-navy-700"
+            >
+              Tailor Resume
+            </Button>
           </div>
-          <h3 className="font-semibold text-lg mb-2">Tailor Your Resume</h3>
-          <p className="text-gray-600 text-center mb-4">
-            Analyze job descriptions and customize your resume for each application
-          </p>
-          <Button 
-            onClick={() => navigate("/tailor")}
-            className="mt-auto w-full bg-navy-600 hover:bg-navy-700"
-          >
-            Tailor Resume
-          </Button>
-        </div>
 
-        <div className="resume-card flex flex-col items-center p-6">
-          <div className="w-12 h-12 bg-navy-100 rounded-full flex items-center justify-center mb-4">
-            <span className="text-navy-800 text-xl font-bold">3</span>
+          <div className="resume-card flex flex-col items-center p-6">
+            <div className="w-12 h-12 bg-navy-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-navy-800 text-xl font-bold">3</span>
+            </div>
+            <h3 className="font-semibold text-lg mb-2">Track Applications</h3>
+            <p className="text-gray-600 text-center mb-4">
+              Manage your job applications and monitor your progress
+            </p>
+            <Button 
+              onClick={() => navigate("/jobs")}
+              className="mt-auto w-full bg-navy-600 hover:bg-navy-700"
+            >
+              Track Jobs
+            </Button>
           </div>
-          <h3 className="font-semibold text-lg mb-2">Track Applications</h3>
-          <p className="text-gray-600 text-center mb-4">
-            Manage your job applications and monitor your progress
+        </div>
+      ) : (
+        <div className="flex flex-col items-center mb-12 space-y-6">
+          <p className="text-lg text-gray-700 max-w-2xl">
+            Sign in or create an account to get started with ResumeAI. Your data will be securely saved and accessible whenever you return.
           </p>
           <Button 
-            onClick={() => navigate("/jobs")}
-            className="mt-auto w-full bg-navy-600 hover:bg-navy-700"
+            onClick={() => navigate("/auth")}
+            size="lg"
+            className="bg-navy-600 hover:bg-navy-700"
           >
-            Track Jobs
+            Sign In or Create Account
           </Button>
         </div>
-      </div>
+      )}
 
       <div className="max-w-3xl">
         <h2 className="text-2xl font-semibold mb-4">How It Works</h2>

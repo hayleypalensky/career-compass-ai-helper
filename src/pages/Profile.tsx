@@ -7,19 +7,12 @@ import SkillsForm, { Skill } from "@/components/SkillsForm";
 import EducationForm, { Education } from "@/components/EducationForm";
 import { Profile as ProfileType, PersonalInfo } from "@/types/profile";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const ProfilePage = () => {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<ProfileType>(() => {
-    // Try to get profile from localStorage
-    const savedProfile = localStorage.getItem("resumeProfile");
-    if (savedProfile) {
-      try {
-        return JSON.parse(savedProfile);
-      } catch (error) {
-        console.error("Error parsing profile from localStorage:", error);
-      }
-    }
-    
     // Default empty profile
     return {
       personalInfo: {
@@ -36,10 +29,79 @@ const ProfilePage = () => {
     };
   });
 
-  // Save to localStorage whenever profile changes
+  // Load profile from Supabase
   useEffect(() => {
-    localStorage.setItem("resumeProfile", JSON.stringify(profile));
-  }, [profile]);
+    const loadProfile = async () => {
+      if (!user) return;
+
+      try {
+        // Try to load profile from localStorage as a fallback
+        const savedProfile = localStorage.getItem("resumeProfile");
+        let loadedProfile = null;
+        
+        if (savedProfile) {
+          try {
+            loadedProfile = JSON.parse(savedProfile);
+            // Use this profile temporarily while we fetch from Supabase
+            setProfile(loadedProfile);
+          } catch (error) {
+            console.error("Error parsing profile from localStorage:", error);
+          }
+        }
+
+        // Check if we have the profile in Supabase
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('resume_data')
+          .eq('id', user.id)
+          .single();
+
+        if (profileData?.resume_data) {
+          setProfile(profileData.resume_data as ProfileType);
+        } else if (loadedProfile) {
+          // If we have a local profile but not in Supabase, save it
+          await supabase
+            .from('profiles')
+            .update({ resume_data: loadedProfile })
+            .eq('id', user.id);
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your profile.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadProfile();
+  }, [user]);
+
+  // Save to localStorage and Supabase whenever profile changes
+  useEffect(() => {
+    const saveProfile = async () => {
+      if (!user) return;
+      
+      // Save to localStorage as a backup
+      localStorage.setItem("resumeProfile", JSON.stringify(profile));
+      
+      try {
+        // Save to Supabase
+        const { error } = await supabase
+          .from('profiles')
+          .update({ resume_data: profile })
+          .eq('id', user.id);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error("Error saving profile to Supabase:", error);
+        // We don't show a toast here to avoid spamming the user on every change
+      }
+    };
+
+    saveProfile();
+  }, [profile, user]);
 
   const handlePersonalInfoSave = (data: PersonalInfo) => {
     setProfile((prev) => ({
@@ -69,9 +131,9 @@ const ProfilePage = () => {
     }));
   };
 
-  const handleResetProfile = () => {
+  const handleResetProfile = async () => {
     if (confirm("Are you sure you want to reset your entire profile? This action cannot be undone.")) {
-      setProfile({
+      const newProfile = {
         personalInfo: {
           name: "",
           email: "",
@@ -83,7 +145,22 @@ const ProfilePage = () => {
         experiences: [],
         skills: [],
         education: [],
-      });
+      };
+      
+      setProfile(newProfile);
+      
+      if (user) {
+        try {
+          const { error } = await supabase
+            .from('profiles')
+            .update({ resume_data: newProfile })
+            .eq('id', user.id);
+            
+          if (error) throw error;
+        } catch (error) {
+          console.error("Error resetting profile in Supabase:", error);
+        }
+      }
       
       toast({
         title: "Profile reset",

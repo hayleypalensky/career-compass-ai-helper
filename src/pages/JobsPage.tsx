@@ -9,36 +9,18 @@ import { Job } from "@/types/job";
 import AddJobDialog from "@/components/AddJobDialog";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 const JobsPage = () => {
   const { toast } = useToast();
-  const [jobs, setJobs] = useState<Job[]>(() => {
-    // Try to get jobs from localStorage
-    const savedJobs = localStorage.getItem("resumeJobs");
-    if (savedJobs) {
-      try {
-        return JSON.parse(savedJobs);
-      } catch (error) {
-        console.error("Error parsing jobs from localStorage:", error);
-        return [];
-      }
-    }
-    return [];
-  });
+  const { user } = useAuth();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("active");
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-
-  // Save to localStorage whenever jobs changes
-  useEffect(() => {
-    localStorage.setItem("resumeJobs", JSON.stringify(jobs));
-  }, [jobs]);
-
-  // Save view preference to localStorage
-  useEffect(() => {
-    localStorage.setItem("jobsViewMode", viewMode);
-  }, [viewMode]);
 
   // Load view preference from localStorage
   useEffect(() => {
@@ -48,44 +30,208 @@ const JobsPage = () => {
     }
   }, []);
 
-  const handleAddJob = (newJob: Job) => {
-    setJobs((prevJobs) => [...prevJobs, newJob]);
+  // Save view preference to localStorage
+  useEffect(() => {
+    localStorage.setItem("jobsViewMode", viewMode);
+  }, [viewMode]);
+
+  // Load jobs from Supabase
+  useEffect(() => {
+    const fetchJobs = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('jobs')
+          .select('*')
+          .order('application_date', { ascending: false });
+          
+        if (error) {
+          throw error;
+        }
+        
+        if (data) {
+          // Format the jobs to match our application's Job type
+          const formattedJobs: Job[] = data.map(job => ({
+            id: job.id,
+            title: job.position,
+            company: job.company,
+            location: job.location || '',
+            appliedDate: job.application_date,
+            status: job.status,
+            description: job.description || '',
+            notes: '',
+            updatedAt: job.updated_at
+          }));
+          
+          setJobs(formattedJobs);
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load your job applications.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, [user, toast]);
+
+  const handleAddJob = async (newJob: Job) => {
+    if (!user) return;
+    
+    try {
+      // Format the job data for Supabase
+      const { data, error } = await supabase
+        .from('jobs')
+        .insert([{
+          user_id: user.id,
+          position: newJob.title,
+          company: newJob.company,
+          location: newJob.location,
+          description: newJob.description,
+          status: newJob.status,
+          application_date: newJob.appliedDate,
+        }])
+        .select();
+        
+      if (error) throw error;
+      
+      if (data && data[0]) {
+        // Add the new job to the state
+        const formattedJob: Job = {
+          id: data[0].id,
+          title: data[0].position,
+          company: data[0].company,
+          location: data[0].location || '',
+          appliedDate: data[0].application_date,
+          status: data[0].status,
+          description: data[0].description || '',
+          notes: '',
+          updatedAt: data[0].updated_at
+        };
+        
+        setJobs((prevJobs) => [formattedJob, ...prevJobs]);
+      }
+    } catch (error) {
+      console.error('Error adding job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add the job application.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateJob = (updatedJob: Job) => {
-    setJobs((prevJobs) =>
-      prevJobs.map((job) => (job.id === updatedJob.id ? updatedJob : job))
-    );
+  const handleUpdateJob = async (updatedJob: Job) => {
+    if (!user) return;
     
-    toast({
-      title: "Job updated",
-      description: `"${updatedJob.title}" has been updated.`,
-    });
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({
+          position: updatedJob.title,
+          company: updatedJob.company,
+          location: updatedJob.location,
+          description: updatedJob.description,
+          status: updatedJob.status,
+          application_date: updatedJob.appliedDate,
+        })
+        .eq('id', updatedJob.id);
+        
+      if (error) throw error;
+      
+      // Update the job in the state
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job.id === updatedJob.id ? updatedJob : job))
+      );
+      
+      toast({
+        title: "Job updated",
+        description: `"${updatedJob.title}" has been updated.`,
+      });
+    } catch (error) {
+      console.error('Error updating job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update the job application.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleArchiveJob = (jobId: string) => {
-    setJobs((prevJobs) =>
-      prevJobs.map((job) =>
-        job.id === jobId
-          ? { ...job, status: "archived", updatedAt: new Date().toISOString() }
-          : job
-      )
-    );
+  const handleArchiveJob = async (jobId: string) => {
+    if (!user) return;
     
-    toast({
-      title: "Job archived",
-      description: "The job application has been archived.",
-    });
+    try {
+      const jobToArchive = jobs.find(job => job.id === jobId);
+      
+      if (!jobToArchive) return;
+      
+      const { error } = await supabase
+        .from('jobs')
+        .update({
+          status: 'archived',
+        })
+        .eq('id', jobId);
+        
+      if (error) throw error;
+      
+      // Update the job in the state
+      setJobs((prevJobs) =>
+        prevJobs.map((job) =>
+          job.id === jobId
+            ? { ...job, status: "archived", updatedAt: new Date().toISOString() }
+            : job
+        )
+      );
+      
+      toast({
+        title: "Job archived",
+        description: "The job application has been archived.",
+      });
+    } catch (error) {
+      console.error('Error archiving job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to archive the job application.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteJob = (jobId: string) => {
-    const jobToDelete = jobs.find(job => job.id === jobId);
-    setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+  const handleDeleteJob = async (jobId: string) => {
+    if (!user) return;
     
-    toast({
-      title: "Job deleted",
-      description: jobToDelete ? `"${jobToDelete.title}" has been deleted.` : "The job application has been deleted.",
-    });
+    try {
+      const jobToDelete = jobs.find(job => job.id === jobId);
+      
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', jobId);
+        
+      if (error) throw error;
+      
+      // Remove the job from the state
+      setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
+      
+      toast({
+        title: "Job deleted",
+        description: jobToDelete ? `"${jobToDelete.title}" has been deleted.` : "The job application has been deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete the job application.",
+        variant: "destructive",
+      });
+    }
   };
 
   // Filter jobs based on search term and active tab
@@ -132,6 +278,14 @@ const JobsPage = () => {
       ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
       : "flex flex-col space-y-4";
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-navy-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
