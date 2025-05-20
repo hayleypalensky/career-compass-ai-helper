@@ -78,13 +78,13 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     }
     
     // Add experience section
-    if (profile.experience && profile.experience.length > 0) {
+    if (profile.experiences && profile.experiences.length > 0) {
       pdf.setFontSize(12);
       pdf.setFont("helvetica", "bold");
       pdf.text("Experience", leftMargin, yPos);
       yPos += 0.2;
       
-      for (const exp of profile.experience) {
+      for (const exp of profile.experiences) {
         pdf.setFontSize(11);
         pdf.setFont("helvetica", "bold");
         pdf.text(exp.title, leftMargin, yPos);
