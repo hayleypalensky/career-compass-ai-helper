@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 // Import our components
 import JobsHeader from "@/components/jobs/JobsHeader";
@@ -64,6 +65,15 @@ const JobsPage = () => {
 
   // Filter jobs based on the current tab
   const tabJobs = filteredJobs.filter(job => job.status === activeTab);
+  
+  // Count jobs in each status category
+  const statusCounts = {
+    applied: filteredJobs.filter(job => job.status === "applied").length,
+    interviewing: filteredJobs.filter(job => job.status === "interviewing").length,
+    offered: filteredJobs.filter(job => job.status === "offered").length,
+    rejected: filteredJobs.filter(job => job.status === "rejected").length,
+    archived: filteredJobs.filter(job => job.status === "archived").length
+  };
 
   return (
     <div className="space-y-8">
@@ -85,11 +95,36 @@ const JobsPage = () => {
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <TabsList className="flex-wrap">
-              <TabsTrigger value="applied">Applied</TabsTrigger>
-              <TabsTrigger value="interviewing">Interviewing</TabsTrigger>
-              <TabsTrigger value="offered">Offered</TabsTrigger>
-              <TabsTrigger value="rejected">Rejected</TabsTrigger>
-              <TabsTrigger value="archived">Archived</TabsTrigger>
+              <TabsTrigger value="applied">
+                Applied
+                <Badge variant="secondary" className="ml-2 bg-slate-200">
+                  {statusCounts.applied}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="interviewing">
+                Interviewing
+                <Badge variant="secondary" className="ml-2 bg-slate-200">
+                  {statusCounts.interviewing}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="offered">
+                Offered
+                <Badge variant="secondary" className="ml-2 bg-slate-200">
+                  {statusCounts.offered}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="rejected">
+                Rejected
+                <Badge variant="secondary" className="ml-2 bg-slate-200">
+                  {statusCounts.rejected}
+                </Badge>
+              </TabsTrigger>
+              <TabsTrigger value="archived">
+                Archived
+                <Badge variant="secondary" className="ml-2 bg-slate-200">
+                  {statusCounts.archived}
+                </Badge>
+              </TabsTrigger>
             </TabsList>
             
             <div className="relative max-w-sm">
