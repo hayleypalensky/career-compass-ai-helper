@@ -24,13 +24,13 @@ export const renderSkillsSection = (
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text("SKILLS", leftMargin, yPos);
-  yPos += SPACING.element;
+  yPos += SPACING.element * 1.2; // Increased spacing after heading
   
-  // Add a clean line under the section header
+  // Add a clean line under the section header - thinner for elegance
   pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.005);
+  pdf.setLineWidth(0.006);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.md;
+  yPos += SPACING.md * 1.3; // Increased spacing after line
   
   // Reset text settings
   pdf.setFontSize(FONT_SIZES.base);
@@ -45,7 +45,10 @@ export const renderSkillsSection = (
   const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
   
   pdf.text(splitSkills, leftMargin, yPos);
-  yPos += (splitSkills.length * SPACING.bullet); // Clean skills line spacing
+  yPos += (splitSkills.length * SPACING.bullet * 1.2); // Increased skills line spacing
+  
+  // Add final spacing at the bottom
+  yPos += SPACING.md;
   
   return yPos;
 };

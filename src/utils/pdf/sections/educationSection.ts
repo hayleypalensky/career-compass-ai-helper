@@ -25,13 +25,13 @@ export const renderEducationSection = (
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text("EDUCATION", leftMargin, yPos);
-  yPos += SPACING.element;
+  yPos += SPACING.element * 1.2; // Increased spacing after heading
   
-  // Add a clean line under the section header
+  // Add a clean line under the section header - thinner for elegance
   pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.005);
+  pdf.setLineWidth(0.006);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.md;
+  yPos += SPACING.md * 1.3; // Increased spacing after line
   
   for (const edu of profile.education) {
     // Degree - clean and prominent
@@ -39,7 +39,7 @@ export const renderEducationSection = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    yPos += SPACING.sm; // Clean spacing between degree and school
+    yPos += SPACING.sm * 1.2; // Increased spacing between degree and school
     
     // School and dates on the same line - consistent with experience
     pdf.setFontSize(FONT_SIZES.base);
@@ -54,21 +54,21 @@ export const renderEducationSection = (
     // Date right-aligned
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.element; // Clean spacing after school info
+    yPos += SPACING.element * 1.2; // Increased spacing after school info
     
     if (edu.description) {
       pdf.setFontSize(FONT_SIZES.small);
       pdf.setTextColor(COLORS.black);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * SPACING.bullet); // Clean description spacing
+      yPos += (splitDesc.length * SPACING.bullet * 1.15); // Increased description spacing
     }
     
-    yPos += SPACING.lg; // Clean spacing between education entries
+    yPos += SPACING.lg * 1.2; // Increased spacing between education entries
   }
   
-  // Add clean section break
-  yPos += SPACING.md;
+  // Add clean section break with increased spacing
+  yPos += SPACING.md * 1.2;
   
   return yPos;
 };

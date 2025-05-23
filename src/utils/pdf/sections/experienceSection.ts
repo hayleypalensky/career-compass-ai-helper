@@ -25,13 +25,13 @@ export const renderExperienceSection = (
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text("EXPERIENCE", leftMargin, yPos);
-  yPos += SPACING.element;
+  yPos += SPACING.element * 1.2; // Increased spacing after heading
   
-  // Add a clean line under the section header
+  // Add a clean line under the section header - thinner for elegance
   pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.005);
+  pdf.setLineWidth(0.006);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.md;
+  yPos += SPACING.md * 1.3; // Increased spacing after line
   
   for (const exp of profile.experiences) {
     // Job title - prominent and clean
@@ -40,7 +40,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(exp.title, leftMargin, yPos);
     
-    yPos += SPACING.sm; // Clean spacing between title and company
+    yPos += SPACING.sm * 1.2; // Increased spacing between title and company
     
     // Company and dates on the same line - clean layout like reference
     pdf.setFontSize(FONT_SIZES.base);
@@ -55,7 +55,7 @@ export const renderExperienceSection = (
     // Date right-aligned
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.element; // Clean spacing before bullets
+    yPos += SPACING.element * 1.2; // Increased spacing before bullets
     
     // Add bullet points with clean spacing like reference
     pdf.setFontSize(FONT_SIZES.small);
@@ -68,15 +68,15 @@ export const renderExperienceSection = (
       const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.15);
       
       pdf.text(splitBullet, leftMargin + 0.15, yPos);
-      yPos += (splitBullet.length * SPACING.bullet); // Clean bullet spacing
+      yPos += (splitBullet.length * SPACING.bullet * 1.15); // Increased bullet spacing
       
       // Small gap between bullets
       if (bulletPoints.indexOf(bullet) < bulletPoints.length - 1) {
-        yPos += SPACING.xs;
+        yPos += SPACING.xs * 1.2; // Increased spacing between bullets
       }
     }
     
-    yPos += SPACING.lg; // Clean spacing between job entries
+    yPos += SPACING.lg * 1.3; // Increased spacing between job entries
   }
   
   // Add clean section break

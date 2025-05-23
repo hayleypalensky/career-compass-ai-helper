@@ -21,15 +21,15 @@ export const renderHeaderSection = (
   pdf.setFont(FONT_FAMILY, "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
-  yPos += SPACING.header; // Clean spacing after name
+  yPos += SPACING.header * 1.5; // Increased spacing after name
   
-  // Add horizontal line with theme color
+  // Add horizontal line with theme color - thinner line for elegance
   pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.008);
+  pdf.setLineWidth(0.006);
   pdf.line(leftMargin, yPos, rightMargin, yPos);
-  yPos += SPACING.sm; // Clean spacing after line
+  yPos += SPACING.sm * 1.3; // Increased spacing after line
   
-  // Add contact information in a professional layout
+  // Add contact information in a professional layout with adjusted spacing
   pdf.setFontSize(FONT_SIZES.base);
   pdf.setFont(FONT_FAMILY, "normal");
   pdf.setTextColor(COLORS.black);
@@ -47,7 +47,7 @@ export const renderHeaderSection = (
     const contactWidth = pdf.getTextWidth(contactLine);
     const centerX = leftMargin + (pageWidth / 2) - (contactWidth / 2);
     pdf.text(contactLine, centerX, yPos);
-    yPos += SPACING.md; // Clean spacing after contact info
+    yPos += SPACING.md * 1.3; // Increased spacing after contact info
   }
   
   // Add summary if available - clean section like reference
@@ -56,7 +56,7 @@ export const renderHeaderSection = (
     pdf.setFont(FONT_FAMILY, "bold");
     pdf.setTextColor(themeColors.heading);
     pdf.text("PROFESSIONAL SUMMARY", leftMargin, yPos);
-    yPos += SPACING.element; // Clean spacing between header and content
+    yPos += SPACING.element * 1.2; // Increased spacing between header and content
     
     pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont(FONT_FAMILY, "normal");
@@ -64,9 +64,11 @@ export const renderHeaderSection = (
     const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
     pdf.text(splitSummary, leftMargin, yPos);
     
-    // Clean line height calculation
+    // Clean line height calculation with increased spacing
     const lineHeight = (FONT_SIZES.base * LINE_HEIGHTS.normal) / 72;
-    yPos += (splitSummary.length * lineHeight) + SPACING.section; // Clean section break
+    yPos += (splitSummary.length * lineHeight) + SPACING.section; // Increased section break
+  } else {
+    yPos += SPACING.md; // Add space even if no summary
   }
   
   return yPos;

@@ -29,7 +29,7 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     // Get selected color theme
     const themeColors = getSelectedTheme(colorTheme);
     
-    // Set consistent margins
+    // Set consistent margins - using our enhanced margins for better whitespace
     const sideMargIn = PDF_MARGINS.left;
     const topBottomMargIn = PDF_MARGINS.top;
 
@@ -46,13 +46,11 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       themeColors
     };
     
-    // Render resume sections in new order: Header -> Education -> Experience -> Skills
+    // Render resume sections in sequence with improved spacing
     layoutData.yPos = renderHeaderSection(pdf, profile, layoutData);
-    layoutData.yPos = renderEducationSection(pdf, profile, layoutData);
     layoutData.yPos = renderExperienceSection(pdf, profile, layoutData);
+    layoutData.yPos = renderEducationSection(pdf, profile, layoutData);
     layoutData.yPos = renderSkillsSection(pdf, profile, layoutData);
-    
-    // Remove footer - no longer calling addFooter function
     
     // Set PDF metadata
     pdf.setProperties({
