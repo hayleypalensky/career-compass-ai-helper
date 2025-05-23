@@ -32,13 +32,35 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     // Calculate content area
     const contentWidth = PDF_DIMENSIONS.width - (SPACING.margin * 2);
     const leftMargin = SPACING.margin;
+    const pageHeight = PDF_DIMENSIONS.height;
+    const bottomMargin = SPACING.margin;
+    const availableHeight = pageHeight - (SPACING.margin * 2); // Top and bottom margins
     
     let yPosition = SPACING.margin;
     
-    // Render sections in order: Header, Education, Experience, Skills
+    // First pass: calculate content heights without rendering
+    const headerHeight = calculateHeaderHeight(pdf, profile, leftMargin, contentWidth, themeColors);
+    const educationHeight = calculateEducationHeight(pdf, profile, leftMargin, contentWidth, themeColors);
+    const experienceHeight = calculateExperienceHeight(pdf, profile, leftMargin, contentWidth, themeColors);
+    const skillsHeight = calculateSkillsHeight(pdf, profile, leftMargin, contentWidth, themeColors);
+    
+    // Calculate total content height
+    const totalContentHeight = headerHeight + educationHeight + experienceHeight + skillsHeight;
+    
+    // Calculate spacing between sections to fill available space
+    const sectionsCount = 4; // header, education, experience, skills
+    const spacingBetweenSections = (availableHeight - totalContentHeight) / (sectionsCount - 1);
+    
+    // Render sections with calculated spacing
     yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    yPosition += spacingBetweenSections;
+    
     yPosition = renderEducation(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    yPosition += spacingBetweenSections;
+    
     yPosition = renderExperience(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    yPosition += spacingBetweenSections;
+    
     yPosition = renderSkills(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
     
     // Set PDF metadata
@@ -62,4 +84,66 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     console.error("PDF generation error:", error);
     throw error;
   }
+};
+
+// Helper functions to calculate section heights
+const calculateHeaderHeight = (
+  pdf: jsPDF,
+  profile: Profile,
+  leftMargin: number,
+  contentWidth: number,
+  themeColors: { heading: string; accent: string; border: string }
+): number => {
+  const tempY = 100; // Temporary position
+  const startY = tempY;
+  const endY = renderHeader(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
+  return endY - startY - SPACING.section; // Subtract the section spacing added by renderHeader
+};
+
+const calculateEducationHeight = (
+  pdf: jsPDF,
+  profile: Profile,
+  leftMargin: number,
+  contentWidth: number,
+  themeColors: { heading: string; accent: string; border: string }
+): number => {
+  if (!profile.education || profile.education.length === 0) {
+    return 0;
+  }
+  const tempY = 100;
+  const startY = tempY;
+  const endY = renderEducation(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
+  return endY - startY - SPACING.section;
+};
+
+const calculateExperienceHeight = (
+  pdf: jsPDF,
+  profile: Profile,
+  leftMargin: number,
+  contentWidth: number,
+  themeColors: { heading: string; accent: string; border: string }
+): number => {
+  if (!profile.experiences || profile.experiences.length === 0) {
+    return 0;
+  }
+  const tempY = 100;
+  const startY = tempY;
+  const endY = renderExperience(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
+  return endY - startY - SPACING.section;
+};
+
+const calculateSkillsHeight = (
+  pdf: jsPDF,
+  profile: Profile,
+  leftMargin: number,
+  contentWidth: number,
+  themeColors: { heading: string; accent: string; border: string }
+): number => {
+  if (!profile.skills || profile.skills.length === 0) {
+    return 0;
+  }
+  const tempY = 100;
+  const startY = tempY;
+  const endY = renderSkills(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
+  return endY - startY;
 };

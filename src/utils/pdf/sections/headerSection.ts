@@ -1,4 +1,3 @@
-
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
@@ -61,5 +60,5 @@ export const renderHeader = (
     currentY += summaryLines.length * SPACING.line;
   }
   
-  return currentY + SPACING.section;
+  return currentY;
 };

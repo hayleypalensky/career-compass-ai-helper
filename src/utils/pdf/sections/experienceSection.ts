@@ -1,4 +1,3 @@
-
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING, BULLET_CHAR } from "../constants";
@@ -75,5 +74,5 @@ export const renderExperience = (
     currentY += SPACING.subsection;
   }
   
-  return currentY + SPACING.section;
+  return currentY;
 };
