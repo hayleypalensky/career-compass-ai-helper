@@ -27,7 +27,7 @@ export const addFooter = (
     const textWidth = pdf.getTextWidth(text);
     const x = (8.5 - textWidth) / 2;
     
-    // Position at bottom of page with small margin
-    pdf.text(text, x, 10.8);
+    // Position at bottom of page with consistent margin
+    pdf.text(text, x, 10.5);
   }
 };

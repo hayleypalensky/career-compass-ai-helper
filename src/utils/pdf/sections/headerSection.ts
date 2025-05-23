@@ -21,13 +21,13 @@ export const renderHeaderSection = (
   pdf.setFont(FONT_FAMILY, "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
-  yPos += SPACING.sm; // Reduced spacing after name
+  yPos += SPACING.md;
   
   // Add horizontal line with theme color
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.01);
   pdf.line(leftMargin, yPos, rightMargin, yPos);
-  yPos += SPACING.sm; // Reduced spacing after line
+  yPos += SPACING.md;
   
   // Add contact information in a professional layout
   pdf.setFontSize(FONT_SIZES.base);
@@ -72,7 +72,7 @@ export const renderHeaderSection = (
       });
     }
     
-    yPos += SPACING.sm; // Reduced space after contact info
+    yPos += SPACING.md;
   }
   
   // Add summary if available
@@ -81,7 +81,7 @@ export const renderHeaderSection = (
     pdf.setFont(FONT_FAMILY, "bold");
     pdf.setTextColor(themeColors.heading);
     pdf.text("Professional Summary", leftMargin, yPos);
-    yPos += SPACING.sm; // Reduced spacing after the heading
+    yPos += SPACING.md;
     
     pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont(FONT_FAMILY, "normal");
@@ -89,9 +89,9 @@ export const renderHeaderSection = (
     const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
     pdf.text(splitSummary, leftMargin, yPos);
     
-    // Use proper line height calculation instead of SPACING.md per line
+    // Use proper line height calculation
     const lineHeight = (FONT_SIZES.base * LINE_HEIGHTS.normal) / 72; // Convert to inches
-    yPos += (splitSummary.length * lineHeight) + SPACING.sm; // Reduced section spacing
+    yPos += (splitSummary.length * lineHeight) + SPACING.lg;
   }
   
   return yPos;

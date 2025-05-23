@@ -22,7 +22,7 @@ export const renderSkillsSection = (
   // Check if we need a new page before skills
   if (yPos > 9.5) {
     pdf.addPage();
-    yPos = layoutData.topBottomMargIn + SPACING.sm;
+    yPos = layoutData.topBottomMargIn + SPACING.md;
   }
   
   // Section header
@@ -36,7 +36,7 @@ export const renderSkillsSection = (
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.sm;
+  yPos += SPACING.md;
   
   // Reset text settings
   pdf.setFontSize(FONT_SIZES.base);
@@ -51,7 +51,7 @@ export const renderSkillsSection = (
   const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
   
   pdf.text(splitSkills, leftMargin, yPos);
-  yPos += (splitSkills.length * 0.15) + SPACING.sm;
+  yPos += (splitSkills.length * 0.15) + SPACING.lg;
   
   return yPos;
 };

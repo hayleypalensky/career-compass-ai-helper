@@ -31,13 +31,13 @@ export const renderExperienceSection = (
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.sm;
+  yPos += SPACING.md;
   
   for (const exp of profile.experiences) {
     // Check if we need to add a new page
     if (yPos > 10 - layoutData.topBottomMargIn) {
       pdf.addPage();
-      yPos = layoutData.topBottomMargIn + SPACING.sm;
+      yPos = layoutData.topBottomMargIn + SPACING.md;
     }
     
     // Job title
@@ -46,7 +46,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(exp.title, leftMargin, yPos);
     
-    yPos += SPACING.sm; // Reduced spacing between role and company lines
+    yPos += SPACING.md;
     
     // Company and dates on the same line, with dates right-aligned
     pdf.setFontSize(FONT_SIZES.base);
@@ -62,7 +62,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.sm; // Reduced spacing before bullet points
+    yPos += SPACING.md;
     
     // Add bullet points
     pdf.setFontSize(FONT_SIZES.small);
@@ -78,14 +78,14 @@ export const renderExperienceSection = (
       // Check if we need to add a new page
       if (yPos + (splitBullet.length * 0.15) > 10.5 - layoutData.topBottomMargIn) {
         pdf.addPage();
-        yPos = layoutData.topBottomMargIn + SPACING.sm;
+        yPos = layoutData.topBottomMargIn + SPACING.md;
       }
       
       pdf.text(splitBullet, leftMargin + 0.1, yPos);
       yPos += (splitBullet.length * 0.15) + SPACING.xs;
     }
     
-    yPos += SPACING.sm; // Reduced space after each experience entry
+    yPos += SPACING.lg;
   }
   
   return yPos;

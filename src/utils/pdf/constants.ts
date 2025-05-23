@@ -19,13 +19,13 @@ export const LINE_HEIGHTS = {
   relaxed: 1.6      // Relaxed for better readability
 };
 
-// Spacing values in inches
+// Spacing values in inches - optimized for consistent layout
 export const SPACING = {
-  xs: 0.1,          // Extra small spacing
-  sm: 0.15,         // Small spacing
-  md: 0.25,         // Medium spacing
-  lg: 0.4,          // Large spacing
-  xl: 0.6           // Extra large spacing
+  xs: 0.08,         // Extra small spacing
+  sm: 0.12,         // Small spacing
+  md: 0.18,         // Medium spacing
+  lg: 0.25,         // Large spacing
+  xl: 0.35          // Extra large spacing
 };
 
 // PDF dimensions (US Letter)
@@ -35,12 +35,12 @@ export const PDF_DIMENSIONS = {
   widthPx: 794      // Width in pixels (for HTML preview)
 };
 
-// PDF margins in inches
+// PDF margins in inches - reduced for better space utilization
 export const PDF_MARGINS = {
-  top: 0.6,
-  bottom: 0.6,
-  left: 0.7,
-  right: 0.7
+  top: 0.5,
+  bottom: 0.5,
+  left: 0.6,
+  right: 0.6
 };
 
 // Font family
