@@ -3,7 +3,7 @@
  * Constants used for PDF styling and formatting
  */
 
-// Font sizes - numeric values for jsPDF
+// Font sizes for jsPDF (numeric values)
 export const FONT_SIZES = {
   base: 10,         // Base font size for body text
   small: 9,         // Small text
@@ -12,45 +12,47 @@ export const FONT_SIZES = {
   heading3: 11      // Section headings
 };
 
-// Line heights - optimized for PDF readability
+// Line heights (multipliers for font size)
 export const LINE_HEIGHTS = {
-  tight: 1.2,         // Tight for compact layout
-  tighter: 1.15,      // Tighter for lists
-  compact: 1.1        // Very compact for small text
+  tight: 1.2,       // Tight for compact layout
+  normal: 1.4,      // Normal for most text
+  relaxed: 1.6      // Relaxed for better readability
 };
 
-// Spacing values - numeric values for jsPDF
+// Spacing values in inches
 export const SPACING = {
-  none: 0,
-  tiny: 0.02,          // Smallest spacing
-  xsmall: 0.03,        // Very small gaps
-  small: 0.04,         // Small gaps between elements
-  medium: 0.06,        // Medium gaps
-  base: 0.08,          // Base spacing
-  large: 0.10          // Largest spacing
+  xs: 0.1,          // Extra small spacing
+  sm: 0.15,         // Small spacing
+  md: 0.25,         // Medium spacing
+  lg: 0.4,          // Large spacing
+  xl: 0.6           // Extra large spacing
 };
 
 // PDF dimensions (US Letter)
 export const PDF_DIMENSIONS = {
-  width: 8.5,
-  height: 11,
-  widthPx: 794,
+  width: 8.5,       // Width in inches
+  height: 11,       // Height in inches
+  widthPx: 794      // Width in pixels (for HTML preview)
 };
 
-// Font families - simple and reliable for PDF
+// PDF margins in inches
+export const PDF_MARGINS = {
+  top: 0.6,
+  bottom: 0.6,
+  left: 0.7,
+  right: 0.7
+};
+
+// Font family
 export const FONT_FAMILY = "helvetica";
 
-// Letter spacing values - numeric for PDF clarity
-export const LETTER_SPACING = {
-  tight: 0,           // No extra spacing for headings
-  normal: 0.1,        // Minimal spacing for body text
-  loose: 0.2          // Slight spacing only when needed
-};
-
-// Common colors
+// Colors
 export const COLORS = {
   black: '#000000',
-  white: '#ffffff',
-  grayLight: '#f3f4f6',
-  gray: '#d1d5db'
+  gray: '#4B5563',
+  grayLight: '#9CA3AF',
+  white: '#FFFFFF'
 };
+
+// Bullet point character
+export const BULLET_CHAR = "•";

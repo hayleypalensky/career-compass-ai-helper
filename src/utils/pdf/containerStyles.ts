@@ -13,7 +13,7 @@ export const applyContainerStyles = (element: HTMLElement): void => {
   element.style.backgroundColor = "white";
   element.style.position = "absolute";
   element.style.left = "-9999px"; // Position off-screen
-  element.style.fontSize = "12px"; // Reduced font size to fit more content
+  element.style.fontSize = "12px"; // Base font size
   element.style.fontFamily = FONT_FAMILY;
   element.style.color = "#000"; // Ensure sharp text
   element.style.textRendering = "optimizeLegibility"; // Improve text rendering

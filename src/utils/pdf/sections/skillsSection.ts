@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
+import { COLORS, FONT_SIZES, SPACING } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { PdfLayoutData } from "../types";
 
@@ -22,29 +22,26 @@ export const renderSkillsSection = (
   // Check if we need a new page before skills
   if (yPos > 9.5) {
     pdf.addPage();
-    yPos = layoutData.topBottomMargIn + 0.2;
+    yPos = layoutData.topBottomMargIn + SPACING.sm;
   }
   
   // Section header
-  pdf.setFontSize(12);
+  pdf.setFontSize(FONT_SIZES.heading3);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text("Skills", leftMargin, yPos);
-  pdf.setCharSpace(0);
-  yPos += 0.15;
+  yPos += SPACING.xs;
   
   // Add a thin line under the section header
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += 0.2;
+  yPos += SPACING.sm;
   
   // Reset text settings
   pdf.setFontSize(FONT_SIZES.base);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(COLORS.black);
-  pdf.setCharSpace(LETTER_SPACING.normal);
   
   // Extract all skill names without categories
   const allSkills = profile.skills.map(skill => skill.name);
@@ -54,8 +51,7 @@ export const renderSkillsSection = (
   const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
   
   pdf.text(splitSkills, leftMargin, yPos);
-  pdf.setCharSpace(0);
-  yPos += (splitSkills.length * 0.15) + 0.1;
+  yPos += (splitSkills.length * 0.15) + SPACING.sm;
   
   return yPos;
 };

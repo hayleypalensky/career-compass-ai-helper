@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
+import { COLORS, FONT_SIZES, SPACING, BULLET_CHAR } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { formatDate } from "../helpers";
 import { PdfLayoutData } from "../types";
@@ -21,41 +21,36 @@ export const renderExperienceSection = (
   }
   
   // Section header
-  pdf.setFontSize(12);
+  pdf.setFontSize(FONT_SIZES.heading3);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text("Experience", leftMargin, yPos);
-  pdf.setCharSpace(0);
-  yPos += 0.15;
+  yPos += SPACING.xs;
   
   // Add a thin line under the section header
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += 0.25;
+  yPos += SPACING.sm;
   
   for (const exp of profile.experiences) {
     // Check if we need to add a new page
     if (yPos > 10 - layoutData.topBottomMargIn) {
       pdf.addPage();
-      yPos = layoutData.topBottomMargIn + 0.2;
+      yPos = layoutData.topBottomMargIn + SPACING.sm;
     }
     
     // Job title
-    pdf.setFontSize(11);
+    pdf.setFontSize(FONT_SIZES.heading3);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(LETTER_SPACING.tight);
     pdf.text(exp.title, leftMargin, yPos);
-    pdf.setCharSpace(0);
     
-    yPos += 0.2;
+    yPos += SPACING.sm;
     
     // Company and dates on the same line, with dates right-aligned
     pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
-    pdf.setCharSpace(LETTER_SPACING.normal);
     const dateText = `${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
@@ -66,33 +61,31 @@ export const renderExperienceSection = (
     // Set date in regular black
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
-    pdf.setCharSpace(0);
     
-    yPos += 0.25;
+    yPos += SPACING.sm;
     
     // Add bullet points
     pdf.setFontSize(FONT_SIZES.small);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(LETTER_SPACING.normal);
+    
     const bulletPoints = exp.bullets.filter(bullet => bullet.trim() !== "");
     for (const bullet of bulletPoints) {
       // Handle bullet points that may need multiple lines
-      const bulletText = "• " + bullet;
+      const bulletText = BULLET_CHAR + " " + bullet;
       const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.1);
       
       // Check if we need to add a new page
       if (yPos + (splitBullet.length * 0.15) > 10.5 - layoutData.topBottomMargIn) {
         pdf.addPage();
-        yPos = layoutData.topBottomMargIn + 0.2;
+        yPos = layoutData.topBottomMargIn + SPACING.sm;
       }
       
       pdf.text(splitBullet, leftMargin + 0.1, yPos);
-      yPos += (splitBullet.length * 0.15) + 0.12;
+      yPos += (splitBullet.length * 0.15) + SPACING.xs;
     }
-    pdf.setCharSpace(0);
     
-    yPos += 0.25;
+    yPos += SPACING.md; // Add space after each experience entry
   }
   
   return yPos;

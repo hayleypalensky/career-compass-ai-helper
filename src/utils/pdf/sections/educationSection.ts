@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
+import { COLORS, FONT_SIZES, SPACING } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { formatDate } from "../helpers";
 import { PdfLayoutData } from "../types";
@@ -23,62 +23,55 @@ export const renderEducationSection = (
   // Check if we need a new page before education
   if (yPos > 9) {
     pdf.addPage();
-    yPos = layoutData.topBottomMargIn + 0.2;
+    yPos = layoutData.topBottomMargIn + SPACING.sm;
   }
   
   // Section header
-  pdf.setFontSize(12);
+  pdf.setFontSize(FONT_SIZES.heading3);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text("Education", leftMargin, yPos);
-  pdf.setCharSpace(0);
-  yPos += 0.15;
+  yPos += SPACING.xs;
   
   // Add a thin line under the section header
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += 0.2;
+  yPos += SPACING.sm;
   
   for (const edu of profile.education) {
     // Degree
-    pdf.setFontSize(11);
+    pdf.setFontSize(FONT_SIZES.heading3);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(LETTER_SPACING.tight);
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    pdf.setCharSpace(0);
+    yPos += SPACING.sm;
     
     // School and dates on the same line
     pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
-    pdf.setCharSpace(LETTER_SPACING.normal);
     const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
     // Set school name in a slightly highlighted color
     pdf.setTextColor(themeColors.heading);
-    pdf.text(edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : ''), leftMargin, yPos + 0.15);
+    pdf.text(edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : ''), leftMargin, yPos);
     
     // Set date in regular black
     pdf.setTextColor(COLORS.black);
-    pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos + 0.15);
-    pdf.setCharSpace(0);
+    pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += 0.3;
+    yPos += SPACING.sm;
     
     if (edu.description) {
       pdf.setFontSize(FONT_SIZES.small);
       pdf.setTextColor(COLORS.black);
-      pdf.setCharSpace(LETTER_SPACING.normal);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      pdf.setCharSpace(0);
-      yPos += (splitDesc.length * 0.13);
+      yPos += (splitDesc.length * 0.15);
     }
     
-    yPos += 0.2;
+    yPos += SPACING.md; // Add space after each education entry
   }
   
   return yPos;

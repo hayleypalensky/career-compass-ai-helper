@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
+import { COLORS, FONT_SIZES, SPACING, FONT_FAMILY } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { PdfLayoutData } from "../types";
 
@@ -16,29 +16,23 @@ export const renderHeaderSection = (
   let { yPos } = layoutData;
   const rightMargin = 8.5 - layoutData.sideMargIn;
   
-  // Set consistent font family for entire document
-  pdf.setFont("helvetica");
-  
-  // Add header - Name with theme color
-  pdf.setFontSize(16);
-  pdf.setFont("helvetica", "bold");
+  // Name with theme color
+  pdf.setFontSize(FONT_SIZES.heading2);
+  pdf.setFont(FONT_FAMILY, "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
-  pdf.setCharSpace(0);
-  yPos += 0.22;
+  yPos += SPACING.sm;
   
   // Add horizontal line with theme color
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.01);
   pdf.line(leftMargin, yPos, rightMargin, yPos);
-  yPos += 0.2;
+  yPos += SPACING.sm;
   
   // Add contact information in a professional layout
   pdf.setFontSize(FONT_SIZES.base);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont(FONT_FAMILY, "normal");
   pdf.setTextColor(COLORS.black);
-  pdf.setCharSpace(LETTER_SPACING.normal);
 
   // Create array of contact items
   const contactItems = [];
@@ -78,29 +72,23 @@ export const renderHeaderSection = (
       });
     }
     
-    yPos += 0.25; // Add space after contact info
+    yPos += SPACING.md; // Add space after contact info
   }
-  
-  pdf.setCharSpace(0);
   
   // Add summary if available
   if (profile.personalInfo.summary) {
-    pdf.setFontSize(12);
-    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(FONT_SIZES.heading3);
+    pdf.setFont(FONT_FAMILY, "bold");
     pdf.setTextColor(themeColors.heading);
-    pdf.setCharSpace(LETTER_SPACING.tight);
     pdf.text("Professional Summary", leftMargin, yPos);
-    pdf.setCharSpace(0);
-    yPos += 0.18;
+    yPos += SPACING.xs;
     
     pdf.setFontSize(FONT_SIZES.base);
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont(FONT_FAMILY, "normal");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(LETTER_SPACING.normal);
     const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
     pdf.text(splitSummary, leftMargin, yPos);
-    pdf.setCharSpace(0);
-    yPos += (splitSummary.length * 0.13) + 0.25;
+    yPos += (splitSummary.length * 0.15) + SPACING.md; // Add space after summary
   }
   
   return yPos;

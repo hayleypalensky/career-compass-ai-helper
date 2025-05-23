@@ -1,7 +1,7 @@
 
 import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { COLORS } from "@/utils/pdf/constants";
+import { COLORS, PDF_MARGINS } from "@/utils/pdf/constants";
 import { ResumeColorTheme, colorThemes } from "@/components/resume-tailoring/ResumeColorSelector";
 import { PdfExportOptions, PdfLayoutData } from "./pdf/types";
 import { getSelectedTheme } from "./pdf/helpers";
@@ -31,8 +31,8 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     const themeColors = getSelectedTheme(colorTheme);
     
     // Set consistent margins
-    const sideMargIn = 0.6;
-    const topBottomMargIn = 0.5;
+    const sideMargIn = PDF_MARGINS.left;
+    const topBottomMargIn = PDF_MARGINS.top;
 
     // Set font for the entire document
     pdf.setFont("helvetica");
