@@ -1,74 +1,69 @@
 
-import { Profile } from "@/types/profile";
-import { COLORS, FONT_SIZES, SPACING } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
+import { Profile } from "@/types/profile";
+import { FONT_SIZES, COLORS, SPACING } from "../constants";
 import { formatDate } from "../helpers";
-import { PdfLayoutData } from "../types";
 
-/**
- * Renders the education section of the resume PDF
- */
-export const renderEducationSection = (
-  pdf: jsPDF, 
-  profile: Profile, 
-  layoutData: PdfLayoutData
+export const renderEducation = (
+  pdf: jsPDF,
+  profile: Profile,
+  leftMargin: number,
+  contentWidth: number,
+  yPos: number
 ): number => {
-  const { leftMargin, pageWidth, themeColors } = layoutData;
-  let { yPos } = layoutData;
-
   if (!profile.education || profile.education.length === 0) {
     return yPos;
   }
   
-  // Section header - clean and consistent
-  pdf.setFontSize(FONT_SIZES.heading3);
+  let currentY = yPos;
+  
+  // Section heading
+  pdf.setFontSize(FONT_SIZES.heading);
   pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(themeColors.heading);
-  pdf.text("EDUCATION", leftMargin, yPos);
-  yPos += SPACING.element * 1.2; // Increased spacing after heading
+  pdf.setTextColor(COLORS.black);
+  pdf.text("EDUCATION", leftMargin, currentY);
+  currentY += SPACING.line;
   
-  // Add a clean line under the section header - thinner for elegance
-  pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.006);
-  pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.md * 1.3; // Increased spacing after line
+  // Add line under heading
+  pdf.setDrawColor(COLORS.black);
+  pdf.setLineWidth(0.01);
+  pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
+  currentY += SPACING.line * 1.5;
   
+  // Education entries
   for (const edu of profile.education) {
-    // Degree - clean and prominent
-    pdf.setFontSize(FONT_SIZES.base);
+    // Degree and field
+    pdf.setFontSize(FONT_SIZES.subheading);
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(COLORS.black);
-    pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    yPos += SPACING.sm * 1.2; // Increased spacing between degree and school
+    pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, currentY);
+    currentY += SPACING.line;
     
-    // School and dates on the same line - consistent with experience
-    pdf.setFontSize(FONT_SIZES.base);
+    // School and dates
+    pdf.setFontSize(FONT_SIZES.body);
     pdf.setFont("helvetica", "normal");
+    
+    const schoolText = edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : '');
     const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
+    
+    pdf.text(schoolText, leftMargin, currentY);
+    
+    // Right-align dates
     const dateWidth = pdf.getTextWidth(dateText);
+    pdf.text(dateText, leftMargin + contentWidth - dateWidth, currentY);
+    currentY += SPACING.line;
     
-    // School name
-    pdf.setTextColor(COLORS.black);
-    pdf.text(edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : ''), leftMargin, yPos);
-    
-    // Date right-aligned
-    pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
-    
-    yPos += SPACING.element * 1.2; // Increased spacing after school info
-    
+    // Description if available
     if (edu.description) {
       pdf.setFontSize(FONT_SIZES.small);
+      pdf.setTextColor(COLORS.gray);
+      const descLines = pdf.splitTextToSize(edu.description, contentWidth);
+      pdf.text(descLines, leftMargin, currentY);
+      currentY += descLines.length * SPACING.line;
       pdf.setTextColor(COLORS.black);
-      const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
-      pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * SPACING.bullet * 1.15); // Increased description spacing
     }
     
-    yPos += SPACING.lg * 1.2; // Increased spacing between education entries
+    currentY += SPACING.subsection;
   }
   
-  // Add clean section break with increased spacing
-  yPos += SPACING.md * 1.2;
-  
-  return yPos;
+  return currentY + SPACING.section;
 };

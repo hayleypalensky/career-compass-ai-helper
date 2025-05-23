@@ -1,75 +1,61 @@
 
 import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { COLORS, PDF_MARGINS } from "@/utils/pdf/constants";
-import { ResumeColorTheme, colorThemes } from "@/components/resume-tailoring/ResumeColorSelector";
-import { PdfExportOptions, PdfLayoutData } from "./pdf/types";
-import { getSelectedTheme } from "./pdf/helpers";
-import { renderHeaderSection } from "./pdf/sections/headerSection";
-import { renderExperienceSection } from "./pdf/sections/experienceSection";
-import { renderEducationSection } from "./pdf/sections/educationSection";
-import { renderSkillsSection } from "./pdf/sections/skillsSection";
+import { PdfExportOptions } from "./pdf/types";
+import { renderHeader } from "./pdf/sections/headerSection";
+import { renderEducation } from "./pdf/sections/educationSection";
+import { renderExperience } from "./pdf/sections/experienceSection";
+import { renderSkills } from "./pdf/sections/skillsSection";
+import { SPACING, PDF_DIMENSIONS } from "./pdf/constants";
 
 /**
- * Generates an ATS-friendly PDF file from the resume data
- * @param options The PDF export options
- * @returns A promise that resolves when the PDF is generated
+ * Generates a clean, ATS-friendly PDF resume
  */
 export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
-  const { profile, jobTitle, companyName, colorTheme = "purple" } = options;
+  const { profile, jobTitle, companyName } = options;
   
   try {
-    // Create PDF with US Letter dimensions (8.5 x 11 inches)
+    // Create PDF with US Letter dimensions
     const pdf = new jsPDF({
       orientation: "portrait",
       unit: "in",
-      format: "letter", // US Letter (8.5 x 11 inches)
+      format: "letter"
     });
-    
-    // Get selected color theme
-    const themeColors = getSelectedTheme(colorTheme);
-    
-    // Set consistent margins - using our enhanced margins for better whitespace
-    const sideMargIn = PDF_MARGINS.left;
-    const topBottomMargIn = PDF_MARGINS.top;
 
-    // Set font for the entire document
+    // Set consistent font
     pdf.setFont("helvetica");
     
-    // Layout data for sections
-    const layoutData: PdfLayoutData = {
-      yPos: topBottomMargIn,
-      leftMargin: sideMargIn,
-      pageWidth: 8.5 - (sideMargIn * 2),
-      sideMargIn,
-      topBottomMargIn,
-      themeColors
-    };
+    // Calculate content area
+    const contentWidth = PDF_DIMENSIONS.width - (SPACING.margin * 2);
+    const leftMargin = SPACING.margin;
     
-    // Render resume sections in sequence with improved spacing
-    layoutData.yPos = renderHeaderSection(pdf, profile, layoutData);
-    layoutData.yPos = renderExperienceSection(pdf, profile, layoutData);
-    layoutData.yPos = renderEducationSection(pdf, profile, layoutData);
-    layoutData.yPos = renderSkillsSection(pdf, profile, layoutData);
+    let yPosition = SPACING.margin;
+    
+    // Render sections in order: Header, Education, Experience, Skills
+    yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition);
+    yPosition = renderEducation(pdf, profile, leftMargin, contentWidth, yPosition);
+    yPosition = renderExperience(pdf, profile, leftMargin, contentWidth, yPosition);
+    yPosition = renderSkills(pdf, profile, leftMargin, contentWidth, yPosition);
     
     // Set PDF metadata
     pdf.setProperties({
-      title: `ATS-Friendly Resume for ${profile.personalInfo.name || 'Candidate'}`,
-      subject: `Tailored resume for ${jobTitle || 'position'} at ${companyName || 'company'}`,
-      creator: 'Resume Builder',
-      keywords: 'resume, ats-friendly, job application'
+      title: `Resume - ${profile.personalInfo.name}`,
+      subject: jobTitle ? `Resume for ${jobTitle}` : 'Professional Resume',
+      creator: 'Resume Builder'
     });
     
-    // Generate filename with job info if available
-    const filenameParts = ["ats_friendly_resume"];
-    if (companyName) filenameParts.push(companyName.toLowerCase().replace(/\s+/g, "_"));
-    if (jobTitle) filenameParts.push(jobTitle.toLowerCase().replace(/\s+/g, "_"));
+    // Generate filename
+    const fileName = [
+      "resume",
+      profile.personalInfo.name?.toLowerCase().replace(/\s+/g, "_"),
+      companyName?.toLowerCase().replace(/\s+/g, "_"),
+      jobTitle?.toLowerCase().replace(/\s+/g, "_")
+    ].filter(Boolean).join("_") + ".pdf";
     
-    pdf.save(`${filenameParts.join("_")}.pdf`);
+    pdf.save(fileName);
     
-    return Promise.resolve();
   } catch (error) {
     console.error("PDF generation error:", error);
-    return Promise.reject(error);
+    throw error;
   }
 };

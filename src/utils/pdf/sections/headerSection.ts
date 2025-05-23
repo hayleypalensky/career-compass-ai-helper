@@ -1,75 +1,61 @@
 
-import { Profile } from "@/types/profile";
-import { COLORS, FONT_SIZES, SPACING, FONT_FAMILY, LINE_HEIGHTS } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
-import { PdfLayoutData } from "../types";
+import { Profile } from "@/types/profile";
+import { FONT_SIZES, COLORS, SPACING } from "../constants";
 
-/**
- * Renders the header section of the resume PDF
- */
-export const renderHeaderSection = (
-  pdf: jsPDF, 
-  profile: Profile, 
-  layoutData: PdfLayoutData
+export const renderHeader = (
+  pdf: jsPDF,
+  profile: Profile,
+  leftMargin: number,
+  contentWidth: number,
+  yPos: number
 ): number => {
-  const { leftMargin, pageWidth, themeColors } = layoutData;
-  let { yPos } = layoutData;
-  const rightMargin = 8.5 - layoutData.sideMargIn;
+  let currentY = yPos;
   
-  // Name with theme color - clean and prominent like reference
-  pdf.setFontSize(FONT_SIZES.heading2);
-  pdf.setFont(FONT_FAMILY, "bold");
-  pdf.setTextColor(themeColors.heading);
-  pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
-  yPos += SPACING.header * 1.5; // Increased spacing after name
-  
-  // Add horizontal line with theme color - thinner line for elegance
-  pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.006);
-  pdf.line(leftMargin, yPos, rightMargin, yPos);
-  yPos += SPACING.sm * 1.3; // Increased spacing after line
-  
-  // Add contact information in a professional layout with adjusted spacing
-  pdf.setFontSize(FONT_SIZES.base);
-  pdf.setFont(FONT_FAMILY, "normal");
+  // Name
+  pdf.setFontSize(FONT_SIZES.name);
+  pdf.setFont("helvetica", "bold");
   pdf.setTextColor(COLORS.black);
-
-  // Create array of contact items
-  const contactItems = [];
-  if (profile.personalInfo.email) contactItems.push(`${profile.personalInfo.email}`);
-  if (profile.personalInfo.phone) contactItems.push(`${profile.personalInfo.phone}`);
-  if (profile.personalInfo.website) contactItems.push(`${profile.personalInfo.website}`);
-  if (profile.personalInfo.location) contactItems.push(`${profile.personalInfo.location}`);
+  pdf.text(profile.personalInfo.name || "Resume", leftMargin, currentY);
+  currentY += SPACING.line * 2;
   
-  // Clean contact layout like reference
-  if (contactItems.length > 0) {
-    const contactLine = contactItems.join(" | ");
-    const contactWidth = pdf.getTextWidth(contactLine);
-    const centerX = leftMargin + (pageWidth / 2) - (contactWidth / 2);
-    pdf.text(contactLine, centerX, yPos);
-    yPos += SPACING.md * 1.3; // Increased spacing after contact info
+  // Contact information
+  pdf.setFontSize(FONT_SIZES.body);
+  pdf.setFont("helvetica", "normal");
+  
+  const contactInfo = [];
+  if (profile.personalInfo.email) contactInfo.push(profile.personalInfo.email);
+  if (profile.personalInfo.phone) contactInfo.push(profile.personalInfo.phone);
+  if (profile.personalInfo.location) contactInfo.push(profile.personalInfo.location);
+  if (profile.personalInfo.website) contactInfo.push(profile.personalInfo.website);
+  
+  if (contactInfo.length > 0) {
+    const contactLine = contactInfo.join(" | ");
+    pdf.text(contactLine, leftMargin, currentY);
+    currentY += SPACING.line;
   }
   
-  // Add summary if available - clean section like reference
+  // Professional Summary
   if (profile.personalInfo.summary) {
-    pdf.setFontSize(FONT_SIZES.heading3);
-    pdf.setFont(FONT_FAMILY, "bold");
-    pdf.setTextColor(themeColors.heading);
-    pdf.text("PROFESSIONAL SUMMARY", leftMargin, yPos);
-    yPos += SPACING.element * 1.2; // Increased spacing between header and content
+    currentY += SPACING.subsection;
     
-    pdf.setFontSize(FONT_SIZES.base);
-    pdf.setFont(FONT_FAMILY, "normal");
-    pdf.setTextColor(COLORS.black);
-    const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
-    pdf.text(splitSummary, leftMargin, yPos);
+    pdf.setFontSize(FONT_SIZES.heading);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("PROFESSIONAL SUMMARY", leftMargin, currentY);
+    currentY += SPACING.line;
     
-    // Clean line height calculation with increased spacing
-    const lineHeight = (FONT_SIZES.base * LINE_HEIGHTS.normal) / 72;
-    yPos += (splitSummary.length * lineHeight) + SPACING.section; // Increased section break
-  } else {
-    yPos += SPACING.md; // Add space even if no summary
+    // Add line under heading
+    pdf.setDrawColor(COLORS.black);
+    pdf.setLineWidth(0.01);
+    pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
+    currentY += SPACING.line;
+    
+    pdf.setFontSize(FONT_SIZES.body);
+    pdf.setFont("helvetica", "normal");
+    const summaryLines = pdf.splitTextToSize(profile.personalInfo.summary, contentWidth);
+    pdf.text(summaryLines, leftMargin, currentY);
+    currentY += summaryLines.length * SPACING.line;
   }
   
-  return yPos;
+  return currentY + SPACING.section;
 };
