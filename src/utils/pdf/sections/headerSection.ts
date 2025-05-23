@@ -1,3 +1,4 @@
+
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
@@ -38,7 +39,7 @@ export const renderHeader = (
   
   // Professional Summary
   if (profile.personalInfo.summary) {
-    currentY += SPACING.subsection;
+    currentY += SPACING.section; // Add spacing above the section
     
     pdf.setFontSize(FONT_SIZES.heading);
     pdf.setFont("helvetica", "bold");
@@ -58,6 +59,9 @@ export const renderHeader = (
     const summaryLines = pdf.splitTextToSize(profile.personalInfo.summary, contentWidth);
     pdf.text(summaryLines, leftMargin, currentY);
     currentY += summaryLines.length * SPACING.line;
+    
+    // Add spacing below the section
+    currentY += SPACING.section;
   }
   
   return currentY;
