@@ -8,8 +8,8 @@ export const FONT_SIZES = {
   base: 10,         // Base font size for body text
   small: 9,         // Small text
   xsmall: 8,        // Extra small text
-  heading2: 14,     // Main headings
-  heading3: 11      // Section headings
+  heading2: 16,     // Main headings - increased for better hierarchy
+  heading3: 12      // Section headings - increased slightly
 };
 
 // Line heights (multipliers for font size)
@@ -19,13 +19,13 @@ export const LINE_HEIGHTS = {
   relaxed: 1.6      // Relaxed for better readability
 };
 
-// Spacing values in inches - optimized for consistent layout
+// Spacing values in inches - adjusted for better page utilization
 export const SPACING = {
-  xs: 0.08,         // Extra small spacing
-  sm: 0.12,         // Small spacing
-  md: 0.18,         // Medium spacing
-  lg: 0.25,         // Large spacing
-  xl: 0.35          // Extra large spacing
+  xs: 0.06,         // Extra small spacing - reduced
+  sm: 0.10,         // Small spacing - reduced
+  md: 0.16,         // Medium spacing - reduced
+  lg: 0.22,         // Large spacing - reduced
+  xl: 0.28          // Extra large spacing - reduced
 };
 
 // PDF dimensions (US Letter)
@@ -37,10 +37,10 @@ export const PDF_DIMENSIONS = {
 
 // PDF margins in inches - reduced for better space utilization
 export const PDF_MARGINS = {
-  top: 0.5,
-  bottom: 0.5,
-  left: 0.6,
-  right: 0.6
+  top: 0.4,         // Reduced from 0.5
+  bottom: 0.4,      // Reduced from 0.5
+  left: 0.5,        // Reduced from 0.6
+  right: 0.5        // Reduced from 0.6
 };
 
 // Font family

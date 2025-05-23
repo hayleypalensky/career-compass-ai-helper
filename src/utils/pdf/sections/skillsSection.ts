@@ -45,7 +45,7 @@ export const renderSkillsSection = (
   const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
   
   pdf.text(splitSkills, leftMargin, yPos);
-  yPos += (splitSkills.length * 0.12);
+  yPos += (splitSkills.length * 0.11); // Slightly reduced line height
   
   return yPos;
 };
