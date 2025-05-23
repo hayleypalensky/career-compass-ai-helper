@@ -70,10 +70,10 @@ export const renderExperienceSection = (
       const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.1);
       
       pdf.text(splitBullet, leftMargin + 0.1, yPos);
-      yPos += (splitBullet.length * 0.14) + SPACING.xs; // Increased line height for better space utilization
+      yPos += (splitBullet.length * 0.12) + SPACING.xs; // Proper line spacing
     }
     
-    yPos += SPACING.md; // Increased spacing between experiences
+    yPos += SPACING.md; // Spacing between experiences
   }
   
   return yPos;

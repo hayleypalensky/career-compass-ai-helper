@@ -62,10 +62,10 @@ export const renderEducationSection = (
       pdf.setTextColor(COLORS.black);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * 0.14); // Increased line height for better space utilization
+      yPos += (splitDesc.length * 0.12); // Proper line spacing
     }
     
-    yPos += SPACING.md; // Increased spacing between education entries
+    yPos += SPACING.md; // Spacing between education entries
   }
   
   return yPos;

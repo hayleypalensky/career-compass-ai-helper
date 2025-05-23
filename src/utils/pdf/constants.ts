@@ -12,11 +12,11 @@ export const FONT_SIZES = {
   heading3: 12      // Section headings - increased slightly
 };
 
-// Line heights (multipliers for font size) - increased for better page utilization
+// Line heights (multipliers for font size) - balanced for readability and space utilization
 export const LINE_HEIGHTS = {
-  tight: 1.4,       // Increased from 1.2
-  normal: 1.6,      // Increased from 1.4
-  relaxed: 1.8      // Increased from 1.6
+  tight: 1.2,       // Tight for compact layout
+  normal: 1.3,      // Slightly increased from default
+  relaxed: 1.4      // For better readability
 };
 
 // Spacing values in inches - adjusted for better page utilization
