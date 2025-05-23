@@ -38,7 +38,7 @@ export const renderExperience = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor("#000000"); // Keep content black for readability
     pdf.text(exp.title, leftMargin, currentY);
-    currentY += SPACING.line * 1.2; // Increased spacing to match education section
+    currentY += SPACING.line * 1.5; // Further increased spacing between title and company
     
     // Company and dates
     pdf.setFontSize(FONT_SIZES.body);
