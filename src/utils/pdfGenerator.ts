@@ -33,10 +33,11 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     const contentWidth = PDF_DIMENSIONS.width - (SPACING.margin * 2);
     const leftMargin = SPACING.margin;
     const pageHeight = PDF_DIMENSIONS.height;
+    const topMargin = SPACING.margin;
     const bottomMargin = SPACING.margin;
-    const availableHeight = pageHeight - (SPACING.margin * 2); // Top and bottom margins
+    const availableHeight = pageHeight - topMargin - bottomMargin; // Account for both top and bottom margins
     
-    let yPosition = SPACING.margin;
+    let yPosition = topMargin;
     
     // First pass: calculate content heights without rendering
     const headerHeight = calculateHeaderHeight(pdf, profile, leftMargin, contentWidth, themeColors);
@@ -47,9 +48,9 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     // Calculate total content height
     const totalContentHeight = headerHeight + educationHeight + experienceHeight + skillsHeight;
     
-    // Calculate spacing between sections to fill available space
+    // Calculate spacing between sections to fill available space while respecting bottom margin
     const sectionsCount = 4; // header, education, experience, skills
-    const spacingBetweenSections = (availableHeight - totalContentHeight) / (sectionsCount - 1);
+    const spacingBetweenSections = Math.max(0.15, (availableHeight - totalContentHeight) / (sectionsCount - 1));
     
     // Render sections with calculated spacing
     yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
