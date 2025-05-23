@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING } from "@/utils/pdf/constants";
+import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { formatDate } from "../helpers";
 import { PdfLayoutData } from "../types";
@@ -53,7 +53,7 @@ export const renderExperienceSection = (
     yPos += 0.2;
     
     // Company and dates on the same line, with dates right-aligned
-    pdf.setFontSize(10);
+    pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
     pdf.setCharSpace(LETTER_SPACING.normal);
     const dateText = `${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`;
@@ -71,7 +71,7 @@ export const renderExperienceSection = (
     yPos += 0.25;
     
     // Add bullet points
-    pdf.setFontSize(9);
+    pdf.setFontSize(FONT_SIZES.small);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
     pdf.setCharSpace(LETTER_SPACING.normal);

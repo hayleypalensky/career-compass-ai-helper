@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING } from "@/utils/pdf/constants";
+import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { PdfLayoutData } from "../types";
 
@@ -41,7 +41,7 @@ export const renderSkillsSection = (
   yPos += 0.2;
   
   // Reset text settings
-  pdf.setFontSize(10);
+  pdf.setFontSize(FONT_SIZES.base);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(COLORS.black);
   pdf.setCharSpace(LETTER_SPACING.normal);

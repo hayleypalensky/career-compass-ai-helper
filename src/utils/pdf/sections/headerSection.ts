@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING } from "@/utils/pdf/constants";
+import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { PdfLayoutData } from "../types";
 
@@ -35,7 +35,7 @@ export const renderHeaderSection = (
   yPos += 0.2;
   
   // Add contact information in a professional layout
-  pdf.setFontSize(10);
+  pdf.setFontSize(FONT_SIZES.base);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(COLORS.black);
   pdf.setCharSpace(LETTER_SPACING.normal);
@@ -93,7 +93,7 @@ export const renderHeaderSection = (
     pdf.setCharSpace(0);
     yPos += 0.18;
     
-    pdf.setFontSize(10);
+    pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
     pdf.setCharSpace(LETTER_SPACING.normal);

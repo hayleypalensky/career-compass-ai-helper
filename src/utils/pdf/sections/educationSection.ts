@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, LETTER_SPACING } from "@/utils/pdf/constants";
+import { COLORS, LETTER_SPACING, FONT_SIZES } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { formatDate } from "../helpers";
 import { PdfLayoutData } from "../types";
@@ -51,7 +51,7 @@ export const renderEducationSection = (
     pdf.setCharSpace(0);
     
     // School and dates on the same line
-    pdf.setFontSize(10);
+    pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
     pdf.setCharSpace(LETTER_SPACING.normal);
     const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
@@ -69,7 +69,7 @@ export const renderEducationSection = (
     yPos += 0.3;
     
     if (edu.description) {
-      pdf.setFontSize(9);
+      pdf.setFontSize(FONT_SIZES.small);
       pdf.setTextColor(COLORS.black);
       pdf.setCharSpace(LETTER_SPACING.normal);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
