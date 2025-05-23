@@ -62,7 +62,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.sm;
+    yPos += SPACING.md; // Increased spacing before bullet points
     
     // Add bullet points
     pdf.setFontSize(FONT_SIZES.small);
