@@ -2,7 +2,7 @@
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
-import { formatDate } from "../helpers";
+import { formatDate as formatDateFromUtils } from "@/utils/resumeFormatters";
 
 export const renderEducation = (
   pdf: jsPDF,
@@ -55,12 +55,12 @@ export const renderEducation = (
     
     const schoolText = edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : '');
     
-    // Format dates consistently - handle both present and completed education
+    // Format dates using the same formatter as the resume components
     let dateText;
     if (edu.endDate && edu.endDate.toLowerCase() !== 'present') {
-      dateText = `${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}`;
+      dateText = `${formatDateFromUtils(edu.startDate)} - ${formatDateFromUtils(edu.endDate)}`;
     } else {
-      dateText = `${formatDate(edu.startDate)} - Present`;
+      dateText = `${formatDateFromUtils(edu.startDate)} - Present`;
     }
     
     pdf.text(schoolText, leftMargin, currentY);
