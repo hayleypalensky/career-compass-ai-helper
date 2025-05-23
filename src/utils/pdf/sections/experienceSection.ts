@@ -1,4 +1,5 @@
 
+
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING, BULLET_CHAR } from "../constants";
@@ -69,7 +70,7 @@ export const renderExperience = (
           pdf.text(bulletLines, leftMargin + bulletIndent + 0.1, currentY);
           
           // Use proper line spacing for multi-line bullets
-          currentY += bulletLines.length * SPACING.line * 1.15; // Increase line spacing multiplier
+          currentY += bulletLines.length * SPACING.line * 1.3; // Increased line spacing multiplier
         }
       }
     }
@@ -79,3 +80,4 @@ export const renderExperience = (
   
   return currentY;
 };
+
