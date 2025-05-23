@@ -28,6 +28,7 @@ const ExperienceEditor = ({
 }: ExperienceEditorProps) => {
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState<number | null>(null);
+  const [loadingSuggestions, setLoadingSuggestions] = useState<number | null>(null);
 
   // Helper function to generate random action verbs
   const getRandomActionVerb = (capitalized = false): string => {
@@ -201,93 +202,66 @@ const ExperienceEditor = ({
     return requirements;
   };
 
-  // Generate 3 new bullet point suggestions for an experience
-  const generateNewBulletSuggestions = (expIndex: number): string[] => {
-    const experience = experiences[expIndex];
-    
-    // Get job responsibilities from the job description
-    const jobResponsibilities = extractJobResponsibilities(jobDescription);
-    
-    // Match experience with relevant responsibilities based on role
-    const roleKeywords = experience.title.toLowerCase().split(/\s+/);
-    const matchedResponsibilities = jobResponsibilities.filter(resp => {
-      const respLower = resp.toLowerCase();
-      // Check if responsibility matches experience title or company
-      return roleKeywords.some(word => 
-        word.length > 3 && respLower.includes(word)
-      ) || experience.company.toLowerCase().split(/\s+/).some(word =>
-        word.length > 3 && respLower.includes(word)
-      );
-    });
-    
-    // Get all skills mentioned in the job description that match user's skills
-    const skillsInJobDescription = relevantSkills.filter(skill => 
-      jobDescription.toLowerCase().includes(skill.toLowerCase())
-    );
-    
-    const suggestions: string[] = [];
-    
-    // Add suggestions based on matched responsibilities from the job
-    if (matchedResponsibilities.length > 0) {
-      matchedResponsibilities.slice(0, 2).forEach(resp => {
-        // Format the responsibility as a bullet point with action verb
-        let bullet = resp.trim();
-        
-        // Add action verb at the beginning if needed
-        if (!bullet.match(/^[A-Z][a-z]+ed|^[A-Z][a-z]+d|^[A-Z][a-z]+t/)) {
-          bullet = `${getRandomActionVerb(true)} ${bullet}`;
-        }
-        
-        // If it's a short responsibility, add context
-        if (bullet.split(' ').length < 6) {
-          const skillToAdd = skillsInJobDescription.length > 0 ? 
-            skillsInJobDescription[Math.floor(Math.random() * skillsInJobDescription.length)] : '';
-          
-          bullet = `${bullet} ${skillToAdd ? `using ${skillToAdd}` : `for ${experience.company}`}`;
-        }
-        
-        // If we don't have a quantity/metric in the bullet, add one
-        if (!bullet.match(/\d+%|\$\d+|\d+ times/)) {
-          bullet += getRandomMetric();
-        }
-        
-        suggestions.push(bullet);
+  // Generate 3 new bullet point suggestions for an experience using AI
+  const generateNewBulletSuggestions = async (expIndex: number): Promise<string[]> => {
+    if (!jobDescription.trim()) {
+      toast({
+        title: "Job description required",
+        description: "Please enter a job description to generate AI suggestions.",
+        variant: "destructive",
       });
+      return [];
     }
-    
-    // Add role-specific suggestions
-    const roleType = determineRoleType(experience.title);
-    
-    if (roleType === 'technical' && skillsInJobDescription.length > 0) {
-      const techSkill = skillsInJobDescription[Math.floor(Math.random() * skillsInJobDescription.length)];
-      suggestions.push(
-        `Developed ${getTechnicalDeliverable(experience.title)} using ${techSkill}${getRandomMetric()}`
-      );
-    } else if (roleType === 'leadership') {
-      suggestions.push(
-        `Led a team of ${Math.floor(Math.random() * 8) + 3} ${roleKeywords.includes('engineering') ? 'engineers' : 'professionals'} to deliver ${getDeliverable(roleType)}${getRandomMetric()}`
-      );
-    } else if (roleType === 'design') {
-      suggestions.push(
-        `Designed ${getDeliverable(roleType)} that improved user engagement${getRandomMetric()}`
-      );
+
+    try {
+      setLoadingSuggestions(expIndex);
+      
+      // Use a placeholder bullet to get general suggestions for this experience
+      const experience = experiences[expIndex];
+      const placeholderBullet = `Worked as ${experience.title} at ${experience.company}`;
+      
+      console.log('Generating new bullet suggestions for experience:', experience.title);
+      
+      const aiSuggestions = await generateBulletSuggestions(expIndex, 0, placeholderBullet, experience.title, jobDescription, relevantSkills);
+      
+      console.log('Received AI suggestions:', aiSuggestions);
+      
+      if (aiSuggestions.length === 0) {
+        toast({
+          title: "No suggestions available",
+          description: "Unable to generate AI suggestions for this experience.",
+          variant: "default",
+        });
+      }
+      
+      return aiSuggestions;
+    } catch (error) {
+      console.error('Error generating suggestions:', error);
+      toast({
+        title: "Error generating suggestions",
+        description: "There was an error generating AI suggestions. Please try again.",
+        variant: "destructive",
+      });
+      return [];
+    } finally {
+      setLoadingSuggestions(null);
     }
+  };
+
+  // Helper function to generate random metric
+  const getRandomMetric = (): string => {
+    const metrics = [
+      ", resulting in a 20% increase in efficiency",
+      ", reducing costs by 15%",
+      ", improving team productivity by 25%",
+      ", accelerating delivery by 30%",
+      ", achieving 95% customer satisfaction",
+      " with 40% faster performance",
+      ", saving $50K annually",
+      " while reducing errors by 35%"
+    ];
     
-    // Add a specific achievement based on experience
-    const achievement = generateAchievement(experience, skillsInJobDescription);
-    if (achievement && !suggestions.includes(achievement)) {
-      suggestions.push(achievement);
-    }
-    
-    // If we don't have enough suggestions, add generic ones
-    while (suggestions.length < 3) {
-      suggestions.push(
-        `${getRandomActionVerb(true)} ${getDeliverable(roleType)} for ${experience.company}${getRandomMetric()}`
-      );
-    }
-    
-    // Remove any duplicates and limit to 3
-    return [...new Set(suggestions)].slice(0, 3);
+    return metrics[Math.floor(Math.random() * metrics.length)];
   };
 
   // Helper function to determine role type
@@ -396,22 +370,6 @@ const ExperienceEditor = ({
     }
   };
 
-  // Helper functions to generate random metrics
-  const getRandomMetric = (): string => {
-    const metrics = [
-      ", resulting in a 20% increase in efficiency",
-      ", reducing costs by 15%",
-      ", improving team productivity by 25%",
-      ", accelerating delivery by 30%",
-      ", achieving 95% customer satisfaction",
-      " with 40% faster performance",
-      ", saving $50K annually",
-      " while reducing errors by 35%"
-    ];
-    
-    return metrics[Math.floor(Math.random() * metrics.length)];
-  };
-
   // Random technical outcomes
   const getRandomTechnicalOutcome = (): string => {
     const outcomes = [
@@ -465,13 +423,22 @@ const ExperienceEditor = ({
       
       toast({
         title: "Bullet point added",
-        description: "New bullet point has been added to your experience.",
+        description: "New AI-generated bullet point has been added to your experience.",
       });
     }, 0);
   };
 
-  const toggleSuggestions = (expIndex: number) => {
-    setExpandedSuggestions(expandedSuggestions === expIndex ? null : expIndex);
+  const toggleSuggestions = async (expIndex: number) => {
+    if (expandedSuggestions === expIndex) {
+      setExpandedSuggestions(null);
+    } else {
+      setExpandedSuggestions(expIndex);
+      
+      // Generate suggestions when expanding
+      if (!loadingSuggestions) {
+        await generateNewBulletSuggestions(expIndex);
+      }
+    }
   };
 
   return (
@@ -515,32 +482,30 @@ const ExperienceEditor = ({
                     size="sm"
                     onClick={() => toggleSuggestions(expIndex)}
                     className="flex items-center gap-1"
+                    disabled={loadingSuggestions === expIndex}
                   >
                     <PlusCircle className="h-4 w-4" />
-                    {expandedSuggestions === expIndex ? 'Hide Suggestions' : 'Suggest Bullets'}
+                    {loadingSuggestions === expIndex ? 'Generating AI Suggestions...' : 
+                     expandedSuggestions === expIndex ? 'Hide AI Suggestions' : 'Generate AI Suggestions'}
                   </Button>
                 </div>
 
-                {/* Suggestions for new bullet points - specifically based on job description */}
+                {/* AI-powered suggestions for new bullet points */}
                 {expandedSuggestions === expIndex && (
-                  <div className="mt-3 p-3 bg-slate-50 rounded-md border border-slate-200">
-                    <h4 className="text-sm font-medium mb-2">Suggested bullet points based on the job description:</h4>
-                    <div className="space-y-2">
-                      {generateNewBulletSuggestions(expIndex).map((suggestion, idx) => (
-                        <div key={idx} className="flex items-start gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            className="text-xs h-auto py-1 px-2 flex items-center gap-1"
-                            onClick={() => handleAddSuggestion(expIndex, suggestion)}
-                          >
-                            <Plus className="h-3 w-3" />
-                            Add
-                          </Button>
-                          <p className="text-sm">{suggestion}</p>
+                  <div className="mt-3 p-3 bg-blue-50 rounded-md border border-blue-200">
+                    <h4 className="text-sm font-medium mb-2 text-blue-800">
+                      AI-Generated bullet points based on job description:
+                    </h4>
+                    {loadingSuggestions === expIndex ? (
+                      <div className="text-sm text-blue-600">Generating suggestions with AI...</div>
+                    ) : (
+                      <div className="space-y-2">
+                        {/* We'll populate these with AI suggestions */}
+                        <div className="text-sm text-blue-600">
+                          AI suggestions will appear here after generation is complete.
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

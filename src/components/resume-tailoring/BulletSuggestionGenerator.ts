@@ -14,10 +14,18 @@ export const generateBulletSuggestions = async (
   
   // If no job description or current bullet is empty, return empty array
   if (!jobDescription.trim() || !currentBullet.trim()) {
+    console.log('Missing job description or bullet content, skipping AI generation');
     return [];
   }
   
   try {
+    console.log('Calling AI service for bullet suggestions:', {
+      currentBullet,
+      jobTitle: experience.title,
+      hasJobDescription: !!jobDescription,
+      relevantSkillsCount: relevantSkills.length
+    });
+    
     // Use AI service to generate suggestions
     const aiSuggestions = await aiService.generateBulletPoints(
       currentBullet,
@@ -26,10 +34,11 @@ export const generateBulletSuggestions = async (
       relevantSkills
     );
     
+    console.log('AI suggestions received:', aiSuggestions);
     return aiSuggestions;
   } catch (error) {
     console.error('Error generating AI bullet suggestions:', error);
-    // Fall back to empty array if AI fails
+    // Return empty array if AI fails
     return [];
   }
 };
