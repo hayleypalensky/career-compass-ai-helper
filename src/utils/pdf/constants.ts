@@ -8,26 +8,28 @@ export const FONT_SIZES = {
   base: 10,         // Base font size for body text
   small: 9,         // Small text
   xsmall: 8,        // Extra small text
-  heading2: 16,     // Main headings - increased for better hierarchy
-  heading3: 12      // Section headings - increased slightly
+  heading2: 18,     // Main headings - increased for better hierarchy like reference
+  heading3: 11      // Section headings - clean and readable
 };
 
-// Line heights (multipliers for font size) - balanced for readability and space utilization
+// Line heights (multipliers for font size) - optimized for clean readability
 export const LINE_HEIGHTS = {
-  tight: 1.2,       // Tight for compact layout
-  normal: 1.3,      // Slightly increased from default
+  tight: 1.1,       // Tight for compact layout
+  normal: 1.25,     // Clean normal spacing like reference
   relaxed: 1.4      // For better readability
 };
 
-// Spacing values in inches - increased for better element separation
+// Spacing values in inches - refined to match reference layout
 export const SPACING = {
-  xs: 0.10,         // Extra small spacing - slightly increased
-  sm: 0.15,         // Small spacing - increased for better element separation
-  md: 0.25,         // Medium spacing - increased for better section breaks
-  lg: 0.35,         // Large spacing - increased for major sections
-  xl: 0.45,         // Extra large spacing - increased for section separation
-  section: 0.50,    // Dedicated section spacing for major breaks
-  element: 0.18     // New: specific spacing between elements within sections
+  xs: 0.08,         // Minimal spacing
+  sm: 0.12,         // Small spacing between elements
+  md: 0.18,         // Medium spacing for section breaks
+  lg: 0.22,         // Large spacing between major elements
+  xl: 0.28,         // Extra large spacing for section separation
+  section: 0.32,    // Clean section breaks like reference
+  element: 0.14,    // Spacing between related elements
+  header: 0.16,     // Specific header spacing
+  bullet: 0.12      // Clean bullet point spacing
 };
 
 // PDF dimensions (US Letter)
@@ -37,12 +39,12 @@ export const PDF_DIMENSIONS = {
   widthPx: 794      // Width in pixels (for HTML preview)
 };
 
-// PDF margins in inches - reduced for better space utilization
+// PDF margins in inches - clean margins like reference
 export const PDF_MARGINS = {
-  top: 0.4,         // Reduced from 0.5
-  bottom: 0.4,      // Reduced from 0.5
-  left: 0.5,        // Reduced from 0.6
-  right: 0.5        // Reduced from 0.6
+  top: 0.5,         // Clean top margin
+  bottom: 0.5,      // Clean bottom margin
+  left: 0.6,        // Professional left margin
+  right: 0.6        // Professional right margin
 };
 
 // Font family

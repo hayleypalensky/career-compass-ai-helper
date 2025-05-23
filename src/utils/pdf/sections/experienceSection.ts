@@ -20,69 +20,67 @@ export const renderExperienceSection = (
     return yPos;
   }
   
-  // Section header
+  // Section header - clean and bold like reference
   pdf.setFontSize(FONT_SIZES.heading3);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.text("Experience", leftMargin, yPos);
-  yPos += SPACING.xs;
+  pdf.text("EXPERIENCE", leftMargin, yPos);
+  yPos += SPACING.element;
   
-  // Add a thin line under the section header
+  // Add a clean line under the section header
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.sm;
+  yPos += SPACING.md;
   
   for (const exp of profile.experiences) {
-    // Job title
-    pdf.setFontSize(FONT_SIZES.heading3);
+    // Job title - prominent and clean
+    pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
     pdf.text(exp.title, leftMargin, yPos);
     
-    yPos += SPACING.element; // Increased spacing between title and company
+    yPos += SPACING.sm; // Clean spacing between title and company
     
-    // Company and dates on the same line, with dates right-aligned
+    // Company and dates on the same line - clean layout like reference
     pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
     const dateText = `${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
-    // Set company name in a slightly highlighted color
-    pdf.setTextColor(themeColors.heading);
+    // Company name
+    pdf.setTextColor(COLORS.black);
     pdf.text(exp.company + (exp.location ? `, ${exp.location}` : ''), leftMargin, yPos);
     
-    // Set date in regular black
-    pdf.setTextColor(COLORS.black);
+    // Date right-aligned
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.element; // Increased spacing between company and bullets
+    yPos += SPACING.element; // Clean spacing before bullets
     
-    // Add bullet points
+    // Add bullet points with clean spacing like reference
     pdf.setFontSize(FONT_SIZES.small);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
     
     const bulletPoints = exp.bullets.filter(bullet => bullet.trim() !== "");
     for (const bullet of bulletPoints) {
-      // Handle bullet points that may need multiple lines
       const bulletText = BULLET_CHAR + " " + bullet;
-      const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.1);
+      const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.15);
       
-      pdf.text(splitBullet, leftMargin + 0.1, yPos);
-      yPos += (splitBullet.length * 0.15); // Increased spacing for bullets
+      pdf.text(splitBullet, leftMargin + 0.15, yPos);
+      yPos += (splitBullet.length * SPACING.bullet); // Clean bullet spacing
       
-      // Add a bit more space between bullet points
+      // Small gap between bullets
       if (bulletPoints.indexOf(bullet) < bulletPoints.length - 1) {
         yPos += SPACING.xs;
       }
     }
     
-    yPos += SPACING.lg; // Increased spacing between experiences
+    yPos += SPACING.lg; // Clean spacing between job entries
   }
   
-  // Add section break spacing
-  yPos += SPACING.section;
+  // Add clean section break
+  yPos += SPACING.md;
   
   return yPos;
 };

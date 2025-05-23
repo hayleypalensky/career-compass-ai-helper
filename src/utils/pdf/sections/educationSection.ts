@@ -20,56 +20,55 @@ export const renderEducationSection = (
     return yPos;
   }
   
-  // Section header
+  // Section header - clean and consistent
   pdf.setFontSize(FONT_SIZES.heading3);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.text("Education", leftMargin, yPos);
-  yPos += SPACING.xs;
+  pdf.text("EDUCATION", leftMargin, yPos);
+  yPos += SPACING.element;
   
-  // Add a thin line under the section header
+  // Add a clean line under the section header
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.sm;
+  yPos += SPACING.md;
   
   for (const edu of profile.education) {
-    // Degree
-    pdf.setFontSize(FONT_SIZES.heading3);
+    // Degree - clean and prominent
+    pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    yPos += SPACING.element; // Increased spacing between degree and school
+    yPos += SPACING.sm; // Clean spacing between degree and school
     
-    // School and dates on the same line
+    // School and dates on the same line - consistent with experience
     pdf.setFontSize(FONT_SIZES.base);
     pdf.setFont("helvetica", "normal");
     const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
-    // Set school name in a slightly highlighted color
-    pdf.setTextColor(themeColors.heading);
+    // School name
+    pdf.setTextColor(COLORS.black);
     pdf.text(edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : ''), leftMargin, yPos);
     
-    // Set date in regular black
-    pdf.setTextColor(COLORS.black);
+    // Date right-aligned
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.element; // Increased spacing between school and description
+    yPos += SPACING.element; // Clean spacing after school info
     
     if (edu.description) {
       pdf.setFontSize(FONT_SIZES.small);
       pdf.setTextColor(COLORS.black);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * 0.15); // Increased line spacing for description
+      yPos += (splitDesc.length * SPACING.bullet); // Clean description spacing
     }
     
-    yPos += SPACING.lg; // Increased spacing between education entries
+    yPos += SPACING.lg; // Clean spacing between education entries
   }
   
-  // Add section break spacing
-  yPos += SPACING.section;
+  // Add clean section break
+  yPos += SPACING.md;
   
   return yPos;
 };
