@@ -77,8 +77,8 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       creator: 'Resume Builder'
     });
     
-    // Generate filename with format: "Full Name - Company Name.pdf"
-    let fileName = profile.personalInfo.name || "Resume";
+    // Generate filename with format: "Full Name Resume - Company Name.pdf"
+    let fileName = profile.personalInfo.name ? `${profile.personalInfo.name} Resume` : "Resume";
     if (companyName) {
       fileName += ` - ${companyName}`;
     }
