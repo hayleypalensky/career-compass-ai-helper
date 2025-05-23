@@ -1,4 +1,3 @@
-
 import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
 import { PdfExportOptions } from "./pdf/types";
@@ -78,13 +77,12 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       creator: 'Resume Builder'
     });
     
-    // Generate filename
-    const fileName = [
-      "resume",
-      profile.personalInfo.name?.toLowerCase().replace(/\s+/g, "_"),
-      companyName?.toLowerCase().replace(/\s+/g, "_"),
-      jobTitle?.toLowerCase().replace(/\s+/g, "_")
-    ].filter(Boolean).join("_") + ".pdf";
+    // Generate filename with format: "Full Name - Company Name.pdf"
+    let fileName = profile.personalInfo.name || "Resume";
+    if (companyName) {
+      fileName += ` - ${companyName}`;
+    }
+    fileName += ".pdf";
     
     pdf.save(fileName);
     
