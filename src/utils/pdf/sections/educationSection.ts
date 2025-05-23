@@ -1,3 +1,4 @@
+
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
@@ -46,7 +47,7 @@ export const renderEducation = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor("#000000"); // Keep content black for readability
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, currentY);
-    currentY += SPACING.line;
+    currentY += SPACING.line * 1.5; // Match experience section spacing
     
     // School and dates
     pdf.setFontSize(FONT_SIZES.body);
