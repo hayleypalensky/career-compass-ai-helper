@@ -1,5 +1,4 @@
 
-
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
@@ -55,7 +54,14 @@ export const renderEducation = (
     pdf.setFont("helvetica", "normal");
     
     const schoolText = edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : '');
-    const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
+    
+    // Format dates consistently - handle both present and completed education
+    let dateText;
+    if (edu.endDate && edu.endDate.toLowerCase() !== 'present') {
+      dateText = `${formatDate(edu.startDate)} - ${formatDate(edu.endDate)}`;
+    } else {
+      dateText = `${formatDate(edu.startDate)} - Present`;
+    }
     
     pdf.text(schoolText, leftMargin, currentY);
     
@@ -85,4 +91,3 @@ export const renderEducation = (
   
   return currentY;
 };
-
