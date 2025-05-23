@@ -39,7 +39,9 @@ export const renderEducation = (
   });
   
   // Education entries
-  for (const edu of sortedEducation) {
+  for (let i = 0; i < sortedEducation.length; i++) {
+    const edu = sortedEducation[i];
+    
     // Degree and field
     pdf.setFontSize(FONT_SIZES.subheading);
     pdf.setFont("helvetica", "bold");
@@ -71,7 +73,10 @@ export const renderEducation = (
       pdf.setTextColor("#000000");
     }
     
-    currentY += SPACING.subsection;
+    // Add spacing between education entries (but not after the last one)
+    if (i < sortedEducation.length - 1) {
+      currentY += SPACING.subsection;
+    }
   }
   
   return currentY + SPACING.section;
