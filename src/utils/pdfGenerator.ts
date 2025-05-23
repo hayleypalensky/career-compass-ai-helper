@@ -9,7 +9,6 @@ import { renderHeaderSection } from "./pdf/sections/headerSection";
 import { renderExperienceSection } from "./pdf/sections/experienceSection";
 import { renderEducationSection } from "./pdf/sections/educationSection";
 import { renderSkillsSection } from "./pdf/sections/skillsSection";
-import { addFooter } from "./pdf/sections/footerSection";
 
 /**
  * Generates an ATS-friendly PDF file from the resume data
@@ -47,14 +46,13 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       themeColors
     };
     
-    // Render resume sections
+    // Render resume sections in new order: Header -> Education -> Experience -> Skills
     layoutData.yPos = renderHeaderSection(pdf, profile, layoutData);
-    layoutData.yPos = renderExperienceSection(pdf, profile, layoutData);
     layoutData.yPos = renderEducationSection(pdf, profile, layoutData);
+    layoutData.yPos = renderExperienceSection(pdf, profile, layoutData);
     layoutData.yPos = renderSkillsSection(pdf, profile, layoutData);
     
-    // Add footer with page numbers
-    addFooter(pdf, layoutData);
+    // Remove footer - no longer calling addFooter function
     
     // Set PDF metadata
     pdf.setProperties({

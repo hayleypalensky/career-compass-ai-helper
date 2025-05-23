@@ -20,12 +20,6 @@ export const renderEducationSection = (
     return yPos;
   }
   
-  // Check if we need a new page before education
-  if (yPos > 9) {
-    pdf.addPage();
-    yPos = layoutData.topBottomMargIn + SPACING.md;
-  }
-  
   // Section header
   pdf.setFontSize(FONT_SIZES.heading3);
   pdf.setFont("helvetica", "bold");
@@ -37,7 +31,7 @@ export const renderEducationSection = (
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += SPACING.md;
+  yPos += SPACING.sm;
   
   for (const edu of profile.education) {
     // Degree
@@ -45,7 +39,7 @@ export const renderEducationSection = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    yPos += SPACING.md;
+    yPos += SPACING.sm;
     
     // School and dates on the same line
     pdf.setFontSize(FONT_SIZES.base);
@@ -61,17 +55,17 @@ export const renderEducationSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.md;
+    yPos += SPACING.sm;
     
     if (edu.description) {
       pdf.setFontSize(FONT_SIZES.small);
       pdf.setTextColor(COLORS.black);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * 0.15);
+      yPos += (splitDesc.length * 0.12);
     }
     
-    yPos += SPACING.lg;
+    yPos += SPACING.md;
   }
   
   return yPos;
