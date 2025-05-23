@@ -504,9 +504,21 @@ const ExperienceEditor = ({
                 {/* AI-powered suggestions for new bullet points */}
                 {expandedSuggestions === expIndex && (
                   <div className="mt-3 p-3 bg-blue-50 rounded-md border border-blue-200">
-                    <h4 className="text-sm font-medium mb-2 text-blue-800">
-                      AI-Generated bullet points based on job description:
-                    </h4>
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="text-sm font-medium text-blue-800">
+                        AI-Generated bullet points based on job description:
+                      </h4>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => generateNewBulletSuggestions(expIndex)}
+                        disabled={loadingSuggestions === expIndex}
+                        className="h-7 text-xs flex items-center gap-1 text-blue-600"
+                      >
+                        <RefreshCw className={`h-3 w-3 ${loadingSuggestions === expIndex ? 'animate-spin' : ''}`} />
+                        {loadingSuggestions === expIndex ? "Generating..." : "Regenerate"}
+                      </Button>
+                    </div>
                     {loadingSuggestions === expIndex ? (
                       <div className="text-sm text-blue-600">Generating suggestions with AI...</div>
                     ) : (

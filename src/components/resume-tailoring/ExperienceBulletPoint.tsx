@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, Pencil, RotateCw, Plus } from "lucide-react";
+import { X, MessageSquare, Pencil, RotateCw, Plus, RefreshCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface ExperienceBulletPointProps {
@@ -29,48 +29,52 @@ const ExperienceBulletPoint = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const generateBulletSuggestions = async () => {
+    if (!jobDescription.trim()) {
+      toast({
+        title: "Job description required",
+        description: "Please enter a job description to generate AI suggestions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!bullet.trim() && !showSuggestions) {
+      toast({
+        title: "Bullet point required",
+        description: "Please enter some content for this bullet point first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const aiSuggestions = await generateSuggestions(expIndex, bulletIndex);
+      setSuggestions(aiSuggestions);
+      setShowSuggestions(true);
+      
+      if (aiSuggestions.length === 0) {
+        toast({
+          title: "No suggestions available",
+          description: "Unable to generate suggestions for this bullet point.",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error generating suggestions",
+        description: "There was an error generating AI suggestions. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const toggleSuggestions = async () => {
     if (!showSuggestions) {
-      if (!jobDescription.trim()) {
-        toast({
-          title: "Job description required",
-          description: "Please enter a job description to generate AI suggestions.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (!bullet.trim()) {
-        toast({
-          title: "Bullet point required",
-          description: "Please enter some content for this bullet point first.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setIsGenerating(true);
-      try {
-        const aiSuggestions = await generateSuggestions(expIndex, bulletIndex);
-        setSuggestions(aiSuggestions);
-        setShowSuggestions(true);
-        
-        if (aiSuggestions.length === 0) {
-          toast({
-            title: "No suggestions available",
-            description: "Unable to generate suggestions for this bullet point.",
-            variant: "default",
-          });
-        }
-      } catch (error) {
-        toast({
-          title: "Error generating suggestions",
-          description: "There was an error generating AI suggestions. Please try again.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsGenerating(false);
-      }
+      await generateBulletSuggestions();
     } else {
       setShowSuggestions(false);
     }
@@ -132,7 +136,19 @@ const ExperienceBulletPoint = ({
       {/* AI Suggestions panel */}
       {showSuggestions && (
         <div className="ml-2 bg-slate-50 p-3 rounded-md border border-slate-200">
-          <h4 className="text-sm font-medium mb-2">AI-Generated suggestions to improve ATS matching:</h4>
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="text-sm font-medium">AI-Generated suggestions to improve ATS matching:</h4>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={generateBulletSuggestions}
+              disabled={isGenerating}
+              className="h-7 text-xs flex items-center gap-1 text-blue-600"
+            >
+              <RefreshCw className={`h-3 w-3 ${isGenerating ? 'animate-spin' : ''}`} />
+              {isGenerating ? "Generating..." : "Regenerate"}
+            </Button>
+          </div>
           <div className="space-y-2">
             {suggestions.length > 0 ? (
               suggestions.map((suggestion, i) => (
@@ -162,7 +178,9 @@ const ExperienceBulletPoint = ({
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500">No AI suggestions available for this bullet point.</p>
+              <p className="text-sm text-gray-500">
+                {isGenerating ? "Generating AI suggestions..." : "No AI suggestions available for this bullet point."}
+              </p>
             )}
           </div>
         </div>

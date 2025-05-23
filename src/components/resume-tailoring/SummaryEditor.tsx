@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { RefreshCw, CheckCircle2 } from "lucide-react";
+import { RefreshCw, CheckCircle2, RotateCw } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { aiService } from "@/services/aiService";
 
@@ -93,7 +93,7 @@ const SummaryEditor = ({
             className="flex items-center gap-1"
           >
             <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-            {isGenerating ? "Generating with AI..." : "Generate AI Suggestions"}
+            {isGenerating ? "Generating with AI..." : suggestions.length > 0 ? "Regenerate Suggestions" : "Generate AI Suggestions"}
           </Button>
         </CardTitle>
       </CardHeader>
