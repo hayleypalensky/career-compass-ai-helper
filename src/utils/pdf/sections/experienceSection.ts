@@ -1,7 +1,7 @@
 
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
-import { FONT_SIZES, COLORS, SPACING, BULLET_CHAR } from "../constants";
+import { FONT_SIZES, SPACING, BULLET_CHAR } from "../constants";
 import { formatDate } from "../helpers";
 
 export const renderExperience = (
@@ -9,7 +9,8 @@ export const renderExperience = (
   profile: Profile,
   leftMargin: number,
   contentWidth: number,
-  yPos: number
+  yPos: number,
+  themeColors: { heading: string; accent: string; border: string }
 ): number => {
   if (!profile.experiences || profile.experiences.length === 0) {
     return yPos;
@@ -20,12 +21,12 @@ export const renderExperience = (
   // Section heading
   pdf.setFontSize(FONT_SIZES.heading);
   pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(COLORS.black);
+  pdf.setTextColor(themeColors.heading);
   pdf.text("EXPERIENCE", leftMargin, currentY);
   currentY += SPACING.line;
   
   // Add line under heading
-  pdf.setDrawColor(COLORS.black);
+  pdf.setDrawColor(themeColors.heading);
   pdf.setLineWidth(0.01);
   pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
   currentY += SPACING.line * 1.5;
@@ -35,6 +36,7 @@ export const renderExperience = (
     // Job title
     pdf.setFontSize(FONT_SIZES.subheading);
     pdf.setFont("helvetica", "bold");
+    pdf.setTextColor("#000000"); // Keep content black for readability
     pdf.text(exp.title, leftMargin, currentY);
     currentY += SPACING.line;
     
@@ -53,15 +55,21 @@ export const renderExperience = (
     currentY += SPACING.line;
     
     // Bullet points
-    pdf.setFontSize(FONT_SIZES.small);
-    const bulletIndent = 0.2;
-    
-    for (const bullet of exp.bullets.filter(b => b.trim())) {
-      const bulletText = `${BULLET_CHAR} ${bullet}`;
-      const bulletLines = pdf.splitTextToSize(bulletText, contentWidth - bulletIndent);
+    if (exp.bullets && exp.bullets.length > 0) {
+      pdf.setFontSize(FONT_SIZES.body);
+      const bulletIndent = 0.15; // Indent for bullets
       
-      pdf.text(bulletLines, leftMargin + bulletIndent, currentY);
-      currentY += bulletLines.length * SPACING.line + SPACING.bullet;
+      for (const bullet of exp.bullets) {
+        if (bullet.trim()) {
+          // Add bullet character
+          pdf.text(BULLET_CHAR, leftMargin + bulletIndent, currentY);
+          
+          // Wrap bullet text
+          const bulletLines = pdf.splitTextToSize(bullet, contentWidth - bulletIndent - 0.1);
+          pdf.text(bulletLines, leftMargin + bulletIndent + 0.1, currentY);
+          currentY += bulletLines.length * SPACING.line;
+        }
+      }
     }
     
     currentY += SPACING.subsection;

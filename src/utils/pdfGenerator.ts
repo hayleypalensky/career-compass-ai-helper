@@ -7,12 +7,13 @@ import { renderEducation } from "./pdf/sections/educationSection";
 import { renderExperience } from "./pdf/sections/experienceSection";
 import { renderSkills } from "./pdf/sections/skillsSection";
 import { SPACING, PDF_DIMENSIONS } from "./pdf/constants";
+import { getSelectedTheme } from "./pdf/helpers";
 
 /**
  * Generates a clean, ATS-friendly PDF resume
  */
 export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
-  const { profile, jobTitle, companyName } = options;
+  const { profile, jobTitle, companyName, colorTheme } = options;
   
   try {
     // Create PDF with US Letter dimensions
@@ -25,6 +26,9 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     // Set consistent font
     pdf.setFont("helvetica");
     
+    // Get theme colors
+    const themeColors = getSelectedTheme(colorTheme);
+    
     // Calculate content area
     const contentWidth = PDF_DIMENSIONS.width - (SPACING.margin * 2);
     const leftMargin = SPACING.margin;
@@ -32,10 +36,10 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     let yPosition = SPACING.margin;
     
     // Render sections in order: Header, Education, Experience, Skills
-    yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition);
-    yPosition = renderEducation(pdf, profile, leftMargin, contentWidth, yPosition);
-    yPosition = renderExperience(pdf, profile, leftMargin, contentWidth, yPosition);
-    yPosition = renderSkills(pdf, profile, leftMargin, contentWidth, yPosition);
+    yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    yPosition = renderEducation(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    yPosition = renderExperience(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    yPosition = renderSkills(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
     
     // Set PDF metadata
     pdf.setProperties({

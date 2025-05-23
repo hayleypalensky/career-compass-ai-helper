@@ -1,14 +1,15 @@
 
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
-import { FONT_SIZES, COLORS, SPACING } from "../constants";
+import { FONT_SIZES, SPACING } from "../constants";
 
 export const renderSkills = (
   pdf: jsPDF,
   profile: Profile,
   leftMargin: number,
   contentWidth: number,
-  yPos: number
+  yPos: number,
+  themeColors: { heading: string; accent: string; border: string }
 ): number => {
   if (!profile.skills || profile.skills.length === 0) {
     return yPos;
@@ -19,12 +20,12 @@ export const renderSkills = (
   // Section heading
   pdf.setFontSize(FONT_SIZES.heading);
   pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(COLORS.black);
+  pdf.setTextColor(themeColors.heading);
   pdf.text("SKILLS", leftMargin, currentY);
   currentY += SPACING.line;
   
   // Add line under heading
-  pdf.setDrawColor(COLORS.black);
+  pdf.setDrawColor(themeColors.heading);
   pdf.setLineWidth(0.01);
   pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
   currentY += SPACING.line * 1.5;
@@ -32,6 +33,7 @@ export const renderSkills = (
   // Skills list
   pdf.setFontSize(FONT_SIZES.body);
   pdf.setFont("helvetica", "normal");
+  pdf.setTextColor("#000000"); // Keep content black for readability
   
   const skillNames = profile.skills.map(skill => skill.name);
   const skillsText = skillNames.join(", ");
