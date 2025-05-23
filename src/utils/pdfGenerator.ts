@@ -35,7 +35,7 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     const pageHeight = PDF_DIMENSIONS.height;
     const topMargin = SPACING.margin;
     const bottomMargin = SPACING.margin;
-    const availableHeight = pageHeight - topMargin - bottomMargin; // Account for both top and bottom margins
+    const availableHeight = pageHeight - topMargin - bottomMargin;
     
     let yPosition = topMargin;
     
@@ -48,9 +48,16 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     // Calculate total content height
     const totalContentHeight = headerHeight + educationHeight + experienceHeight + skillsHeight;
     
-    // Calculate spacing between sections to fill available space while respecting bottom margin
+    // Calculate spacing between sections - ensure it doesn't make content overflow
     const sectionsCount = 4; // header, education, experience, skills
-    const spacingBetweenSections = Math.max(0.15, (availableHeight - totalContentHeight) / (sectionsCount - 1));
+    const minSpacing = 0.1; // Minimum spacing between sections
+    const maxAvailableForSpacing = availableHeight - totalContentHeight;
+    const spacingBetweenSections = Math.max(minSpacing, Math.min(0.2, maxAvailableForSpacing / (sectionsCount - 1)));
+    
+    // If content is too tall, use minimum spacing
+    if (totalContentHeight + (spacingBetweenSections * (sectionsCount - 1)) > availableHeight) {
+      console.warn("Content may be too tall for single page, using minimum spacing");
+    }
     
     // Render sections with calculated spacing
     yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
