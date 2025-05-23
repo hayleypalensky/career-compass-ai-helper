@@ -216,13 +216,10 @@ const ExperienceEditor = ({
     try {
       setLoadingSuggestions(expIndex);
       
-      // Use a placeholder bullet to get general suggestions for this experience
-      const experience = experiences[expIndex];
-      const placeholderBullet = `Worked as ${experience.title} at ${experience.company}`;
+      console.log('Generating new bullet suggestions for experience:', experiences[expIndex].title);
       
-      console.log('Generating new bullet suggestions for experience:', experience.title);
-      
-      const aiSuggestions = await generateBulletSuggestions(expIndex, 0, placeholderBullet, experience.title, jobDescription, relevantSkills);
+      // Use the generateBulletSuggestions function with a placeholder bullet index
+      const aiSuggestions = await generateBulletSuggestions(expIndex, 0);
       
       console.log('Received AI suggestions:', aiSuggestions);
       
