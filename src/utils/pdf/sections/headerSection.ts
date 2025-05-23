@@ -14,6 +14,7 @@ export const renderHeaderSection = (
 ): number => {
   const { leftMargin, pageWidth, themeColors } = layoutData;
   let { yPos } = layoutData;
+  const rightMargin = 8.5 - layoutData.sideMargIn;
   
   // Set consistent font family for entire document
   pdf.setFont("helvetica");
@@ -30,7 +31,7 @@ export const renderHeaderSection = (
   // Add horizontal line with theme color
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.01);
-  pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
+  pdf.line(leftMargin, yPos, rightMargin, yPos);
   yPos += 0.2;
   
   // Add contact information in a professional layout
@@ -38,19 +39,50 @@ export const renderHeaderSection = (
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(COLORS.black);
   pdf.setCharSpace(0.2); // Consistent letter spacing for contact info
-  
+
+  // Create array of contact items
   const contactItems = [];
   if (profile.personalInfo.email) contactItems.push(`Email: ${profile.personalInfo.email}`);
   if (profile.personalInfo.phone) contactItems.push(`Phone: ${profile.personalInfo.phone}`);
   if (profile.personalInfo.website) contactItems.push(`Website: ${profile.personalInfo.website}`);
   if (profile.personalInfo.location) contactItems.push(`Location: ${profile.personalInfo.location}`);
   
-  // Create a nicely formatted contact row
-  const contactText = contactItems.join(" | ");
-  const splitContactInfo = pdf.splitTextToSize(contactText, pageWidth);
-  pdf.text(splitContactInfo, leftMargin, yPos);
+  // Only proceed with evenly spacing if we have contact items
+  if (contactItems.length > 0) {
+    // Calculate positions for evenly spaced contact info
+    const availableWidth = rightMargin - leftMargin;
+    
+    // Instead of joining with "|", space items evenly across the page width
+    if (contactItems.length === 1) {
+      // If only one item, center it
+      pdf.text(contactItems[0], leftMargin + (availableWidth / 2) - (pdf.getTextWidth(contactItems[0]) / 2), yPos);
+    } else {
+      // For multiple items, calculate even spacing
+      const spacing = availableWidth / (contactItems.length - 1);
+      
+      // Position and render each contact item
+      contactItems.forEach((item, index) => {
+        const xPos = leftMargin + (spacing * index);
+        
+        // For first item, align left
+        if (index === 0) {
+          pdf.text(item, leftMargin, yPos);
+        }
+        // For last item, align right
+        else if (index === contactItems.length - 1) {
+          pdf.text(item, rightMargin - pdf.getTextWidth(item), yPos);
+        }
+        // For middle items, center at their position
+        else {
+          pdf.text(item, xPos - (pdf.getTextWidth(item) / 2), yPos);
+        }
+      });
+    }
+    
+    yPos += 0.25; // Add space after contact info
+  }
+  
   pdf.setCharSpace(0); // Reset char spacing
-  yPos += (splitContactInfo.length * 0.15) + 0.22;
   
   // Add summary if available
   if (profile.personalInfo.summary) {
