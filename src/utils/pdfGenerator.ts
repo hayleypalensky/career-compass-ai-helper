@@ -51,17 +51,25 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     const sectionsCount = 4; // header, education, experience, skills
     const spacingBetweenSections = (availableHeight - totalContentHeight) / (sectionsCount - 1);
     
-    // Render sections with calculated spacing
+    // Render header section
     yPosition = renderHeader(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
     yPosition += spacingBetweenSections;
     
+    // Render education section
     yPosition = renderEducation(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
     yPosition += spacingBetweenSections;
     
-    yPosition = renderExperience(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
-    yPosition += spacingBetweenSections;
+    // Calculate position for skills section (moved up 50px)
+    // Convert 50px to inches (assuming 72dpi standard)
+    const pixelsToInches = 50 / 72; // 50px converted to inches
     
-    yPosition = renderSkills(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
+    // Render skills section at an adjusted position (moved up)
+    const skillsPosition = yPosition - pixelsToInches;
+    yPosition = renderSkills(pdf, profile, leftMargin, contentWidth, skillsPosition, themeColors);
+    
+    // Then render experience section after skills 
+    // (effectively swapping their order and moving skills up)
+    yPosition = renderExperience(pdf, profile, leftMargin, contentWidth, yPosition, themeColors);
     
     // Set PDF metadata
     pdf.setProperties({
