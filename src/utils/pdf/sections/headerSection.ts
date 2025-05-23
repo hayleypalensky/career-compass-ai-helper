@@ -1,5 +1,5 @@
 
-import { jsPDF } from "jspdf";
+import { jsPDF } from "jsPDF";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
 
@@ -60,7 +60,7 @@ export const renderHeader = (
     pdf.text(summaryLines, leftMargin, currentY);
     currentY += summaryLines.length * SPACING.line;
     
-    // Add spacing below the section
+    // Add equal spacing below the section
     currentY += SPACING.section;
   }
   
