@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS } from "@/utils/pdf/constants";
+import { COLORS, LETTER_SPACING } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { formatDate } from "../helpers";
 import { PdfLayoutData } from "../types";
@@ -26,11 +26,13 @@ export const renderEducationSection = (
     yPos = layoutData.topBottomMargIn + 0.2;
   }
   
-  // Section header
+  // Section header with consistent formatting
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
+  pdf.setCharSpace(0.3); // Letter spacing for section headers
   pdf.text("Education", leftMargin, yPos);
+  pdf.setCharSpace(0); // Reset char spacing
   yPos += 0.15;
   
   // Add a thin line under the section header
@@ -43,14 +45,18 @@ export const renderEducationSection = (
   const itemSpacing = 0.2;
   
   for (const edu of profile.education) {
+    // Degree with consistent formatting
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
+    pdf.setCharSpace(0.2); // Letter spacing for degree titles
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
+    pdf.setCharSpace(0); // Reset char spacing
     
     // School and dates on the same line
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
+    pdf.setCharSpace(0.2); // Consistent letter spacing
     const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
@@ -61,14 +67,18 @@ export const renderEducationSection = (
     // Set date in regular black
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos + 0.15);
+    pdf.setCharSpace(0); // Reset char spacing
     
     yPos += 0.3;
     
     if (edu.description) {
       pdf.setFontSize(9);
+      pdf.setTextColor(COLORS.black);
+      pdf.setCharSpace(0.2); // Letter spacing for descriptions
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * 0.13); // Slightly reduced line height
+      pdf.setCharSpace(0); // Reset char spacing
+      yPos += (splitDesc.length * 0.13);
     }
     
     yPos += itemSpacing;

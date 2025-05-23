@@ -14,9 +14,9 @@ export const FONT_SIZES = {
 
 // Line heights - more consistent
 export const LINE_HEIGHTS = {
-  tight: '1.2',         // Tight line height for general text
-  tighter: '1.15',      // Tighter for lists and compact areas
-  compact: '1.1'        // Very compact for small text
+  tight: '1.3',         // Slightly increased for better readability
+  tighter: '1.25',      // Tighter for lists and compact areas
+  compact: '1.2'        // Very compact for small text
 };
 
 // Spacing values - more consistent
@@ -37,8 +37,15 @@ export const PDF_DIMENSIONS = {
   widthPx: '794px',     // 8.5in in pixels (slightly adjusted)
 };
 
-// Font families
+// Font families - ensuring consistency
 export const FONT_FAMILY = "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+
+// Letter spacing values for improved readability
+export const LETTER_SPACING = {
+  tight: '0.01em',      // For headings and bold text
+  normal: '0.02em',     // For body text
+  loose: '0.03em'       // For small text when needed
+};
 
 // Common colors
 export const COLORS = {
