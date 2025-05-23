@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Experience } from "@/components/ExperienceForm";
 import ExperienceBulletPoint from "./ExperienceBulletPoint";
-import { PlusCircle, Plus } from "lucide-react";
+import { PlusCircle, Plus, RefreshCw } from "lucide-react"; // Added RefreshCw import
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 

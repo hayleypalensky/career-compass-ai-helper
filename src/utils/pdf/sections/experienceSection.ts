@@ -30,7 +30,7 @@ export const renderExperienceSection = (
   pdf.setDrawColor(themeColors.border);
   pdf.setLineWidth(0.005);
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
-  yPos += 0.15;
+  yPos += 0.25; // Increased spacing after section header
   
   for (const exp of profile.experiences) {
     // Check if we need to add a new page
@@ -44,6 +44,8 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(exp.title, leftMargin, yPos);
     
+    yPos += 0.2; // Increased spacing between role and company
+    
     // Company and dates on the same line, with dates right-aligned
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
@@ -52,13 +54,13 @@ export const renderExperienceSection = (
     
     // Set company name in a slightly highlighted color
     pdf.setTextColor(themeColors.heading);
-    pdf.text(exp.company + (exp.location ? `, ${exp.location}` : ''), leftMargin, yPos + 0.15);
+    pdf.text(exp.company + (exp.location ? `, ${exp.location}` : ''), leftMargin, yPos);
     
     // Set date in regular black
     pdf.setTextColor(COLORS.black);
-    pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos + 0.15);
+    pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += 0.3;
+    yPos += 0.25; // Increased spacing between company and bullets
     
     // Add bullet points
     pdf.setFontSize(9);
@@ -75,10 +77,10 @@ export const renderExperienceSection = (
       }
       
       pdf.text(splitBullet, leftMargin + 0.1, yPos);
-      yPos += (splitBullet.length * 0.15) + 0.08;
+      yPos += (splitBullet.length * 0.15) + 0.12; // Increased spacing between bullets
     }
     
-    yPos += 0.15;
+    yPos += 0.25; // Increased spacing between experiences
   }
   
   return yPos;
