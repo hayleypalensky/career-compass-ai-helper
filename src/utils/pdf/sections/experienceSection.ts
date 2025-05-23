@@ -1,3 +1,4 @@
+
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING, BULLET_CHAR } from "../constants";
@@ -51,7 +52,7 @@ export const renderExperience = (
     // Right-align dates
     const dateWidth = pdf.getTextWidth(dateText);
     pdf.text(dateText, leftMargin + contentWidth - dateWidth, currentY);
-    currentY += SPACING.line;
+    currentY += SPACING.line * 1.2; // Add slight extra spacing before bullets
     
     // Bullet points
     if (exp.bullets && exp.bullets.length > 0) {
@@ -66,7 +67,9 @@ export const renderExperience = (
           // Wrap bullet text
           const bulletLines = pdf.splitTextToSize(bullet, contentWidth - bulletIndent - 0.1);
           pdf.text(bulletLines, leftMargin + bulletIndent + 0.1, currentY);
-          currentY += bulletLines.length * SPACING.line;
+          
+          // Use proper line spacing for multi-line bullets
+          currentY += bulletLines.length * SPACING.line * 1.15; // Increase line spacing multiplier
         }
       }
     }
