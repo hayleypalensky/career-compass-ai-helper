@@ -2,7 +2,7 @@
 import { Experience } from "@/components/ExperienceForm";
 import { aiService } from "@/services/aiService";
 
-// Generate suggestions for bullet points using AI service
+// Generate suggestions for existing bullet points using AI service (considers current bullet + job description)
 export const generateBulletSuggestions = async (
   experience: Experience,
   expIndex: number,
@@ -17,28 +17,70 @@ export const generateBulletSuggestions = async (
   }
   
   try {
-    console.log('Calling AI service for bullet suggestions:', {
+    console.log('Calling AI service for existing bullet suggestions:', {
+      jobTitle: experience.title,
+      company: experience.company,
+      hasJobDescription: !!jobDescription,
+      relevantSkillsCount: relevantSkills.length,
+      currentBullet: experience.bullets[bulletIndex]
+    });
+    
+    // Use the actual current bullet point for context
+    const currentBullet = experience.bullets[bulletIndex] || "";
+    
+    // Use AI service to generate suggestions based on current bullet + job description
+    const aiSuggestions = await aiService.generateBulletPoints(
+      currentBullet,
+      experience.title,
+      jobDescription,
+      relevantSkills
+    );
+    
+    console.log('AI suggestions received for existing bullet:', aiSuggestions);
+    return aiSuggestions;
+  } catch (error) {
+    console.error('Error generating AI bullet suggestions:', error);
+    // Return empty array if AI fails
+    return [];
+  }
+};
+
+// Generate new bullet point suggestions based ONLY on job description (no existing bullet context)
+export const generateNewBulletSuggestions = async (
+  experience: Experience,
+  jobDescription: string,
+  relevantSkills: string[]
+): Promise<string[]> => {
+  // If no job description, return empty array
+  if (!jobDescription.trim()) {
+    console.log('Missing job description, skipping new bullet generation');
+    return [];
+  }
+  
+  try {
+    console.log('Calling AI service for new bullet suggestions:', {
       jobTitle: experience.title,
       company: experience.company,
       hasJobDescription: !!jobDescription,
       relevantSkillsCount: relevantSkills.length
     });
     
-    // Create a generic bullet template based on role and company without specific metrics
-    const roleTemplate = `Contributed to ${experience.title} responsibilities at ${experience.company}`;
+    // Use a generic placeholder that doesn't influence the AI too much
+    // This ensures suggestions are based primarily on job description requirements
+    const genericPlaceholder = `Contributed to ${experience.title} responsibilities`;
     
-    // Use AI service to generate suggestions based on job description requirements
+    // Use AI service to generate suggestions based primarily on job description
     const aiSuggestions = await aiService.generateBulletPoints(
-      roleTemplate,
+      genericPlaceholder,
       experience.title,
       jobDescription,
       relevantSkills
     );
     
-    console.log('AI suggestions received:', aiSuggestions);
+    console.log('AI suggestions received for new bullets:', aiSuggestions);
     return aiSuggestions;
   } catch (error) {
-    console.error('Error generating AI bullet suggestions:', error);
+    console.error('Error generating new bullet suggestions:', error);
     // Return empty array if AI fails
     return [];
   }
