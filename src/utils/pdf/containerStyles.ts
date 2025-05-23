@@ -8,7 +8,7 @@ import { FONT_FAMILY, PDF_DIMENSIONS } from './constants';
 export const applyContainerStyles = (element: HTMLElement): void => {
   // Set container styles
   element.className = "pdf-export-container";
-  element.style.width = PDF_DIMENSIONS.widthPx;
+  element.style.width = `${PDF_DIMENSIONS.widthPx}px`;
   element.style.padding = "0"; // Remove padding to allow precise margin control in PDF
   element.style.backgroundColor = "white";
   element.style.position = "absolute";
