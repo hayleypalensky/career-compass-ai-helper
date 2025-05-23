@@ -1,5 +1,5 @@
 
-import { jsPDF } from "jsPDF";
+import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
 
