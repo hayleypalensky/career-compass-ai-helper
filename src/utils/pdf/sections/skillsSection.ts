@@ -45,7 +45,7 @@ export const renderSkillsSection = (
   const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
   
   pdf.text(splitSkills, leftMargin, yPos);
-  yPos += (splitSkills.length * 0.14); // Slightly increased line spacing for skills
+  yPos += (splitSkills.length * 0.18); // Increased line spacing for skills
   
   return yPos;
 };

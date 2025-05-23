@@ -19,14 +19,15 @@ export const LINE_HEIGHTS = {
   relaxed: 1.4      // For better readability
 };
 
-// Spacing values in inches - increased for better page utilization
+// Spacing values in inches - increased for better element separation
 export const SPACING = {
-  xs: 0.08,         // Extra small spacing
-  sm: 0.12,         // Small spacing
-  md: 0.20,         // Medium spacing - increased for section breaks
-  lg: 0.30,         // Large spacing - increased for major sections
-  xl: 0.40,         // Extra large spacing - increased for section separation
-  section: 0.50     // New: dedicated section spacing for major breaks
+  xs: 0.10,         // Extra small spacing - slightly increased
+  sm: 0.15,         // Small spacing - increased for better element separation
+  md: 0.25,         // Medium spacing - increased for better section breaks
+  lg: 0.35,         // Large spacing - increased for major sections
+  xl: 0.45,         // Extra large spacing - increased for section separation
+  section: 0.50,    // Dedicated section spacing for major breaks
+  element: 0.18     // New: specific spacing between elements within sections
 };
 
 // PDF dimensions (US Letter)

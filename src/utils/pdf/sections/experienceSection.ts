@@ -40,7 +40,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(exp.title, leftMargin, yPos);
     
-    yPos += SPACING.sm;
+    yPos += SPACING.element; // Increased spacing between title and company
     
     // Company and dates on the same line, with dates right-aligned
     pdf.setFontSize(FONT_SIZES.base);
@@ -56,7 +56,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.sm;
+    yPos += SPACING.element; // Increased spacing between company and bullets
     
     // Add bullet points
     pdf.setFontSize(FONT_SIZES.small);
@@ -70,7 +70,12 @@ export const renderExperienceSection = (
       const splitBullet = pdf.splitTextToSize(bulletText, pageWidth - 0.1);
       
       pdf.text(splitBullet, leftMargin + 0.1, yPos);
-      yPos += (splitBullet.length * 0.12) + SPACING.xs; // Proper line spacing
+      yPos += (splitBullet.length * 0.15); // Increased spacing for bullets
+      
+      // Add a bit more space between bullet points
+      if (bulletPoints.indexOf(bullet) < bulletPoints.length - 1) {
+        yPos += SPACING.xs;
+      }
     }
     
     yPos += SPACING.lg; // Increased spacing between experiences

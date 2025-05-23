@@ -39,7 +39,7 @@ export const renderEducationSection = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    yPos += SPACING.sm;
+    yPos += SPACING.element; // Increased spacing between degree and school
     
     // School and dates on the same line
     pdf.setFontSize(FONT_SIZES.base);
@@ -55,14 +55,14 @@ export const renderEducationSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
     
-    yPos += SPACING.sm;
+    yPos += SPACING.element; // Increased spacing between school and description
     
     if (edu.description) {
       pdf.setFontSize(FONT_SIZES.small);
       pdf.setTextColor(COLORS.black);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      yPos += (splitDesc.length * 0.12); // Proper line spacing
+      yPos += (splitDesc.length * 0.15); // Increased line spacing for description
     }
     
     yPos += SPACING.lg; // Increased spacing between education entries
