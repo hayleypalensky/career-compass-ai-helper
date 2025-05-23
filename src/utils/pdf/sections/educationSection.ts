@@ -65,8 +65,11 @@ export const renderEducationSection = (
       yPos += (splitDesc.length * 0.12); // Proper line spacing
     }
     
-    yPos += SPACING.md; // Spacing between education entries
+    yPos += SPACING.lg; // Increased spacing between education entries
   }
+  
+  // Add section break spacing
+  yPos += SPACING.section;
   
   return yPos;
 };

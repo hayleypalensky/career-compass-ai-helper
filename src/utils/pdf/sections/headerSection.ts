@@ -91,7 +91,7 @@ export const renderHeaderSection = (
     
     // Use proper line height calculation
     const lineHeight = (FONT_SIZES.base * LINE_HEIGHTS.normal) / 72; // Convert to inches
-    yPos += (splitSummary.length * lineHeight) + SPACING.md; // Reduced spacing after summary
+    yPos += (splitSummary.length * lineHeight) + SPACING.section; // Increased spacing after summary for section break
   }
   
   return yPos;

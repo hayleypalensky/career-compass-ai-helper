@@ -73,8 +73,11 @@ export const renderExperienceSection = (
       yPos += (splitBullet.length * 0.12) + SPACING.xs; // Proper line spacing
     }
     
-    yPos += SPACING.md; // Spacing between experiences
+    yPos += SPACING.lg; // Increased spacing between experiences
   }
+  
+  // Add section break spacing
+  yPos += SPACING.section;
   
   return yPos;
 };
