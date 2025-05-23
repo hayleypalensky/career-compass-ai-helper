@@ -1,6 +1,6 @@
 
 import { Profile } from "@/types/profile";
-import { COLORS, FONT_SIZES, SPACING, FONT_FAMILY } from "@/utils/pdf/constants";
+import { COLORS, FONT_SIZES, SPACING, FONT_FAMILY, LINE_HEIGHTS } from "@/utils/pdf/constants";
 import { jsPDF } from "jspdf";
 import { PdfLayoutData } from "../types";
 
@@ -88,7 +88,10 @@ export const renderHeaderSection = (
     pdf.setTextColor(COLORS.black);
     const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
     pdf.text(splitSummary, leftMargin, yPos);
-    yPos += (splitSummary.length * SPACING.md) + SPACING.lg; // Consistent line spacing and section spacing
+    
+    // Use proper line height calculation instead of SPACING.md per line
+    const lineHeight = (FONT_SIZES.base * LINE_HEIGHTS.normal) / 72; // Convert to inches
+    yPos += (splitSummary.length * lineHeight) + SPACING.md; // Proper line spacing plus section spacing
   }
   
   return yPos;
