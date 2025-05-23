@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +12,7 @@ interface ExperienceEditorProps {
   onBulletChange: (expIndex: number, bulletIndex: number, value: string) => void;
   onRemoveBullet: (expIndex: number, bulletIndex: number) => void;
   onAddBullet: (expIndex: number) => void;
-  generateBulletSuggestions: (expIndex: number, bulletIndex: number) => string[];
+  generateBulletSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription?: string;
   relevantSkills: string[];
 }
@@ -499,9 +498,7 @@ const ExperienceEditor = ({
                     expIndex={expIndex}
                     onBulletChange={onBulletChange}
                     onRemoveBullet={onRemoveBullet}
-                    generateSuggestions={(expIndex, bulletIndex) => 
-                      generateBulletSuggestions(expIndex, bulletIndex)
-                    }
+                    generateSuggestions={generateBulletSuggestions}
                     jobDescription={jobDescription}
                   />
                 ))}
@@ -556,4 +553,3 @@ const ExperienceEditor = ({
 };
 
 export default ExperienceEditor;
-
