@@ -25,7 +25,7 @@ export const LINE_HEIGHTS = {
 
 // Spacing values in inches
 export const SPACING = {
-  section: 0.25,    // Between major sections
+  section: 0.35,    // Between major sections (increased from 0.25)
   subsection: 0.15, // Between items within sections
   line: 0.12,       // Between lines of text
   bullet: 0.08,     // Between bullet points
