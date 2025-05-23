@@ -1,5 +1,4 @@
 
-
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING, BULLET_CHAR } from "../constants";
@@ -39,7 +38,7 @@ export const renderExperience = (
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor("#000000"); // Keep content black for readability
     pdf.text(exp.title, leftMargin, currentY);
-    currentY += SPACING.line;
+    currentY += SPACING.line * 1.2; // Increased spacing to match education section
     
     // Company and dates
     pdf.setFontSize(FONT_SIZES.body);
@@ -80,4 +79,3 @@ export const renderExperience = (
   
   return currentY;
 };
-
