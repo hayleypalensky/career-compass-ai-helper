@@ -51,7 +51,19 @@ Return ONLY a JSON array with 3 strings, no other text.`;
     });
 
     const data = await response.json();
-    const generatedText = data.choices[0].message.content;
+    let generatedText = data.choices[0].message.content;
+    
+    console.log('Raw OpenAI response:', generatedText);
+    
+    // Clean up the response if it's wrapped in markdown code blocks
+    if (generatedText.includes('```json')) {
+      generatedText = generatedText.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
+    }
+    if (generatedText.includes('```')) {
+      generatedText = generatedText.replace(/```\s*/g, '').trim();
+    }
+    
+    console.log('Cleaned response:', generatedText);
     
     const suggestions = JSON.parse(generatedText);
 
