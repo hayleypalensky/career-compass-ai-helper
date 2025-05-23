@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
@@ -120,10 +119,10 @@ export const useTailorResume = ({
     }));
   };
 
-  // Helper function to generate bullet suggestions using the utility function
-  const generateBulletSuggestionsWrapper = (expIndex: number, bulletIndex: number) => {
+  // Helper function to generate bullet suggestions using AI service
+  const generateBulletSuggestionsWrapper = async (expIndex: number, bulletIndex: number): Promise<string[]> => {
     const experience = tailoredExperiences[expIndex];
-    return generateBulletSuggestions(
+    return await generateBulletSuggestions(
       experience, 
       expIndex, 
       bulletIndex, 
