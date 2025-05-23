@@ -1,4 +1,5 @@
 
+
 import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
 import { FONT_SIZES, SPACING } from "../constants";
@@ -16,7 +17,7 @@ export const renderEducation = (
     return yPos;
   }
   
-  let currentY = yPos;
+  let currentY = yPos + SPACING.section; // Add spacing above the section
   
   // Section heading
   pdf.setFontSize(FONT_SIZES.heading);
@@ -79,5 +80,9 @@ export const renderEducation = (
     }
   }
   
+  // Add spacing below the section
+  currentY += SPACING.section;
+  
   return currentY;
 };
+
