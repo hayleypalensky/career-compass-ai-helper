@@ -48,11 +48,11 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
     // Calculate total content height
     const totalContentHeight = headerHeight + educationHeight + experienceHeight + skillsHeight;
     
-    // Calculate spacing between sections - ensure it doesn't make content overflow
+    // Calculate spacing between sections - increased from previous value
     const sectionsCount = 4; // header, education, experience, skills
-    const minSpacing = 0.1; // Minimum spacing between sections
+    const minSpacing = 0.2; // Increased minimum spacing between sections
     const maxAvailableForSpacing = availableHeight - totalContentHeight;
-    const spacingBetweenSections = Math.max(minSpacing, Math.min(0.2, maxAvailableForSpacing / (sectionsCount - 1)));
+    const spacingBetweenSections = Math.max(minSpacing, Math.min(0.35, maxAvailableForSpacing / (sectionsCount - 1)));
     
     // If content is too tall, use minimum spacing
     if (totalContentHeight + (spacingBetweenSections * (sectionsCount - 1)) > availableHeight) {
