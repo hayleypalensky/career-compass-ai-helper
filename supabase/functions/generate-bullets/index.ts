@@ -17,20 +17,21 @@ serve(async (req) => {
   try {
     const { currentBullet, jobTitle, jobDescription, relevantSkills } = await req.json();
 
-    const prompt = `You are a professional resume writer. Generate 3 improved bullet point variations for this experience:
+    const prompt = `You are a professional resume writer. Based on the job description provided, create 3 completely new and distinct bullet points for someone in this role:
 
-Current Bullet: ${currentBullet}
 Job Title: ${jobTitle}
 Job Description: ${jobDescription}
-Relevant Skills: ${relevantSkills.join(', ')}
+Relevant Skills to Incorporate: ${relevantSkills.join(', ')}
 
 Requirements:
-- Start with strong action verbs
-- Include quantifiable achievements where possible
-- Incorporate relevant keywords from the job description
-- Make them ATS-friendly
+- Create entirely NEW bullet points based on the job description requirements
+- DO NOT use any specific numbers, percentages, or metrics from existing content
+- Start with strong action verbs (Led, Developed, Implemented, Designed, etc.)
+- Include realistic but varied quantifiable achievements (use different percentages like 15%, 25%, 30%, etc.)
+- Incorporate keywords and requirements directly from the job description
+- Make them ATS-friendly and role-appropriate
 - Each should be 1-2 lines maximum
-- Focus on impact and results
+- Focus on impact and results that would be relevant to this specific job
 
 Return ONLY a JSON array with 3 strings, no other text.`;
 
@@ -43,10 +44,10 @@ Return ONLY a JSON array with 3 strings, no other text.`;
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a professional resume writer that returns only valid JSON arrays.' },
+          { role: 'system', content: 'You are a professional resume writer that creates original bullet points based on job descriptions. Return only valid JSON arrays with no markdown formatting.' },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
+        temperature: 0.8, // Increased for more creative/varied responses
       }),
     });
 

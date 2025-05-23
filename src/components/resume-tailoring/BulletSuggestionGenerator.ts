@@ -1,3 +1,4 @@
+
 import { Experience } from "@/components/ExperienceForm";
 import { aiService } from "@/services/aiService";
 
@@ -9,18 +10,6 @@ export const generateBulletSuggestions = async (
   jobDescription: string,
   relevantSkills: string[]
 ): Promise<string[]> => {
-  // Get the current bullet to improve
-  let currentBullet = "";
-  
-  // If this is an existing bullet, use its text
-  if (bulletIndex < experience.bullets.length) {
-    currentBullet = experience.bullets[bulletIndex];
-  } 
-  // Otherwise, generate a placeholder bullet for a new suggestion
-  else {
-    currentBullet = `Worked on projects at ${experience.company} related to ${experience.title}`;
-  }
-  
   // If no job description, return empty array
   if (!jobDescription.trim()) {
     console.log('Missing job description, skipping AI generation');
@@ -29,15 +18,18 @@ export const generateBulletSuggestions = async (
   
   try {
     console.log('Calling AI service for bullet suggestions:', {
-      currentBullet,
       jobTitle: experience.title,
+      company: experience.company,
       hasJobDescription: !!jobDescription,
       relevantSkillsCount: relevantSkills.length
     });
     
-    // Use AI service to generate suggestions
+    // Create a generic bullet template based on role and company without specific metrics
+    const roleTemplate = `Contributed to ${experience.title} responsibilities at ${experience.company}`;
+    
+    // Use AI service to generate suggestions based on job description requirements
     const aiSuggestions = await aiService.generateBulletPoints(
-      currentBullet,
+      roleTemplate,
       experience.title,
       jobDescription,
       relevantSkills
