@@ -26,13 +26,13 @@ export const renderEducationSection = (
     yPos = layoutData.topBottomMargIn + 0.2;
   }
   
-  // Section header with consistent formatting
+  // Section header
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(0.3); // Letter spacing for section headers
+  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text("Education", leftMargin, yPos);
-  pdf.setCharSpace(0); // Reset char spacing
+  pdf.setCharSpace(0);
   yPos += 0.15;
   
   // Add a thin line under the section header
@@ -41,22 +41,19 @@ export const renderEducationSection = (
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
   yPos += 0.2;
   
-  // Consistent spacing between education items
-  const itemSpacing = 0.2;
-  
   for (const edu of profile.education) {
-    // Degree with consistent formatting
+    // Degree
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(0.2); // Letter spacing for degree titles
+    pdf.setCharSpace(LETTER_SPACING.tight);
     pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, yPos);
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     
     // School and dates on the same line
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
-    pdf.setCharSpace(0.2); // Consistent letter spacing
+    pdf.setCharSpace(LETTER_SPACING.normal);
     const dateText = `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
@@ -67,21 +64,21 @@ export const renderEducationSection = (
     // Set date in regular black
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos + 0.15);
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     
     yPos += 0.3;
     
     if (edu.description) {
       pdf.setFontSize(9);
       pdf.setTextColor(COLORS.black);
-      pdf.setCharSpace(0.2); // Letter spacing for descriptions
+      pdf.setCharSpace(LETTER_SPACING.normal);
       const splitDesc = pdf.splitTextToSize(edu.description, pageWidth);
       pdf.text(splitDesc, leftMargin, yPos);
-      pdf.setCharSpace(0); // Reset char spacing
+      pdf.setCharSpace(0);
       yPos += (splitDesc.length * 0.13);
     }
     
-    yPos += itemSpacing;
+    yPos += 0.2;
   }
   
   return yPos;

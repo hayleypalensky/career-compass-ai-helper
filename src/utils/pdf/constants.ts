@@ -5,46 +5,46 @@
 
 // Font sizes - making more consistent
 export const FONT_SIZES = {
-  base: '11px',         // Consistent base font size
-  small: '10px',        // Small text
-  xsmall: '9px',        // Extra small text
-  heading2: '16px',     // Main headings reduced
-  heading3: '13px'      // Section headings reduced
+  base: '10px',         // Base font size for body text
+  small: '9px',         // Small text
+  xsmall: '8px',        // Extra small text
+  heading2: '14px',     // Main headings
+  heading3: '11px'      // Section headings
 };
 
-// Line heights - more consistent
+// Line heights - optimized for PDF readability
 export const LINE_HEIGHTS = {
-  tight: '1.3',         // Slightly increased for better readability
-  tighter: '1.25',      // Tighter for lists and compact areas
-  compact: '1.2'        // Very compact for small text
+  tight: '1.2',         // Tight for compact layout
+  tighter: '1.15',      // Tighter for lists
+  compact: '1.1'        // Very compact for small text
 };
 
-// Spacing values - more consistent
+// Spacing values - optimized for PDF
 export const SPACING = {
   none: '0',
-  tiny: '1px',          // Smallest spacing
-  xsmall: '2px',        // Very small gaps
-  small: '3px',         // Small gaps between elements
-  medium: '4px',        // Medium gaps
-  base: '6px',          // Base spacing (reduced from 8px)
-  large: '8px'          // Largest spacing (reduced from 10px)
+  tiny: '2px',          // Smallest spacing
+  xsmall: '3px',        // Very small gaps
+  small: '4px',         // Small gaps between elements
+  medium: '6px',        // Medium gaps
+  base: '8px',          // Base spacing
+  large: '10px'         // Largest spacing
 };
 
 // PDF dimensions (US Letter)
 export const PDF_DIMENSIONS = {
   width: '8.5in',
   height: '11in',
-  widthPx: '794px',     // 8.5in in pixels (slightly adjusted)
+  widthPx: '794px',
 };
 
-// Font families - ensuring consistency
-export const FONT_FAMILY = "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+// Font families - simple and reliable for PDF
+export const FONT_FAMILY = "helvetica";
 
-// Letter spacing values for improved readability
+// Letter spacing values - minimal for PDF clarity
 export const LETTER_SPACING = {
-  tight: '0.01em',      // For headings and bold text
-  normal: '0.02em',     // For body text
-  loose: '0.03em'       // For small text when needed
+  tight: '0',           // No extra spacing for headings
+  normal: '0.1',        // Minimal spacing for body text
+  loose: '0.2'          // Slight spacing only when needed
 };
 
 // Common colors

@@ -19,13 +19,13 @@ export const renderHeaderSection = (
   // Set consistent font family for entire document
   pdf.setFont("helvetica");
   
-  // Add header - Name with theme color and consistent formatting
+  // Add header - Name with theme color
   pdf.setFontSize(16);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(0.5); // Increased letter spacing for readability
+  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text(profile.personalInfo.name || "Resume", leftMargin, yPos);
-  pdf.setCharSpace(0); // Reset char spacing
+  pdf.setCharSpace(0);
   yPos += 0.22;
   
   // Add horizontal line with theme color
@@ -38,7 +38,7 @@ export const renderHeaderSection = (
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(COLORS.black);
-  pdf.setCharSpace(0.2); // Consistent letter spacing for contact info
+  pdf.setCharSpace(LETTER_SPACING.normal);
 
   // Create array of contact items
   const contactItems = [];
@@ -52,7 +52,6 @@ export const renderHeaderSection = (
     // Calculate positions for evenly spaced contact info
     const availableWidth = rightMargin - leftMargin;
     
-    // Instead of joining with "|", space items evenly across the page width
     if (contactItems.length === 1) {
       // If only one item, center it
       pdf.text(contactItems[0], leftMargin + (availableWidth / 2) - (pdf.getTextWidth(contactItems[0]) / 2), yPos);
@@ -82,25 +81,25 @@ export const renderHeaderSection = (
     yPos += 0.25; // Add space after contact info
   }
   
-  pdf.setCharSpace(0); // Reset char spacing
+  pdf.setCharSpace(0);
   
   // Add summary if available
   if (profile.personalInfo.summary) {
     pdf.setFontSize(12);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(themeColors.heading);
-    pdf.setCharSpace(0.3); // Letter spacing for section headers
+    pdf.setCharSpace(LETTER_SPACING.tight);
     pdf.text("Professional Summary", leftMargin, yPos);
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     yPos += 0.18;
     
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(0.2); // Letter spacing for body text
+    pdf.setCharSpace(LETTER_SPACING.normal);
     const splitSummary = pdf.splitTextToSize(profile.personalInfo.summary, pageWidth);
     pdf.text(splitSummary, leftMargin, yPos);
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     yPos += (splitSummary.length * 0.13) + 0.25;
   }
   

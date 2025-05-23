@@ -20,13 +20,13 @@ export const renderExperienceSection = (
     return yPos;
   }
   
-  // Section header with consistent formatting
+  // Section header
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(0.3); // Letter spacing for section headers
+  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text("Experience", leftMargin, yPos);
-  pdf.setCharSpace(0); // Reset char spacing
+  pdf.setCharSpace(0);
   yPos += 0.15;
   
   // Add a thin line under the section header
@@ -42,20 +42,20 @@ export const renderExperienceSection = (
       yPos = layoutData.topBottomMargIn + 0.2;
     }
     
-    // Job title with consistent bold formatting
+    // Job title
     pdf.setFontSize(11);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(0.2); // Letter spacing for job titles
+    pdf.setCharSpace(LETTER_SPACING.tight);
     pdf.text(exp.title, leftMargin, yPos);
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     
     yPos += 0.2;
     
     // Company and dates on the same line, with dates right-aligned
     pdf.setFontSize(10);
     pdf.setFont("helvetica", "normal");
-    pdf.setCharSpace(0.2); // Consistent letter spacing
+    pdf.setCharSpace(LETTER_SPACING.normal);
     const dateText = `${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`;
     const dateWidth = pdf.getTextWidth(dateText);
     
@@ -66,15 +66,15 @@ export const renderExperienceSection = (
     // Set date in regular black
     pdf.setTextColor(COLORS.black);
     pdf.text(dateText, 8.5 - layoutData.sideMargIn - dateWidth, yPos);
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     
     yPos += 0.25;
     
-    // Add bullet points with consistent formatting
+    // Add bullet points
     pdf.setFontSize(9);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.black);
-    pdf.setCharSpace(0.2); // Letter spacing for bullet points
+    pdf.setCharSpace(LETTER_SPACING.normal);
     const bulletPoints = exp.bullets.filter(bullet => bullet.trim() !== "");
     for (const bullet of bulletPoints) {
       // Handle bullet points that may need multiple lines
@@ -90,7 +90,7 @@ export const renderExperienceSection = (
       pdf.text(splitBullet, leftMargin + 0.1, yPos);
       yPos += (splitBullet.length * 0.15) + 0.12;
     }
-    pdf.setCharSpace(0); // Reset char spacing
+    pdf.setCharSpace(0);
     
     yPos += 0.25;
   }

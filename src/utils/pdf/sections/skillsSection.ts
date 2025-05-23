@@ -25,13 +25,13 @@ export const renderSkillsSection = (
     yPos = layoutData.topBottomMargIn + 0.2;
   }
   
-  // Section header with consistent formatting
+  // Section header
   pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
-  pdf.setCharSpace(0.3); // Letter spacing for section headers
+  pdf.setCharSpace(LETTER_SPACING.tight);
   pdf.text("Skills", leftMargin, yPos);
-  pdf.setCharSpace(0); // Reset char spacing
+  pdf.setCharSpace(0);
   yPos += 0.15;
   
   // Add a thin line under the section header
@@ -40,11 +40,11 @@ export const renderSkillsSection = (
   pdf.line(leftMargin, yPos, 8.5 - layoutData.sideMargIn, yPos);
   yPos += 0.2;
   
-  // Reset text settings with consistent formatting
+  // Reset text settings
   pdf.setFontSize(10);
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(COLORS.black);
-  pdf.setCharSpace(0.2); // Letter spacing for skills text
+  pdf.setCharSpace(LETTER_SPACING.normal);
   
   // Extract all skill names without categories
   const allSkills = profile.skills.map(skill => skill.name);
@@ -54,7 +54,7 @@ export const renderSkillsSection = (
   const splitSkills = pdf.splitTextToSize(skillsText, pageWidth);
   
   pdf.text(splitSkills, leftMargin, yPos);
-  pdf.setCharSpace(0); // Reset char spacing
+  pdf.setCharSpace(0);
   yPos += (splitSkills.length * 0.15) + 0.1;
   
   return yPos;
