@@ -105,7 +105,7 @@ const calculateHeaderHeight = (
   const tempY = 100; // Temporary position
   const startY = tempY;
   const endY = renderHeader(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
-  return endY - startY - SPACING.section; // Subtract the section spacing added by renderHeader
+  return endY - startY;
 };
 
 const calculateEducationHeight = (
@@ -121,7 +121,7 @@ const calculateEducationHeight = (
   const tempY = 100;
   const startY = tempY;
   const endY = renderEducation(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
-  return endY - startY - SPACING.section;
+  return endY - startY;
 };
 
 const calculateExperienceHeight = (
@@ -137,7 +137,7 @@ const calculateExperienceHeight = (
   const tempY = 100;
   const startY = tempY;
   const endY = renderExperience(pdf, profile, leftMargin, contentWidth, tempY, themeColors);
-  return endY - startY - SPACING.section;
+  return endY - startY;
 };
 
 const calculateSkillsHeight = (

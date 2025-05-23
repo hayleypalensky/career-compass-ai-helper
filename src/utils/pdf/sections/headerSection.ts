@@ -39,7 +39,7 @@ export const renderHeader = (
   
   // Professional Summary
   if (profile.personalInfo.summary) {
-    currentY += SPACING.section; // Same spacing as between other sections
+    currentY += SPACING.section; // Add consistent spacing before summary section
     
     pdf.setFontSize(FONT_SIZES.heading);
     pdf.setFont("helvetica", "bold");
@@ -59,9 +59,6 @@ export const renderHeader = (
     const summaryLines = pdf.splitTextToSize(profile.personalInfo.summary, contentWidth);
     pdf.text(summaryLines, leftMargin, currentY);
     currentY += summaryLines.length * SPACING.line;
-    
-    // Same spacing as between other sections
-    currentY += SPACING.section;
   }
   
   return currentY;

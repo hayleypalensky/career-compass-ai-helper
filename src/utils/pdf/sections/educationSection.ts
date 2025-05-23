@@ -16,7 +16,7 @@ export const renderEducation = (
     return yPos;
   }
   
-  let currentY = yPos; // Remove the extra spacing above
+  let currentY = yPos;
   
   // Section heading
   pdf.setFontSize(FONT_SIZES.heading);
@@ -86,5 +86,5 @@ export const renderEducation = (
     }
   }
   
-  return currentY; // Remove the extra spacing below
+  return currentY;
 };
