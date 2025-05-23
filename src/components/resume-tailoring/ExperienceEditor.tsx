@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,7 @@ const ExperienceEditor = ({
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState<number | null>(null);
   const [loadingSuggestions, setLoadingSuggestions] = useState<number | null>(null);
+  const [newSuggestions, setNewSuggestions] = useState<{ [key: number]: string[] }>({});
 
   // Helper function to generate random action verbs
   const getRandomActionVerb = (capitalized = false): string => {
@@ -218,7 +220,13 @@ const ExperienceEditor = ({
       
       console.log('Generating new bullet suggestions for experience:', experiences[expIndex].title);
       
-      // Use the generateBulletSuggestions function with a placeholder bullet index
+      // Create a placeholder bullet if none exists
+      const currentExperience = experiences[expIndex];
+      const placeholderBullet = currentExperience.bullets.length > 0 ? 
+        currentExperience.bullets[0] : 
+        `${getRandomActionVerb(true)} projects at ${currentExperience.company}`;
+      
+      // Use the generateBulletSuggestions function with the placeholder bullet
       const aiSuggestions = await generateBulletSuggestions(expIndex, 0);
       
       console.log('Received AI suggestions:', aiSuggestions);
@@ -229,6 +237,12 @@ const ExperienceEditor = ({
           description: "Unable to generate AI suggestions for this experience.",
           variant: "default",
         });
+      } else {
+        // Store suggestions in state with experience index as key
+        setNewSuggestions(prev => ({
+          ...prev,
+          [expIndex]: aiSuggestions
+        }));
       }
       
       return aiSuggestions;
@@ -416,7 +430,7 @@ const ExperienceEditor = ({
     // Then update the last bullet with the suggestion
     setTimeout(() => {
       const newBulletIndex = experiences[expIndex].bullets.length;
-      onBulletChange(expIndex, newBulletIndex, suggestion);
+      onBulletChange(expIndex, newBulletIndex - 1, suggestion);
       
       toast({
         title: "Bullet point added",
@@ -497,10 +511,26 @@ const ExperienceEditor = ({
                       <div className="text-sm text-blue-600">Generating suggestions with AI...</div>
                     ) : (
                       <div className="space-y-2">
-                        {/* We'll populate these with AI suggestions */}
-                        <div className="text-sm text-blue-600">
-                          AI suggestions will appear here after generation is complete.
-                        </div>
+                        {newSuggestions[expIndex] && newSuggestions[expIndex].length > 0 ? (
+                          newSuggestions[expIndex].map((suggestion, idx) => (
+                            <div key={idx} className="flex items-start gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="text-xs whitespace-nowrap"
+                                onClick={() => handleAddSuggestion(expIndex, suggestion)}
+                              >
+                                <Plus className="h-3 w-3 mr-1" />
+                                Add
+                              </Button>
+                              <p className="text-sm">{suggestion}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-sm text-blue-600">
+                            AI suggestions will appear here after generation is complete.
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
