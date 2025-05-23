@@ -46,7 +46,7 @@ export const renderExperienceSection = (
     pdf.setTextColor(COLORS.black);
     pdf.text(exp.title, leftMargin, yPos);
     
-    yPos += SPACING.sm;
+    yPos += SPACING.md; // Increased spacing between role and company lines
     
     // Company and dates on the same line, with dates right-aligned
     pdf.setFontSize(FONT_SIZES.base);
