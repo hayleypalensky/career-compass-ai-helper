@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -69,7 +68,7 @@ const ResumeColorSelector = ({
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Resume Color Theme</CardTitle>
+        <CardTitle className="text-title-medium">Resume Color Theme</CardTitle>
       </CardHeader>
       <CardContent>
         <RadioGroup
@@ -80,15 +79,15 @@ const ResumeColorSelector = ({
         >
           {colorThemes.map((theme) => (
             <div key={theme.id} className="flex items-center space-x-2">
-              <RadioGroupItem value={theme.id} id={`theme-${theme.id}`} />
+              <RadioGroupItem value={theme.id} id={`theme-${theme.id}`} className="border-outline" />
               <Label
                 htmlFor={`theme-${theme.id}`}
-                className="flex items-center cursor-pointer"
+                className="flex items-center cursor-pointer material-ripple rounded-md px-2 py-1"
               >
                 <span
                   className={`w-4 h-4 rounded-full mr-2 ${theme.accentColor.split(" ")[0]}`}
                 />
-                {theme.name}
+                <span className="text-body-medium">{theme.name}</span>
               </Label>
             </div>
           ))}
