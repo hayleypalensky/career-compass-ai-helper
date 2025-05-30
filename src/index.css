@@ -154,11 +154,12 @@
   
   .material-ripple:hover::before {
     content: '';
-    @apply absolute inset-0 bg-primary/8 pointer-events-none;
+    @apply absolute inset-0 pointer-events-none;
+    background-color: rgba(103, 80, 164, 0.08);
   }
   
   .material-ripple:active::before {
-    @apply bg-primary/12;
+    background-color: rgba(103, 80, 164, 0.12);
   }
 }
 
