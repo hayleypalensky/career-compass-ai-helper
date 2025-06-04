@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -6,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { createJob } from "@/services/jobService";
 import { Job } from "@/types/job";
 import { Briefcase, Plus } from "lucide-react";
 
@@ -17,7 +20,9 @@ interface AddToJobTrackerProps {
 
 const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" }: AddToJobTrackerProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<Omit<Job, "id" | "status" | "updatedAt">>({
     title: jobTitle,
     company: companyName,
@@ -39,40 +44,78 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
     setFormData((prev) => ({ ...prev, remote: checked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Get existing jobs
-    const savedJobs = localStorage.getItem("resumeJobs");
-    let jobs: Job[] = [];
-    
-    if (savedJobs) {
-      try {
-        jobs = JSON.parse(savedJobs);
-      } catch (error) {
-        console.error("Error parsing jobs from localStorage:", error);
-      }
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to add jobs to your tracker.",
+        variant: "destructive",
+      });
+      return;
     }
     
-    // Create new job - preserve the date string exactly as entered
-    const newJob: Job = {
-      ...formData,
-      id: crypto.randomUUID(),
-      status: "applied",
-      updatedAt: new Date().toISOString(),
-    };
+    setIsSubmitting(true);
     
-    // Add job to list and save
-    jobs.push(newJob);
-    localStorage.setItem("resumeJobs", JSON.stringify(jobs));
-    
-    // Close dialog and show confirmation
-    setOpen(false);
-    toast({
-      title: "Job added to tracker",
-      description: `"${formData.title}" at "${formData.company}" has been added to your job tracker.`,
-    });
+    try {
+      // Create new job using Supabase service
+      const newJob: Job = {
+        ...formData,
+        id: crypto.randomUUID(),
+        status: "applied",
+        updatedAt: new Date().toISOString(),
+      };
+      
+      await createJob(user.id, newJob);
+      
+      // Close dialog and show confirmation
+      setOpen(false);
+      toast({
+        title: "Job added to tracker",
+        description: `"${formData.title}" at "${formData.company}" has been added to your job tracker.`,
+      });
+      
+      // Reset form
+      setFormData({
+        title: "",
+        company: "",
+        location: "",
+        remote: false,
+        description: "",
+        notes: "",
+        appliedDate: new Date().toISOString().split("T")[0],
+      });
+    } catch (error) {
+      console.error("Error adding job:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add the job to your tracker. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // Show auth required message if user is not logged in
+  if (!user) {
+    return (
+      <Button 
+        variant="outline" 
+        className="flex items-center gap-2" 
+        onClick={() => toast({
+          title: "Authentication required",
+          description: "Please log in to add jobs to your tracker.",
+          variant: "destructive",
+        })}
+      >
+        <Plus className="h-4 w-4" /> 
+        <Briefcase className="h-4 w-4" />
+        Add to Job Tracker
+      </Button>
+    );
+  }
 
   return (
     <>
@@ -179,7 +222,9 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
             </div>
 
             <DialogFooter>
-              <Button type="submit">Add to Job Tracker</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Adding..." : "Add to Job Tracker"}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
