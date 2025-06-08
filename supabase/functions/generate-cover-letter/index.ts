@@ -61,7 +61,7 @@ RELEVANT SKILLS FOR THIS ROLE:
 ${relevantSkills.join(', ')}
 
 Please write a compelling, professional cover letter that:
-1. Uses a proper business letter format with date, recipient address, and formal greeting
+1. Starts directly with "Dear Hiring Manager," - DO NOT include any header information like dates, addresses, or recipient details
 2. Opens with a strong hook that mentions the specific position and company
 3. Highlights the most relevant experience and achievements from the candidate's background
 4. Demonstrates knowledge of the company and role requirements
@@ -71,8 +71,9 @@ Please write a compelling, professional cover letter that:
 8. Uses professional language while showing personality
 9. Specifically addresses requirements mentioned in the job description
 10. Emphasizes the relevant skills identified for this role
+11. Ends with "Sincerely," followed by the candidate's name
 
-Format the letter properly with appropriate spacing and professional structure.`;
+Format the letter with appropriate paragraph spacing but WITHOUT any business letter header formatting (no dates, addresses, etc).`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -85,7 +86,7 @@ Format the letter properly with appropriate spacing and professional structure.`
         messages: [
           {
             role: 'system',
-            content: 'You are an expert career counselor and professional writer specializing in creating compelling cover letters. You write in a professional yet engaging tone that helps candidates stand out while maintaining appropriate business communication standards.'
+            content: 'You are an expert career counselor and professional writer specializing in creating compelling cover letters. You write in a professional yet engaging tone that helps candidates stand out while maintaining appropriate business communication standards. You NEVER include business letter headers, dates, or addresses - you start directly with the greeting.'
           },
           {
             role: 'user',
