@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
@@ -18,31 +17,35 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
   console.log('useTailorResumeExperiences - Profile.experiences length:', profile.experiences?.length);
   
   // Initialize selected experiences to include all by default
-  const [selectedExperienceIds, setSelectedExperienceIds] = useState<string[]>(() => {
-    const initialIds = profile.experiences?.map(exp => exp.id) || [];
-    console.log('useTailorResumeExperiences - Initial selectedExperienceIds:', initialIds);
-    return initialIds;
-  });
+  const [selectedExperienceIds, setSelectedExperienceIds] = useState<string[]>([]);
   
   // Update selected experiences when profile changes to ensure all experiences are included
   useEffect(() => {
     console.log('useTailorResumeExperiences - useEffect triggered with profile.experiences:', profile.experiences);
     
-    const currentExperienceIds = profile.experiences?.map(exp => exp.id) || [];
-    console.log('useTailorResumeExperiences - Current experience IDs from profile:', currentExperienceIds);
-    
-    setSelectedExperienceIds(currentIds => {
-      console.log('useTailorResumeExperiences - Previous selected IDs:', currentIds);
+    if (profile.experiences && Array.isArray(profile.experiences)) {
+      const allExperienceIds = profile.experiences.map(exp => exp.id);
+      console.log('useTailorResumeExperiences - All experience IDs from profile:', allExperienceIds);
       
-      // Keep existing selections that are still valid, and add any new experiences
-      const validExistingIds = currentIds.filter(id => currentExperienceIds.includes(id));
-      const newIds = currentExperienceIds.filter(id => !currentIds.includes(id));
-      
-      const updatedIds = [...validExistingIds, ...newIds];
-      console.log('useTailorResumeExperiences - Updated selected IDs:', updatedIds);
-      
-      return updatedIds;
-    });
+      setSelectedExperienceIds(currentIds => {
+        console.log('useTailorResumeExperiences - Previous selected IDs:', currentIds);
+        
+        // If we don't have any selected IDs yet, select all by default
+        if (currentIds.length === 0) {
+          console.log('useTailorResumeExperiences - No previous selections, selecting all:', allExperienceIds);
+          return allExperienceIds;
+        }
+        
+        // Keep existing selections that are still valid, and add any new experiences
+        const validExistingIds = currentIds.filter(id => allExperienceIds.includes(id));
+        const newIds = allExperienceIds.filter(id => !currentIds.includes(id));
+        
+        const updatedIds = [...validExistingIds, ...newIds];
+        console.log('useTailorResumeExperiences - Updated selected IDs:', updatedIds);
+        
+        return updatedIds;
+      });
+    }
   }, [profile.experiences]);
   
   // Filter experiences based on selection
@@ -53,11 +56,7 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
   console.log('useTailorResumeExperiences - Selected experiences:', selectedExperiences);
   console.log('useTailorResumeExperiences - Number of selected experiences:', selectedExperiences.length);
   
-  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>(() => {
-    const initial = JSON.parse(JSON.stringify(selectedExperiences));
-    console.log('useTailorResumeExperiences - Initial tailored experiences:', initial);
-    return initial;
-  });
+  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>([]);
   
   // Update tailored experiences when selection changes or profile changes
   useEffect(() => {
