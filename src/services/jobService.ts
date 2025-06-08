@@ -14,25 +14,40 @@ export interface JobData {
   description: string | null;
   notes: string | null;
   updated_at: string;
-  attachments: JobAttachment[] | null;
+  attachments: any; // Use any for the raw JSON data from database
 }
 
 /**
  * Converts database job data to application Job model
  */
-export const formatJobFromDb = (jobData: JobData): Job => ({
-  id: jobData.id,
-  title: jobData.position,
-  company: jobData.company,
-  location: jobData.location || '',
-  remote: jobData.remote || false,
-  appliedDate: jobData.application_date,
-  status: jobData.status as JobStatus,
-  description: jobData.description || '',
-  notes: jobData.notes || '',
-  updatedAt: jobData.updated_at,
-  attachments: jobData.attachments || []
-});
+export const formatJobFromDb = (jobData: JobData): Job => {
+  // Parse attachments from JSON, ensuring it's always an array
+  let attachments: JobAttachment[] = [];
+  if (jobData.attachments) {
+    try {
+      attachments = Array.isArray(jobData.attachments) 
+        ? jobData.attachments 
+        : JSON.parse(jobData.attachments);
+    } catch (error) {
+      console.error('Error parsing attachments:', error);
+      attachments = [];
+    }
+  }
+
+  return {
+    id: jobData.id,
+    title: jobData.position,
+    company: jobData.company,
+    location: jobData.location || '',
+    remote: jobData.remote || false,
+    appliedDate: jobData.application_date,
+    status: jobData.status as JobStatus,
+    description: jobData.description || '',
+    notes: jobData.notes || '',
+    updatedAt: jobData.updated_at,
+    attachments
+  };
+};
 
 /**
  * Fetches all jobs for the current user
@@ -56,7 +71,7 @@ export const fetchJobs = async (userId: string) => {
 export const createJob = async (userId: string, job: Job) => {
   const { data, error } = await supabase
     .from('jobs')
-    .insert([{
+    .insert({
       user_id: userId,
       position: job.title,
       company: job.company,
@@ -67,7 +82,7 @@ export const createJob = async (userId: string, job: Job) => {
       status: job.status,
       application_date: job.appliedDate,
       attachments: job.attachments || [],
-    }])
+    })
     .select();
     
   if (error) throw error;
