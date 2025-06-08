@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -16,10 +17,18 @@ import { JobAttachment } from "@/services/attachmentService";
 interface AddToJobTrackerProps {
   jobTitle?: string;
   companyName?: string;
+  location?: string;
+  remote?: boolean;
   jobDescription?: string;
 }
 
-const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" }: AddToJobTrackerProps) => {
+const AddToJobTracker = ({ 
+  jobTitle = "", 
+  companyName = "", 
+  location = "",
+  remote = false,
+  jobDescription = "" 
+}: AddToJobTrackerProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -28,8 +37,8 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
   const [formData, setFormData] = useState<Omit<Job, "id" | "status" | "updatedAt">>({
     title: jobTitle,
     company: companyName,
-    location: "",
-    remote: false,
+    location: location,
+    remote: remote,
     description: jobDescription,
     notes: "",
     appliedDate: new Date().toISOString().split("T")[0],
