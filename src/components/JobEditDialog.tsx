@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Dialog,
@@ -14,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Job } from "@/types/job";
 import { useToast } from "@/hooks/use-toast";
+import JobAttachments from "./jobs/JobAttachments";
+import { JobAttachment } from "@/services/attachmentService";
 
 interface JobEditDialogProps {
   job: Job;
@@ -41,6 +42,10 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
 
   const handleRemoteChange = (checked: boolean) => {
     setEditedJob((prev) => ({ ...prev, remote: checked }));
+  };
+
+  const handleAttachmentsChange = (attachments: JobAttachment[]) => {
+    setEditedJob((prev) => ({ ...prev, attachments }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -74,7 +79,7 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Job Application</DialogTitle>
         </DialogHeader>
@@ -155,6 +160,14 @@ const JobEditDialog = ({ job, open, onOpenChange, onSave }: JobEditDialogProps) 
               rows={3}
               className="font-mono text-sm"
               style={{ whiteSpace: "pre-wrap" }}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <JobAttachments
+              jobId={editedJob.id}
+              attachments={editedJob.attachments || []}
+              onAttachmentsChange={handleAttachmentsChange}
             />
           </div>
           

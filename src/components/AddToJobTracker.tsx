@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -11,6 +10,8 @@ import { useAuth } from "@/context/AuthContext";
 import { createJob } from "@/services/jobService";
 import { Job } from "@/types/job";
 import { Briefcase, Plus } from "lucide-react";
+import JobAttachments from "./jobs/JobAttachments";
+import { JobAttachment } from "@/services/attachmentService";
 
 interface AddToJobTrackerProps {
   jobTitle?: string;
@@ -23,6 +24,7 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [attachments, setAttachments] = useState<JobAttachment[]>([]);
   const [formData, setFormData] = useState<Omit<Job, "id" | "status" | "updatedAt">>({
     title: jobTitle,
     company: companyName,
@@ -31,6 +33,7 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
     description: jobDescription,
     notes: "",
     appliedDate: new Date().toISOString().split("T")[0],
+    attachments: [],
   });
 
   const handleChange = (
@@ -65,6 +68,7 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
         id: crypto.randomUUID(),
         status: "applied",
         updatedAt: new Date().toISOString(),
+        attachments,
       };
       
       await createJob(user.id, newJob);
@@ -85,7 +89,9 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
         description: "",
         notes: "",
         appliedDate: new Date().toISOString().split("T")[0],
+        attachments: [],
       });
+      setAttachments([]);
     } catch (error) {
       console.error("Error adding job:", error);
       toast({
@@ -130,7 +136,7 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add Job to Tracker</DialogTitle>
           </DialogHeader>
@@ -218,6 +224,14 @@ const AddToJobTracker = ({ jobTitle = "", companyName = "", jobDescription = "" 
                 rows={2}
                 className="font-mono text-sm"
                 style={{ whiteSpace: "pre-wrap" }}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <JobAttachments
+                jobId="temp-id"
+                attachments={attachments}
+                onAttachmentsChange={setAttachments}
               />
             </div>
 

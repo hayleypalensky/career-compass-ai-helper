@@ -12,6 +12,7 @@ export type Database = {
       jobs: {
         Row: {
           application_date: string
+          attachments: Json | null
           company: string
           created_at: string
           description: string | null
@@ -26,6 +27,7 @@ export type Database = {
         }
         Insert: {
           application_date: string
+          attachments?: Json | null
           company: string
           created_at?: string
           description?: string | null
@@ -40,6 +42,7 @@ export type Database = {
         }
         Update: {
           application_date?: string
+          attachments?: Json | null
           company?: string
           created_at?: string
           description?: string | null

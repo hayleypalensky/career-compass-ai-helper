@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Job, JobStatus } from "@/types/job";
+import { JobAttachment } from "@/services/attachmentService";
 
 export interface JobData {
   id: string;
@@ -13,6 +14,7 @@ export interface JobData {
   description: string | null;
   notes: string | null;
   updated_at: string;
+  attachments: JobAttachment[] | null;
 }
 
 /**
@@ -28,7 +30,8 @@ export const formatJobFromDb = (jobData: JobData): Job => ({
   status: jobData.status as JobStatus,
   description: jobData.description || '',
   notes: jobData.notes || '',
-  updatedAt: jobData.updated_at
+  updatedAt: jobData.updated_at,
+  attachments: jobData.attachments || []
 });
 
 /**
@@ -63,6 +66,7 @@ export const createJob = async (userId: string, job: Job) => {
       notes: job.notes,
       status: job.status,
       application_date: job.appliedDate,
+      attachments: job.attachments || [],
     }])
     .select();
     
@@ -86,6 +90,7 @@ export const updateJobById = async (jobId: string, job: Job) => {
       notes: job.notes,
       status: job.status,
       application_date: job.appliedDate,
+      attachments: job.attachments || [],
       updated_at: new Date().toISOString(),
     })
     .eq('id', jobId);

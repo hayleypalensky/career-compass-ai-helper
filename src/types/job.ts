@@ -1,4 +1,6 @@
 
+import { JobAttachment } from "@/services/attachmentService";
+
 export type JobStatus = "applied" | "interviewing" | "offered" | "rejected" | "archived";
 
 export interface Job {
@@ -12,4 +14,5 @@ export interface Job {
   appliedDate: string;
   status: JobStatus;
   updatedAt?: string;
+  attachments?: JobAttachment[];
 }

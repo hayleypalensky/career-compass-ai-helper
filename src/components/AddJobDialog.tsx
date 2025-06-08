@@ -14,6 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Job } from "@/types/job";
 import { Plus } from "lucide-react";
+import JobAttachments from "./jobs/JobAttachments";
+import { JobAttachment } from "@/services/attachmentService";
 
 interface AddJobDialogProps {
   onAddJob: (job: Job) => void;
@@ -22,6 +24,7 @@ interface AddJobDialogProps {
 const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  const [attachments, setAttachments] = useState<JobAttachment[]>([]);
   const [newJob, setNewJob] = useState<Omit<Job, "id" | "status" | "updatedAt">>({
     title: "",
     company: "",
@@ -30,6 +33,7 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
     description: "",
     notes: "",
     appliedDate: new Date().toISOString().split('T')[0],
+    attachments: [],
   });
 
   const resetForm = () => {
@@ -41,7 +45,9 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
       description: "",
       notes: "",
       appliedDate: new Date().toISOString().split('T')[0],
+      attachments: [],
     });
+    setAttachments([]);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -73,6 +79,7 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
       id: crypto.randomUUID(),
       status: "applied",
       updatedAt: new Date().toISOString(),
+      attachments,
     };
     
     // Add the job and close dialog
@@ -96,7 +103,7 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
         setOpen(isOpen);
         if (!isOpen) resetForm();
       }}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Add New Job Application</DialogTitle>
           </DialogHeader>
@@ -183,6 +190,14 @@ const AddJobDialog = ({ onAddJob }: AddJobDialogProps) => {
                 rows={3}
                 className="font-mono text-sm"
                 style={{ whiteSpace: "pre-wrap" }}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <JobAttachments
+                jobId="temp-id"
+                attachments={attachments}
+                onAttachmentsChange={setAttachments}
               />
             </div>
             

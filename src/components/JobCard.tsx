@@ -9,6 +9,8 @@ import JobCardHeader from "./jobs/JobCardHeader";
 import JobCardMeta from "./jobs/JobCardMeta";
 import JobCardNotes from "./jobs/JobCardNotes";
 import JobActions from "./jobs/JobActions";
+import JobAttachments from "./jobs/JobAttachments";
+import { JobAttachment } from "@/services/attachmentService";
 
 interface JobCardProps {
   job: Job;
@@ -27,6 +29,14 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
     onUpdate({
       ...job,
       status: newStatus,
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
+  const handleAttachmentsChange = (attachments: JobAttachment[]) => {
+    onUpdate({
+      ...job,
+      attachments,
       updatedAt: new Date().toISOString(),
     });
   };
@@ -53,12 +63,22 @@ const JobCard = ({ job, isFullWidth = false, onUpdate, onArchive, onDelete }: Jo
           />
 
           {isExpanded && (
-            <JobDetails
-              description={job.description}
-              updatedAt={job.updatedAt}
-              appliedDate={job.appliedDate}
-              showNotes={false}
-            />
+            <>
+              <JobDetails
+                description={job.description}
+                updatedAt={job.updatedAt}
+                appliedDate={job.appliedDate}
+                showNotes={false}
+              />
+              
+              <div className="mt-4">
+                <JobAttachments
+                  jobId={job.id}
+                  attachments={job.attachments || []}
+                  onAttachmentsChange={handleAttachmentsChange}
+                />
+              </div>
+            </>
           )}
 
           <JobActions
