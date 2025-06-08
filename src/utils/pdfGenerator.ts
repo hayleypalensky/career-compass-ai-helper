@@ -78,14 +78,14 @@ export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
       creator: 'Resume Builder'
     });
     
-    // Generate filename with format: "Resume Company Name - Full Name.pdf"
+    // Generate filename with format: "Full Name Resume - Company Name.pdf"
     let fileName = "";
-    if (companyName && profile.personalInfo.name) {
-      fileName = `Resume ${companyName} - ${profile.personalInfo.name}.pdf`;
-    } else if (companyName) {
-      fileName = `Resume ${companyName}.pdf`;
+    if (profile.personalInfo.name && companyName) {
+      fileName = `${profile.personalInfo.name} Resume - ${companyName}.pdf`;
     } else if (profile.personalInfo.name) {
-      fileName = `Resume - ${profile.personalInfo.name}.pdf`;
+      fileName = `${profile.personalInfo.name} Resume.pdf`;
+    } else if (companyName) {
+      fileName = `Resume - ${companyName}.pdf`;
     } else {
       fileName = "Resume.pdf";
     }
