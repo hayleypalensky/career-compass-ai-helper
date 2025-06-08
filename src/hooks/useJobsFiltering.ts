@@ -18,18 +18,14 @@ export const useJobsFiltering = (jobs: Job[], defaultActiveTab: JobStatus = "app
     });
   }, [jobs, searchTerm]);
 
-  // Sort jobs by application date (newest first), then by creation order (using ID)
+  // Sort jobs by creation order (newest first) - using updatedAt as proxy for creation time
   const sortedJobs = useMemo(() => {
     return [...filteredJobs].sort((a, b) => {
-      // First sort by date (newest first)
-      const dateComparison = new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime();
+      // Sort by updatedAt (which reflects when jobs were created/modified), newest first
+      const aTime = new Date(a.updatedAt || a.appliedDate).getTime();
+      const bTime = new Date(b.updatedAt || b.appliedDate).getTime();
       
-      // If dates are the same, sort by ID (which reflects the order of creation)
-      if (dateComparison === 0) {
-        return a.id.localeCompare(b.id);
-      }
-      
-      return dateComparison;
+      return bTime - aTime;
     });
   }, [filteredJobs]);
 
