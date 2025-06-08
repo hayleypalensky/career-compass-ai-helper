@@ -29,7 +29,7 @@ serve(async (req) => {
     }
 
     // Create a comprehensive prompt for cover letter generation
-    const prompt = `Generate a professional cover letter based on the following information:
+    const prompt = `Write me a personalized cover letter for the following job posting. My goal is to sound confident, professional, and aligned with the company's values without repeating my resume line-by-line. Focus on showing how my experience makes me a great fit for this specific role. Use a clear structure: a strong intro, a body that connects my skills to their needs, and a respectful, enthusiastic close.
 
 CANDIDATE PROFILE:
 - Name: ${profile.personalInfo.name}
@@ -60,20 +60,16 @@ JOB DETAILS:
 RELEVANT SKILLS FOR THIS ROLE:
 ${relevantSkills.join(', ')}
 
-Please write a compelling, professional cover letter that:
-1. Starts directly with "Dear Hiring Manager," - DO NOT include any header information like dates, addresses, or recipient details
-2. Opens with a strong hook that mentions the specific position and company
-3. Highlights the most relevant experience and achievements from the candidate's background
-4. Demonstrates knowledge of the company and role requirements
-5. Shows enthusiasm for the position and company
-6. Includes a professional closing with a call to action
-7. Is approximately 300-400 words long
-8. Uses professional language while showing personality
-9. Specifically addresses requirements mentioned in the job description
-10. Emphasizes the relevant skills identified for this role
-11. Ends with "Sincerely," followed by the candidate's name
-
-Format the letter with appropriate paragraph spacing but WITHOUT any business letter header formatting (no dates, addresses, etc).`;
+Requirements:
+- Start directly with "Dear Hiring Manager," - DO NOT include any header information like dates, addresses, or recipient details
+- Write a strong intro that mentions the specific position and company
+- Focus on connecting my experience to their specific needs rather than listing resume items
+- Show alignment with the company's values and culture
+- Demonstrate enthusiasm for the role and company
+- End with "Sincerely," followed by my name
+- Keep it approximately 300-400 words
+- Use professional but engaging language that shows personality
+- Format with appropriate paragraph spacing but WITHOUT any business letter header formatting`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -86,7 +82,7 @@ Format the letter with appropriate paragraph spacing but WITHOUT any business le
         messages: [
           {
             role: 'system',
-            content: 'You are an expert career counselor and professional writer specializing in creating compelling cover letters. You write in a professional yet engaging tone that helps candidates stand out while maintaining appropriate business communication standards. You NEVER include business letter headers, dates, or addresses - you start directly with the greeting.'
+            content: 'You are an expert career counselor and professional writer specializing in creating compelling cover letters. You write in a professional yet engaging tone that helps candidates stand out while maintaining appropriate business communication standards. You NEVER include business letter headers, dates, or addresses - you start directly with the greeting. Focus on creating personalized, confident cover letters that connect the candidate\'s experience to the specific role without simply repeating resume content.'
           },
           {
             role: 'user',
