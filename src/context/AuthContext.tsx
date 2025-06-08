@@ -15,6 +15,7 @@ interface AuthContextType {
   requestMFAOTP: (email: string) => Promise<void>;
   setupTOTP: (email: string) => Promise<{ secret: string, qrCode: string }>;
   verifyTOTP: (email: string, token: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   mfaEnabled: boolean;
 }
 
@@ -240,6 +241,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for instructions to reset your password.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error sending reset email",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   return (
     <AuthContext.Provider value={{ 
       session, 
@@ -252,6 +275,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       requestMFAOTP,
       setupTOTP,
       verifyTOTP,
+      resetPassword,
       mfaEnabled
     }}>
       {children}

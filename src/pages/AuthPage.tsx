@@ -16,7 +16,10 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showMFA, setShowMFA] = useState(false);
   const [enableMFA, setEnableMFA] = useState(true);
-  const { signIn, signUp, mfaEnabled, requestMFAOTP, user } = useAuth();
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const { signIn, signUp, mfaEnabled, requestMFAOTP, user, resetPassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -94,6 +97,34 @@ const AuthPage = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!forgotPasswordEmail) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsResettingPassword(true);
+      await resetPassword(forgotPasswordEmail);
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for instructions to reset your password.",
+      });
+      setShowForgotPassword(false);
+      setForgotPasswordEmail('');
+    } catch (error) {
+      console.error('Password reset error:', error);
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
   const handleMFAVerified = () => {
     setShowMFA(false);
     navigate('/jobs');
@@ -123,6 +154,47 @@ const AuthPage = () => {
           onVerified={handleMFAVerified}
           onCancel={handleCancelMFA}
         />
+      </div>
+    );
+  }
+
+  if (showForgotPassword) {
+    return (
+      <div className="flex items-center justify-center min-h-[80vh]">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Reset Password</CardTitle>
+            <CardDescription>Enter your email to receive password reset instructions</CardDescription>
+          </CardHeader>
+          <form onSubmit={handleForgotPassword}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="forgot-email">Email</Label>
+                <Input 
+                  id="forgot-email" 
+                  type="email" 
+                  placeholder="you@example.com" 
+                  value={forgotPasswordEmail}
+                  onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col gap-3">
+              <Button className="w-full" type="submit" disabled={isResettingPassword}>
+                {isResettingPassword ? "Sending..." : "Send Reset Instructions"}
+              </Button>
+              <Button 
+                type="button" 
+                variant="ghost" 
+                className="w-full" 
+                onClick={() => setShowForgotPassword(false)}
+              >
+                Back to Sign In
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
       </div>
     );
   }
@@ -164,13 +236,23 @@ const AuthPage = () => {
                     required
                   />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="enable-mfa" 
-                    checked={enableMFA}
-                    onCheckedChange={setEnableMFA}
-                  />
-                  <Label htmlFor="enable-mfa">Use multi-factor authentication</Label>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="enable-mfa" 
+                      checked={enableMFA}
+                      onCheckedChange={setEnableMFA}
+                    />
+                    <Label htmlFor="enable-mfa">Use multi-factor authentication</Label>
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="link" 
+                    className="p-0 h-auto text-sm"
+                    onClick={() => setShowForgotPassword(true)}
+                  >
+                    Forgot password?
+                  </Button>
                 </div>
               </CardContent>
               <CardFooter>
