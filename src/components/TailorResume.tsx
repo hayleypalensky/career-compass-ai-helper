@@ -14,7 +14,7 @@ import ResumeColorSelector from "./resume-tailoring/ResumeColorSelector";
 import SummaryEditor from "./resume-tailoring/SummaryEditor";
 import ExperienceSelector from "./resume-tailoring/ExperienceSelector";
 
-// Import our new hook
+// Import our refactored hook
 import useTailorResume from "@/hooks/useTailorResume";
 import { useEffect } from "react";
 
@@ -35,7 +35,7 @@ const TailorResume = ({
   jobDescription = "",
   onColorThemeChange,
 }: TailorResumeProps) => {
-  // Use our custom hook for state and logic
+  // Use our refactored custom hook for state and logic
   const {
     tailoredExperiences,
     skillsToAdd,
