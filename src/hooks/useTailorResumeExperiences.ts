@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
 
@@ -13,6 +12,17 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     profile.experiences.map(exp => exp.id)
   );
   
+  // Update selected experiences when profile changes to ensure all experiences are included
+  useEffect(() => {
+    const currentExperienceIds = profile.experiences.map(exp => exp.id);
+    setSelectedExperienceIds(currentIds => {
+      // Keep existing selections that are still valid, and add any new experiences
+      const validExistingIds = currentIds.filter(id => currentExperienceIds.includes(id));
+      const newIds = currentExperienceIds.filter(id => !currentIds.includes(id));
+      return [...validExistingIds, ...newIds];
+    });
+  }, [profile.experiences]);
+  
   // Filter experiences based on selection
   const selectedExperiences = profile.experiences.filter(exp => 
     selectedExperienceIds.includes(exp.id)
@@ -22,13 +32,17 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     JSON.parse(JSON.stringify(selectedExperiences))
   );
   
+  // Update tailored experiences when selection changes or profile changes
+  useEffect(() => {
+    const newSelectedExperiences = profile.experiences.filter(exp => 
+      selectedExperienceIds.includes(exp.id)
+    );
+    setTailoredExperiences(JSON.parse(JSON.stringify(newSelectedExperiences)));
+  }, [selectedExperienceIds, profile.experiences]);
+  
   // Update tailored experiences when selection changes
   const handleExperienceSelectionChange = (selectedIds: string[]) => {
     setSelectedExperienceIds(selectedIds);
-    const newSelectedExperiences = profile.experiences.filter(exp => 
-      selectedIds.includes(exp.id)
-    );
-    setTailoredExperiences(JSON.parse(JSON.stringify(newSelectedExperiences)));
   };
 
   // Handle changes to experience bullet points
