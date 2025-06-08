@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Profile } from "@/types/profile";
 import { aiService } from "@/services/aiService";
 import { FileText, Copy, Download } from "lucide-react";
+import jsPDF from "jspdf";
 
 interface CoverLetterGeneratorProps {
   profile: Profile;
@@ -90,16 +91,57 @@ const CoverLetterGenerator = ({
     }
   };
 
-  const downloadAsText = () => {
-    const blob = new Blob([coverLetter], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${profile.personalInfo.name || 'Cover'} Letter - ${companyName || jobTitle || 'Position'}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const downloadAsPdf = () => {
+    try {
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "in",
+        format: "letter"
+      });
+
+      // Set font
+      pdf.setFont("helvetica");
+      pdf.setFontSize(12);
+
+      // Page margins
+      const leftMargin = 1;
+      const rightMargin = 1;
+      const topMargin = 1;
+      const pageWidth = 8.5;
+      const maxWidth = pageWidth - leftMargin - rightMargin;
+
+      // Split text into lines that fit the page width
+      const lines = pdf.splitTextToSize(coverLetter, maxWidth);
+      
+      // Add text to PDF
+      pdf.text(lines, leftMargin, topMargin);
+
+      // Generate filename
+      let fileName = "";
+      if (profile.personalInfo.name && companyName) {
+        fileName = `${profile.personalInfo.name} Cover Letter - ${companyName}.pdf`;
+      } else if (profile.personalInfo.name) {
+        fileName = `${profile.personalInfo.name} Cover Letter.pdf`;
+      } else if (companyName) {
+        fileName = `Cover Letter - ${companyName}.pdf`;
+      } else {
+        fileName = "Cover Letter.pdf";
+      }
+
+      pdf.save(fileName);
+
+      toast({
+        title: "PDF downloaded",
+        description: "Your cover letter has been downloaded as a PDF.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Download failed",
+        description: "Failed to download PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -141,11 +183,11 @@ const CoverLetterGenerator = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={downloadAsText}
+                  onClick={downloadAsPdf}
                   className="flex items-center gap-1"
                 >
                   <Download className="h-4 w-4" />
-                  Download
+                  Download PDF
                 </Button>
               </div>
             </div>
