@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
@@ -23,16 +24,16 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
   useEffect(() => {
     console.log('useTailorResumeExperiences - useEffect triggered with profile.experiences:', profile.experiences);
     
-    if (profile.experiences && Array.isArray(profile.experiences)) {
+    if (profile.experiences && Array.isArray(profile.experiences) && profile.experiences.length > 0) {
       const allExperienceIds = profile.experiences.map(exp => exp.id);
       console.log('useTailorResumeExperiences - All experience IDs from profile:', allExperienceIds);
       
       setSelectedExperienceIds(currentIds => {
         console.log('useTailorResumeExperiences - Previous selected IDs:', currentIds);
         
-        // If we don't have any selected IDs yet, select all by default
-        if (currentIds.length === 0) {
-          console.log('useTailorResumeExperiences - No previous selections, selecting all:', allExperienceIds);
+        // Always ensure we have all experiences selected if we don't have a complete set
+        if (currentIds.length !== allExperienceIds.length) {
+          console.log('useTailorResumeExperiences - Updating to select all experiences:', allExperienceIds);
           return allExperienceIds;
         }
         
@@ -40,10 +41,14 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
         const validExistingIds = currentIds.filter(id => allExperienceIds.includes(id));
         const newIds = allExperienceIds.filter(id => !currentIds.includes(id));
         
-        const updatedIds = [...validExistingIds, ...newIds];
-        console.log('useTailorResumeExperiences - Updated selected IDs:', updatedIds);
+        if (newIds.length > 0) {
+          const updatedIds = [...validExistingIds, ...newIds];
+          console.log('useTailorResumeExperiences - Adding new experiences:', updatedIds);
+          return updatedIds;
+        }
         
-        return updatedIds;
+        console.log('useTailorResumeExperiences - No changes needed, keeping current selection:', currentIds);
+        return currentIds;
       });
     }
   }, [profile.experiences]);
