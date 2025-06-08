@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
 import TailorResume from "@/components/TailorResume";
+import CoverLetterGenerator from "@/components/resume-tailoring/CoverLetterGenerator";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
@@ -120,6 +121,14 @@ const TailorPage = () => {
               onUpdateResume={handleUpdateResume}
               jobDescription={jobDescription}
               onColorThemeChange={handleColorThemeChange}
+            />
+
+            <CoverLetterGenerator
+              profile={profile}
+              jobDescription={jobDescription}
+              jobTitle={jobTitle}
+              companyName={companyName}
+              relevantSkills={relevantSkills}
             />
             
             {isTailored && (

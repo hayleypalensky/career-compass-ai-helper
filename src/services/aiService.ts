@@ -1,5 +1,5 @@
-
 import { createClient } from '@supabase/supabase-js';
+import { Profile } from '@/types/profile';
 
 const supabase = createClient(
   'https://ilrrxwkxrbgslpifkdlf.supabase.co',
@@ -91,6 +91,45 @@ export const aiService = {
     } catch (error) {
       console.error('Error suggesting skills:', error);
       throw new Error('Failed to suggest skills');
+    }
+  },
+
+  async generateCoverLetter(
+    profile: Profile, 
+    jobDescription: string, 
+    jobTitle: string, 
+    companyName: string, 
+    relevantSkills: string[]
+  ): Promise<string> {
+    try {
+      console.log('Calling generate-cover-letter function with:', {
+        hasProfile: !!profile,
+        hasJobDescription: !!jobDescription,
+        jobTitle,
+        companyName,
+        relevantSkillsCount: relevantSkills.length
+      });
+
+      const { data, error } = await supabase.functions.invoke('generate-cover-letter', {
+        body: {
+          profile,
+          jobDescription,
+          jobTitle,
+          companyName,
+          relevantSkills
+        }
+      });
+
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+      
+      console.log('Cover letter generation response:', data);
+      return data.coverLetter || '';
+    } catch (error) {
+      console.error('Error generating cover letter:', error);
+      throw new Error('Failed to generate cover letter');
     }
   }
 };

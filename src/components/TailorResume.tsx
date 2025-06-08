@@ -13,6 +13,7 @@ import SkillManagement from "./resume-tailoring/SkillManagement";
 import ResumeColorSelector from "./resume-tailoring/ResumeColorSelector";
 import SummaryEditor from "./resume-tailoring/SummaryEditor";
 import ExperienceSelector from "./resume-tailoring/ExperienceSelector";
+import CoverLetterGenerator from "./resume-tailoring/CoverLetterGenerator";
 
 // Import our refactored hook
 import useTailorResume from "@/hooks/useTailorResume";
