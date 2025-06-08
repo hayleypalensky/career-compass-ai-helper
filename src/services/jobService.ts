@@ -81,7 +81,7 @@ export const createJob = async (userId: string, job: Job) => {
       notes: job.notes,
       status: job.status,
       application_date: job.appliedDate,
-      attachments: job.attachments || [],
+      attachments: JSON.stringify(job.attachments || []),
     })
     .select();
     
@@ -105,7 +105,7 @@ export const updateJobById = async (jobId: string, job: Job) => {
       notes: job.notes,
       status: job.status,
       application_date: job.appliedDate,
-      attachments: job.attachments || [],
+      attachments: JSON.stringify(job.attachments || []),
       updated_at: new Date().toISOString(),
     })
     .eq('id', jobId);
