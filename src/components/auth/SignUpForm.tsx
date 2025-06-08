@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,9 +15,27 @@ const SignUpForm = ({ onSuccess }: SignUpFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [enableMFA, setEnableMFA] = useState(true);
   const { signUp } = useAuth();
   const { toast } = useToast();
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 12) {
+      return "Password must be at least 12 characters long.";
+    }
+    if (!/(?=.*[a-z])/.test(password)) {
+      return "Password must contain at least one lowercase letter.";
+    }
+    if (!/(?=.*[A-Z])/.test(password)) {
+      return "Password must contain at least one uppercase letter.";
+    }
+    if (!/(?=.*\d)/.test(password)) {
+      return "Password must contain at least one number.";
+    }
+    if (!/(?=.*[@$!%*?&])/.test(password)) {
+      return "Password must contain at least one special character (@$!%*?&).";
+    }
+    return null;
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,11 +48,12 @@ const SignUpForm = ({ onSuccess }: SignUpFormProps) => {
       });
       return;
     }
-    
-    if (password.length < 6) {
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
       toast({
-        title: "Error",
-        description: "Password must be at least 6 characters.",
+        title: "Invalid Password",
+        description: passwordError,
         variant: "destructive",
       });
       return;
@@ -44,13 +62,7 @@ const SignUpForm = ({ onSuccess }: SignUpFormProps) => {
     try {
       setIsLoading(true);
       await signUp(email, password);
-      
-      if (enableMFA) {
-        toast({
-          title: "MFA Enabled",
-          description: "Two-factor authentication has been enabled for your account.",
-        });
-      }
+      onSuccess();
     } catch (error) {
       console.error('Signup error:', error);
     } finally {
@@ -81,23 +93,22 @@ const SignUpForm = ({ onSuccess }: SignUpFormProps) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <p className="text-xs text-gray-500">
-            Password must be at least 6 characters.
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Switch 
-            id="enable-mfa-signup" 
-            checked={enableMFA}
-            onCheckedChange={setEnableMFA}
-          />
-          <Label htmlFor="enable-mfa-signup">Enable multi-factor authentication</Label>
+          <div className="text-xs text-gray-600 space-y-1">
+            <p>Password must contain:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>At least 12 characters</li>
+              <li>One uppercase letter</li>
+              <li>One lowercase letter</li>
+              <li>One number</li>
+              <li>One special character (@$!%*?&)</li>
+            </ul>
+          </div>
         </div>
         <div className="rounded-md bg-blue-50 p-3">
           <div className="flex">
             <div className="text-blue-800 text-sm">
               <p className="font-medium">Enhanced Security</p>
-              <p>Multi-factor authentication adds an extra layer of security to your account by requiring a second verification step.</p>
+              <p>Strong passwords help protect your account from unauthorized access.</p>
             </div>
           </div>
         </div>

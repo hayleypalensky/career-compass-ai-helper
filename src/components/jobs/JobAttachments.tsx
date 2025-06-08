@@ -37,7 +37,7 @@ const JobAttachments = ({ jobId, attachments, onAttachmentsChange }: JobAttachme
       console.error("Upload error:", error);
       toast({
         title: "Upload failed",
-        description: "Failed to upload files. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to upload files. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -63,7 +63,7 @@ const JobAttachments = ({ jobId, attachments, onAttachmentsChange }: JobAttachme
       console.error("Delete error:", error);
       toast({
         title: "Delete failed",
-        description: "Failed to delete file. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to delete file. Please try again.",
         variant: "destructive",
       });
     }
@@ -103,6 +103,10 @@ const JobAttachments = ({ jobId, attachments, onAttachmentsChange }: JobAttachme
           <Upload className="h-3 w-3" />
           {isUploading ? "Uploading..." : "Upload"}
         </Button>
+      </div>
+
+      <div className="text-xs text-gray-500">
+        Allowed: Images, PDF, Word documents, text files (max 10MB each)
       </div>
 
       {/* Attachments List */}

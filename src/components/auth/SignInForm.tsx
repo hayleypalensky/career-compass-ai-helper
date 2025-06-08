@@ -4,22 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
 interface SignInFormProps {
   onShowForgotPassword: () => void;
-  onMFARequired: (email: string) => void;
   onSuccess: () => void;
 }
 
-const SignInForm = ({ onShowForgotPassword, onMFARequired, onSuccess }: SignInFormProps) => {
+const SignInForm = ({ onShowForgotPassword, onSuccess }: SignInFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [enableMFA, setEnableMFA] = useState(true);
-  const { signIn, requestMFAOTP } = useAuth();
+  const { signIn } = useAuth();
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -37,13 +34,7 @@ const SignInForm = ({ onShowForgotPassword, onMFARequired, onSuccess }: SignInFo
     try {
       setIsLoading(true);
       await signIn(email, password);
-      
-      if (enableMFA) {
-        await requestMFAOTP(email);
-        onMFARequired(email);
-      } else {
-        onSuccess();
-      }
+      onSuccess();
     } catch (error) {
       console.error('Login error:', error);
     } finally {
@@ -75,15 +66,7 @@ const SignInForm = ({ onShowForgotPassword, onMFARequired, onSuccess }: SignInFo
             required
           />
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="enable-mfa" 
-              checked={enableMFA}
-              onCheckedChange={setEnableMFA}
-            />
-            <Label htmlFor="enable-mfa">Use multi-factor authentication</Label>
-          </div>
+        <div className="flex items-center justify-end">
           <Button 
             type="button" 
             variant="link" 
