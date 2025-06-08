@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,13 +9,14 @@ import { X } from "lucide-react";
 
 export interface Experience {
   id: string;
-  company: string;
   title: string;
+  company: string;
+  location?: string;
   startDate: string;
-  endDate: string;
-  location: string;
-  description: string;
+  endDate?: string;
+  description?: string;
   bullets: string[];
+  excludeFromResume?: boolean; // Add option to exclude from resume
 }
 
 interface ExperienceFormProps {
@@ -31,13 +31,14 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
   );
   const [currentExperience, setCurrentExperience] = useState<Experience>({
     id: crypto.randomUUID(),
-    company: "",
     title: "",
+    company: "",
+    location: "",
     startDate: "",
     endDate: "",
-    location: "",
     description: "",
     bullets: [""],
+    excludeFromResume: false,
   });
   const [editing, setEditing] = useState<number | null>(null);
 
@@ -76,6 +77,7 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
       ...currentExperience,
       bullets: nonEmptyBullets.length ? nonEmptyBullets : [],
       id: crypto.randomUUID(),
+      excludeFromResume: currentExperience.excludeFromResume,
     };
 
     if (editing !== null) {
@@ -89,13 +91,14 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
 
     setCurrentExperience({
       id: crypto.randomUUID(),
-      company: "",
       title: "",
+      company: "",
+      location: "",
       startDate: "",
       endDate: "",
-      location: "",
       description: "",
       bullets: [""],
+      excludeFromResume: false,
     });
 
     toast({
@@ -118,13 +121,14 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
       setEditing(null);
       setCurrentExperience({
         id: crypto.randomUUID(),
-        company: "",
         title: "",
+        company: "",
+        location: "",
         startDate: "",
         endDate: "",
-        location: "",
         description: "",
         bullets: [""],
+        excludeFromResume: false,
       });
     }
     toast({
@@ -153,18 +157,6 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
-                <Input
-                  id="company"
-                  name="company"
-                  value={currentExperience.company}
-                  onChange={handleChange}
-                  placeholder="Company Name"
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="title">Job Title</Label>
                 <Input
                   id="title"
@@ -172,6 +164,18 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
                   value={currentExperience.title}
                   onChange={handleChange}
                   placeholder="Job Title"
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  name="company"
+                  value={currentExperience.company}
+                  onChange={handleChange}
+                  placeholder="Company Name"
                   required
                 />
               </div>

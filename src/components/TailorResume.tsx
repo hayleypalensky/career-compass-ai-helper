@@ -12,6 +12,7 @@ import ResumePreview from "./resume-tailoring/ResumePreview";
 import SkillManagement from "./resume-tailoring/SkillManagement";
 import ResumeColorSelector from "./resume-tailoring/ResumeColorSelector";
 import SummaryEditor from "./resume-tailoring/SummaryEditor";
+import ExperienceSelector from "./resume-tailoring/ExperienceSelector";
 
 // Import our new hook
 import useTailorResume from "@/hooks/useTailorResume";
@@ -23,7 +24,7 @@ interface TailorResumeProps {
   missingSkills: string[];
   onUpdateResume: (experiences: Experience[], skills: Skill[]) => void;
   jobDescription?: string;
-  onColorThemeChange?: (theme: string) => void; // Add this prop
+  onColorThemeChange?: (theme: string) => void;
 }
 
 const TailorResume = ({
@@ -41,6 +42,7 @@ const TailorResume = ({
     skillsToRemove,
     selectedTheme,
     updatedSummary,
+    selectedExperienceIds,
     handleBulletChange,
     addBullet,
     removeBullet,
@@ -49,6 +51,7 @@ const TailorResume = ({
     generateBulletSuggestions,
     handleThemeChange,
     handleSummaryChange,
+    handleExperienceSelectionChange,
     saveTailoredResume
   } = useTailorResume({
     profile,
@@ -73,6 +76,12 @@ const TailorResume = ({
         jobDescription={jobDescription}
         relevantSkills={relevantSkills}
         onSummaryChange={handleSummaryChange}
+      />
+
+      <ExperienceSelector
+        experiences={profile.experiences}
+        selectedExperiences={selectedExperienceIds}
+        onSelectionChange={handleExperienceSelectionChange}
       />
 
       <SkillManagement

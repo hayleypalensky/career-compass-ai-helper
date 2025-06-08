@@ -19,9 +19,30 @@ export const useTailorResume = ({
   onUpdateResume 
 }: UseTailorResumeProps) => {
   const { toast } = useToast();
-  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>(
-    JSON.parse(JSON.stringify(profile.experiences))
+  
+  // Initialize selected experiences to include all by default
+  const [selectedExperienceIds, setSelectedExperienceIds] = useState<string[]>(
+    profile.experiences.map(exp => exp.id)
   );
+  
+  // Filter experiences based on selection
+  const selectedExperiences = profile.experiences.filter(exp => 
+    selectedExperienceIds.includes(exp.id)
+  );
+  
+  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>(
+    JSON.parse(JSON.stringify(selectedExperiences))
+  );
+  
+  // Update tailored experiences when selection changes
+  const handleExperienceSelectionChange = (selectedIds: string[]) => {
+    setSelectedExperienceIds(selectedIds);
+    const newSelectedExperiences = profile.experiences.filter(exp => 
+      selectedIds.includes(exp.id)
+    );
+    setTailoredExperiences(JSON.parse(JSON.stringify(newSelectedExperiences)));
+  };
+
   const [userResponses, setUserResponses] = useState<Record<string, string>>({});
   const [skillsToAdd, setSkillsToAdd] = useState<string[]>([]);
   const [skillsToRemove, setSkillsToRemove] = useState<string[]>([]);
@@ -187,6 +208,7 @@ export const useTailorResume = ({
     skillsToRemove,
     selectedTheme,
     updatedSummary,
+    selectedExperienceIds,
     handleBulletChange,
     addBullet,
     removeBullet,
@@ -196,6 +218,7 @@ export const useTailorResume = ({
     generateBulletSuggestions: generateBulletSuggestionsWrapper,
     handleThemeChange,
     handleSummaryChange,
+    handleExperienceSelectionChange,
     saveTailoredResume
   };
 };
