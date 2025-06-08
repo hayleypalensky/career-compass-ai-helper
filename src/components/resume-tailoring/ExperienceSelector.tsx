@@ -16,10 +16,16 @@ const ExperienceSelector = ({
   selectedExperiences,
   onSelectionChange,
 }: ExperienceSelectorProps) => {
-  // Debug logging
-  console.log('ExperienceSelector - All experiences:', experiences);
-  console.log('ExperienceSelector - Number of experiences:', experiences.length);
-  console.log('ExperienceSelector - Selected experience IDs:', selectedExperiences);
+  // Enhanced debug logging
+  console.log('ExperienceSelector - Received props:');
+  console.log('  - experiences:', experiences);
+  console.log('  - experiences type:', typeof experiences);
+  console.log('  - experiences is array:', Array.isArray(experiences));
+  console.log('  - experiences length:', experiences?.length);
+  console.log('  - selectedExperiences:', selectedExperiences);
+  console.log('  - selectedExperiences type:', typeof selectedExperiences);
+  console.log('  - selectedExperiences is array:', Array.isArray(selectedExperiences));
+  console.log('  - selectedExperiences length:', selectedExperiences?.length);
   
   const handleExperienceToggle = (experienceId: string, checked: boolean) => {
     console.log('ExperienceSelector - Toggling experience:', experienceId, 'to', checked);
@@ -39,6 +45,35 @@ const ExperienceSelector = ({
       onSelectionChange(experiences.map(exp => exp.id));
     }
   };
+
+  // Check if we have valid data
+  if (!Array.isArray(experiences)) {
+    console.error('ExperienceSelector - experiences is not an array:', experiences);
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select Experiences to Include</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-red-500">Error: Invalid experiences data</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (experiences.length === 0) {
+    console.warn('ExperienceSelector - No experiences provided');
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select Experiences to Include</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-gray-500">No experiences found</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

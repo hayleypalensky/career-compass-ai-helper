@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
@@ -7,21 +8,27 @@ interface UseTailorResumeExperiencesProps {
 }
 
 export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperiencesProps) => {
-  // Debug logging
-  console.log('useTailorResumeExperiences - Profile experiences:', profile.experiences);
-  console.log('useTailorResumeExperiences - Number of experiences in profile:', profile.experiences.length);
+  // Debug logging - detailed profile inspection
+  console.log('useTailorResumeExperiences - Received profile object:', profile);
+  console.log('useTailorResumeExperiences - Profile keys:', Object.keys(profile));
+  console.log('useTailorResumeExperiences - Profile.experiences exists?:', 'experiences' in profile);
+  console.log('useTailorResumeExperiences - Profile.experiences value:', profile.experiences);
+  console.log('useTailorResumeExperiences - Profile.experiences type:', typeof profile.experiences);
+  console.log('useTailorResumeExperiences - Profile.experiences is array?:', Array.isArray(profile.experiences));
+  console.log('useTailorResumeExperiences - Profile.experiences length:', profile.experiences?.length);
   
   // Initialize selected experiences to include all by default
-  const [selectedExperienceIds, setSelectedExperienceIds] = useState<string[]>(
-    profile.experiences.map(exp => exp.id)
-  );
-  
-  // Debug logging for initial state
-  console.log('useTailorResumeExperiences - Initial selectedExperienceIds:', selectedExperienceIds);
+  const [selectedExperienceIds, setSelectedExperienceIds] = useState<string[]>(() => {
+    const initialIds = profile.experiences?.map(exp => exp.id) || [];
+    console.log('useTailorResumeExperiences - Initial selectedExperienceIds:', initialIds);
+    return initialIds;
+  });
   
   // Update selected experiences when profile changes to ensure all experiences are included
   useEffect(() => {
-    const currentExperienceIds = profile.experiences.map(exp => exp.id);
+    console.log('useTailorResumeExperiences - useEffect triggered with profile.experiences:', profile.experiences);
+    
+    const currentExperienceIds = profile.experiences?.map(exp => exp.id) || [];
     console.log('useTailorResumeExperiences - Current experience IDs from profile:', currentExperienceIds);
     
     setSelectedExperienceIds(currentIds => {
@@ -39,22 +46,24 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
   }, [profile.experiences]);
   
   // Filter experiences based on selection
-  const selectedExperiences = profile.experiences.filter(exp => 
+  const selectedExperiences = profile.experiences?.filter(exp => 
     selectedExperienceIds.includes(exp.id)
-  );
+  ) || [];
   
   console.log('useTailorResumeExperiences - Selected experiences:', selectedExperiences);
   console.log('useTailorResumeExperiences - Number of selected experiences:', selectedExperiences.length);
   
-  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>(
-    JSON.parse(JSON.stringify(selectedExperiences))
-  );
+  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>(() => {
+    const initial = JSON.parse(JSON.stringify(selectedExperiences));
+    console.log('useTailorResumeExperiences - Initial tailored experiences:', initial);
+    return initial;
+  });
   
   // Update tailored experiences when selection changes or profile changes
   useEffect(() => {
-    const newSelectedExperiences = profile.experiences.filter(exp => 
+    const newSelectedExperiences = profile.experiences?.filter(exp => 
       selectedExperienceIds.includes(exp.id)
-    );
+    ) || [];
     console.log('useTailorResumeExperiences - Updating tailored experiences:', newSelectedExperiences);
     setTailoredExperiences(JSON.parse(JSON.stringify(newSelectedExperiences)));
   }, [selectedExperienceIds, profile.experiences]);
