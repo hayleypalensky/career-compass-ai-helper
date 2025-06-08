@@ -28,6 +28,7 @@ const TailorActionsRow = ({
       />
       
       <AddToJobTracker
+        key={`${jobTitle}-${companyName}`}
         jobTitle={jobTitle}
         companyName={companyName}
         jobDescription={jobDescription}

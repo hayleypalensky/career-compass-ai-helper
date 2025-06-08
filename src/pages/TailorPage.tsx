@@ -57,6 +57,7 @@ const TailorPage = () => {
     setJobTitle(jobInfo.title || "");
     setCompanyName(jobInfo.company || "");
     setJobDescription(jobInfo.description || "");
+    console.log('Job analysis complete:', { title: jobInfo.title, company: jobInfo.company });
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
