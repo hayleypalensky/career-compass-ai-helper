@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
@@ -19,6 +18,8 @@ const TailorPage = () => {
   const [showTailorSection, setShowTailorSection] = useState(false);
   const [jobTitle, setJobTitle] = useState<string>("");
   const [companyName, setCompanyName] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
+  const [remote, setRemote] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
@@ -49,15 +50,17 @@ const TailorPage = () => {
   const handleAnalysisComplete = (
     relevant: string[], 
     missing: string[], 
-    jobInfo: { title?: string; company?: string; description?: string }
+    jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }
   ) => {
     setRelevantSkills(relevant);
     setMissingSkills(missing);
     setShowTailorSection(true);
     setJobTitle(jobInfo.title || "");
     setCompanyName(jobInfo.company || "");
+    setLocation(jobInfo.location || "");
+    setRemote(jobInfo.remote || false);
     setJobDescription(jobInfo.description || "");
-    console.log('Job analysis complete:', { title: jobInfo.title, company: jobInfo.company });
+    console.log('Job analysis complete:', { title: jobInfo.title, company: jobInfo.company, location: jobInfo.location, remote: jobInfo.remote });
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
@@ -137,6 +140,8 @@ const TailorPage = () => {
                 profile={profile}
                 jobTitle={jobTitle}
                 companyName={companyName}
+                location={location}
+                remote={remote}
                 jobDescription={jobDescription}
                 colorTheme={selectedColorTheme}
               />

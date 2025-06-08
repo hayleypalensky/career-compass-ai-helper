@@ -13,7 +13,7 @@ interface JobDescriptionAnalyzerProps {
   onAnalysisComplete: (
     relevantSkills: string[],
     missingSkills: string[],
-    jobInfo: { title?: string; company?: string; description?: string }
+    jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }
   ) => void;
 }
 
@@ -21,6 +21,8 @@ const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete }: JobDescriptionA
   const { toast } = useToast();
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [location, setLocation] = useState("");
+  const [remote, setRemote] = useState(false);
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -49,6 +51,8 @@ const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete }: JobDescriptionA
           { 
             title: jobTitle, 
             company: companyName,
+            location: location,
+            remote: remote,
             description: jobDescription 
           }
         );
@@ -79,10 +83,14 @@ const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete }: JobDescriptionA
         <JobForm 
           jobTitle={jobTitle}
           companyName={companyName}
+          location={location}
+          remote={remote}
           jobDescription={jobDescription}
           isAnalyzing={isAnalyzing}
           onJobTitleChange={setJobTitle}
           onCompanyNameChange={setCompanyName}
+          onLocationChange={setLocation}
+          onRemoteChange={setRemote}
           onJobDescriptionChange={setJobDescription}
           onSubmit={handleAnalyze}
         />

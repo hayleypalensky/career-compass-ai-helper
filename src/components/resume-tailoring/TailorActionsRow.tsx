@@ -7,6 +7,8 @@ interface TailorActionsRowProps {
   profile: Profile;
   jobTitle: string;
   companyName: string;
+  location: string;
+  remote: boolean;
   jobDescription: string;
   colorTheme: string;
 }
@@ -15,6 +17,8 @@ const TailorActionsRow = ({
   profile,
   jobTitle,
   companyName,
+  location,
+  remote,
   jobDescription,
   colorTheme
 }: TailorActionsRowProps) => {
@@ -28,9 +32,11 @@ const TailorActionsRow = ({
       />
       
       <AddToJobTracker
-        key={`${jobTitle}-${companyName}`}
+        key={`${jobTitle}-${companyName}-${location}`}
         jobTitle={jobTitle}
         companyName={companyName}
+        location={location}
+        remote={remote}
         jobDescription={jobDescription}
       />
     </div>
