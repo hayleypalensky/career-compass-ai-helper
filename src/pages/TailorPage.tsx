@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
@@ -24,6 +23,7 @@ const TailorPage = () => {
   const [jobDescription, setJobDescription] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
+  const [resetTrigger, setResetTrigger] = useState(false);
 
   // Load profile from localStorage
   useEffect(() => {
@@ -109,6 +109,9 @@ const TailorPage = () => {
     
     // Reset color theme
     setSelectedColorTheme("purple");
+    
+    // Trigger reset in JobDescriptionAnalyzer
+    setResetTrigger(prev => !prev);
   };
 
   // If there's no profile, show message to create one
@@ -135,6 +138,7 @@ const TailorPage = () => {
       <JobDescriptionAnalyzer 
         profile={profile} 
         onAnalysisComplete={handleAnalysisComplete} 
+        resetTrigger={resetTrigger}
       />
       
       <div className="space-y-8 mt-6">

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
 import { Profile } from "@/types/profile";
@@ -15,9 +15,10 @@ interface JobDescriptionAnalyzerProps {
     missingSkills: string[],
     jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }
   ) => void;
+  resetTrigger?: boolean;
 }
 
-const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete }: JobDescriptionAnalyzerProps) => {
+const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete, resetTrigger }: JobDescriptionAnalyzerProps) => {
   const { toast } = useToast();
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -25,6 +26,17 @@ const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete }: JobDescriptionA
   const [remote, setRemote] = useState(false);
   const [jobDescription, setJobDescription] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Reset form fields when resetTrigger changes
+  useEffect(() => {
+    if (resetTrigger) {
+      setJobTitle("");
+      setCompanyName("");
+      setLocation("");
+      setRemote(false);
+      setJobDescription("");
+    }
+  }, [resetTrigger]);
 
   const handleAnalyze = () => {
     if (!jobDescription) {
