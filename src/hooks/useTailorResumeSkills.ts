@@ -48,10 +48,17 @@ export const useTailorResumeSkills = ({ profile }: UseTailorResumeSkillsProps) =
     );
   };
 
+  // Reset skills to original state
+  const resetSkills = () => {
+    setSkillsToAdd([]);
+    setSkillsToRemove([]);
+  };
+
   return {
     skillsToAdd,
     skillsToRemove,
     toggleSkillSelection,
     toggleSkillRemoval,
+    resetSkills,
   };
 };

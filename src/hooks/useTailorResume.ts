@@ -35,6 +35,23 @@ export const useTailorResume = ({
     relevantSkills
   );
 
+  // Reset all tailored changes
+  const resetTailoredResume = () => {
+    // Reset experiences to original profile state
+    experienceHook.resetExperiences();
+    
+    // Reset skills to original state
+    skillsHook.resetSkills();
+    
+    // Reset UI to original state
+    uiHook.resetUI();
+    
+    toast({
+      title: "Resume reset",
+      description: "All tailored changes have been cleared. Ready for a new job application.",
+    });
+  };
+
   // Save the tailored resume
   const saveTailoredResume = () => {
     const newSkills = createUpdatedSkills(profile, skillsHook.skillsToAdd, skillsHook.skillsToRemove);
@@ -79,7 +96,8 @@ export const useTailorResume = ({
     
     // Utility functions
     generateBulletSuggestions,
-    saveTailoredResume
+    saveTailoredResume,
+    resetTailoredResume
   };
 };
 

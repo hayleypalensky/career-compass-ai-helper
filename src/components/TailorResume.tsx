@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { Skill } from "@/components/SkillsForm";
+import { RotateCcw } from "lucide-react";
 
 // Import refactored components
 import RelevantSkillsCard from "./resume-tailoring/RelevantSkillsCard";
@@ -53,7 +54,8 @@ const TailorResume = ({
     handleThemeChange,
     handleSummaryChange,
     handleExperienceSelectionChange,
-    saveTailoredResume
+    saveTailoredResume,
+    resetTailoredResume
   } = useTailorResume({
     profile,
     relevantSkills,
@@ -125,12 +127,23 @@ const TailorResume = ({
         colorTheme={selectedTheme}
       />
 
-      <Button
-        onClick={saveTailoredResume}
-        className="w-full bg-navy-700 hover:bg-navy-800"
-      >
-        Save Tailored Resume
-      </Button>
+      <div className="flex gap-4">
+        <Button
+          onClick={saveTailoredResume}
+          className="flex-1 bg-navy-700 hover:bg-navy-800"
+        >
+          Save Tailored Resume
+        </Button>
+        
+        <Button
+          onClick={resetTailoredResume}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <RotateCcw className="h-4 w-4" />
+          Reset for New Job
+        </Button>
+      </div>
     </div>
   );
 };

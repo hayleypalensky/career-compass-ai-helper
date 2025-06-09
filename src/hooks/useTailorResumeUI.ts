@@ -20,10 +20,17 @@ export const useTailorResumeUI = ({ profile }: UseTailorResumeUIProps) => {
     setUpdatedSummary(summary);
   };
 
+  // Reset UI to original state
+  const resetUI = () => {
+    setSelectedTheme("purple");
+    setUpdatedSummary(profile.personalInfo.summary || "");
+  };
+
   return {
     selectedTheme,
     updatedSummary,
     handleThemeChange,
     handleSummaryChange,
+    resetUI,
   };
 };

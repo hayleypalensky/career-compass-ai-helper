@@ -125,6 +125,15 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     });
   };
 
+  // Reset experiences to original profile state
+  const resetExperiences = () => {
+    if (profile.experiences && Array.isArray(profile.experiences)) {
+      const allExperienceIds = profile.experiences.map(exp => exp.id);
+      setSelectedExperienceIds(allExperienceIds);
+      setTailoredExperiences(JSON.parse(JSON.stringify(profile.experiences)));
+    }
+  };
+
   return {
     selectedExperienceIds,
     tailoredExperiences,
@@ -132,5 +141,6 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     handleBulletChange,
     addBullet,
     removeBullet,
+    resetExperiences,
   };
 };
