@@ -2,10 +2,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Skill } from "@/components/SkillsForm";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Info, X, Check, AlertCircle, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -35,6 +36,7 @@ const SkillManagement = ({
   // Group skills by relevance
   const [relevantProfileSkills, setRelevantProfileSkills] = useState<Skill[]>([]);
   const [nonRelevantProfileSkills, setNonRelevantProfileSkills] = useState<Skill[]>([]);
+  const [customSkill, setCustomSkill] = useState("");
 
   // Prepare skill data when props change
   useEffect(() => {
@@ -52,6 +54,29 @@ const SkillManagement = ({
     setRelevantProfileSkills(relevant);
     setNonRelevantProfileSkills(nonRelevant);
   }, [profileSkills, relevantSkills]);
+
+  const handleAddCustomSkill = () => {
+    if (customSkill.trim() === "") return;
+    
+    // Check if skill already exists in profile or skillsToAdd
+    const skillExists = profileSkills.some(skill => 
+      skill.name.toLowerCase() === customSkill.trim().toLowerCase()
+    ) || skillsToAdd.some(skill => 
+      skill.toLowerCase() === customSkill.trim().toLowerCase()
+    );
+
+    if (!skillExists) {
+      onToggleSkillToAdd(customSkill.trim());
+      setCustomSkill("");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddCustomSkill();
+    }
+  };
 
   return (
     <Card>
@@ -107,6 +132,33 @@ const SkillManagement = ({
                   <p className="text-sm text-gray-500">No missing skills detected.</p>
                 )}
               </div>
+            </div>
+
+            <div>
+              <h4 className="text-sm font-medium mb-2 flex items-center">
+                <Plus className="h-4 w-4 mr-2 text-blue-500" />
+                Add Custom Skills
+              </h4>
+              <div className="flex gap-2">
+                <Input
+                  value={customSkill}
+                  onChange={(e) => setCustomSkill(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Enter a skill to add..."
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleAddCustomSkill}
+                  disabled={!customSkill.trim()}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Add skills that are relevant to the job but weren't detected in the analysis.
+              </p>
             </div>
           </TabsContent>
 
