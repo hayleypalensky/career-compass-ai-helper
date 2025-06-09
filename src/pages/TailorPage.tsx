@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
@@ -89,6 +90,27 @@ const TailorPage = () => {
     setSelectedColorTheme(theme);
   };
 
+  // Handle reset for new job - clear all form fields and tailor section
+  const handleResetForNewJob = () => {
+    // Clear job form fields
+    setJobTitle("");
+    setCompanyName("");
+    setLocation("");
+    setRemote(false);
+    setJobDescription("");
+    
+    // Clear analysis results
+    setRelevantSkills([]);
+    setMissingSkills([]);
+    
+    // Hide tailor section
+    setShowTailorSection(false);
+    setIsTailored(false);
+    
+    // Reset color theme
+    setSelectedColorTheme("purple");
+  };
+
   // If there's no profile, show message to create one
   if (!profile) {
     return <ProfileNotFoundMessage />;
@@ -125,6 +147,7 @@ const TailorPage = () => {
               onUpdateResume={handleUpdateResume}
               jobDescription={jobDescription}
               onColorThemeChange={handleColorThemeChange}
+              onResetForNewJob={handleResetForNewJob}
             />
 
             <CoverLetterGenerator

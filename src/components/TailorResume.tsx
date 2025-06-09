@@ -27,6 +27,7 @@ interface TailorResumeProps {
   onUpdateResume: (experiences: Experience[], skills: Skill[]) => void;
   jobDescription?: string;
   onColorThemeChange?: (theme: string) => void;
+  onResetForNewJob?: () => void;
 }
 
 const TailorResume = ({
@@ -36,6 +37,7 @@ const TailorResume = ({
   onUpdateResume,
   jobDescription = "",
   onColorThemeChange,
+  onResetForNewJob,
 }: TailorResumeProps) => {
   // Use our refactored custom hook for state and logic
   const {
@@ -69,6 +71,14 @@ const TailorResume = ({
       onColorThemeChange(selectedTheme);
     }
   }, [selectedTheme, onColorThemeChange]);
+
+  // Handle reset for new job - call both internal reset and parent reset
+  const handleResetForNewJob = () => {
+    resetTailoredResume();
+    if (onResetForNewJob) {
+      onResetForNewJob();
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -136,7 +146,7 @@ const TailorResume = ({
         </Button>
         
         <Button
-          onClick={resetTailoredResume}
+          onClick={handleResetForNewJob}
           variant="outline"
           className="flex items-center gap-2"
         >
