@@ -96,6 +96,27 @@ const TailorPage = () => {
     setUpdatedSummary(summary);
   };
 
+  // Handle saving summary changes to the profile
+  const handleSummarySave = async (summary: string) => {
+    if (!profile) return;
+
+    // Update profile with new summary
+    const updatedProfile = {
+      ...profile,
+      personalInfo: {
+        ...profile.personalInfo,
+        summary: summary
+      }
+    };
+
+    // Save to localStorage
+    localStorage.setItem("resumeProfile", JSON.stringify(updatedProfile));
+    setProfile(updatedProfile);
+    
+    // Also update the local state for the tailor actions
+    setUpdatedSummary(summary);
+  };
+
   // Handle reset for new job - clear all form fields and tailor section
   const handleResetForNewJob = () => {
     // Clear job form fields
@@ -160,6 +181,7 @@ const TailorPage = () => {
               onColorThemeChange={handleColorThemeChange}
               onResetForNewJob={handleResetForNewJob}
               onSummaryChange={handleSummaryChange}
+              onSummarySave={handleSummarySave}
             />
 
             <CoverLetterGenerator

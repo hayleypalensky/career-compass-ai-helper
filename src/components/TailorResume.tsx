@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
@@ -29,6 +28,7 @@ interface TailorResumeProps {
   onColorThemeChange?: (theme: string) => void;
   onResetForNewJob?: () => void;
   onSummaryChange?: (summary: string) => void;
+  onSummarySave?: (summary: string) => void;
 }
 
 const TailorResume = ({
@@ -40,6 +40,7 @@ const TailorResume = ({
   onColorThemeChange,
   onResetForNewJob,
   onSummaryChange,
+  onSummarySave,
 }: TailorResumeProps) => {
   // Use our refactored custom hook for state and logic
   const {
@@ -98,6 +99,7 @@ const TailorResume = ({
         jobDescription={jobDescription}
         relevantSkills={relevantSkills}
         onSummaryChange={handleSummaryChange}
+        onSummarySave={onSummarySave}
       />
 
       <ExperienceSelector
