@@ -11,6 +11,7 @@ interface TailorActionsRowProps {
   remote: boolean;
   jobDescription: string;
   colorTheme: string;
+  updatedSummary?: string;
 }
 
 const TailorActionsRow = ({
@@ -20,12 +21,22 @@ const TailorActionsRow = ({
   location,
   remote,
   jobDescription,
-  colorTheme
+  colorTheme,
+  updatedSummary
 }: TailorActionsRowProps) => {
+  // Create a profile with the updated summary for PDF export
+  const profileForPdf = updatedSummary ? {
+    ...profile,
+    personalInfo: {
+      ...profile.personalInfo,
+      summary: updatedSummary
+    }
+  } : profile;
+
   return (
     <div className="flex flex-col md:flex-row gap-4 mt-6">
       <ResumePdfExport 
-        profile={profile}
+        profile={profileForPdf}
         jobTitle={jobTitle}
         companyName={companyName}
         colorTheme={colorTheme}

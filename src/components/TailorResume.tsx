@@ -28,6 +28,7 @@ interface TailorResumeProps {
   jobDescription?: string;
   onColorThemeChange?: (theme: string) => void;
   onResetForNewJob?: () => void;
+  onSummaryChange?: (summary: string) => void;
 }
 
 const TailorResume = ({
@@ -38,6 +39,7 @@ const TailorResume = ({
   jobDescription = "",
   onColorThemeChange,
   onResetForNewJob,
+  onSummaryChange,
 }: TailorResumeProps) => {
   // Use our refactored custom hook for state and logic
   const {
@@ -71,6 +73,13 @@ const TailorResume = ({
       onColorThemeChange(selectedTheme);
     }
   }, [selectedTheme, onColorThemeChange]);
+
+  // Notify parent component when summary changes
+  useEffect(() => {
+    if (onSummaryChange) {
+      onSummaryChange(updatedSummary);
+    }
+  }, [updatedSummary, onSummaryChange]);
 
   // Handle reset for new job - call both internal reset and parent reset
   const handleResetForNewJob = () => {

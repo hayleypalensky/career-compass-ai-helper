@@ -24,6 +24,7 @@ const TailorPage = () => {
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
   const [resetTrigger, setResetTrigger] = useState(false);
+  const [updatedSummary, setUpdatedSummary] = useState<string>("");
 
   // Load profile from localStorage
   useEffect(() => {
@@ -90,6 +91,11 @@ const TailorPage = () => {
     setSelectedColorTheme(theme);
   };
 
+  // Handle summary updates from the tailor section
+  const handleSummaryChange = (summary: string) => {
+    setUpdatedSummary(summary);
+  };
+
   // Handle reset for new job - clear all form fields and tailor section
   const handleResetForNewJob = () => {
     // Clear job form fields
@@ -107,8 +113,9 @@ const TailorPage = () => {
     setShowTailorSection(false);
     setIsTailored(false);
     
-    // Reset color theme
+    // Reset color theme and summary
     setSelectedColorTheme("purple");
+    setUpdatedSummary("");
     
     // Trigger reset in JobDescriptionAnalyzer
     setResetTrigger(prev => !prev);
@@ -152,6 +159,7 @@ const TailorPage = () => {
               jobDescription={jobDescription}
               onColorThemeChange={handleColorThemeChange}
               onResetForNewJob={handleResetForNewJob}
+              onSummaryChange={handleSummaryChange}
             />
 
             <CoverLetterGenerator
@@ -171,6 +179,7 @@ const TailorPage = () => {
                 remote={remote}
                 jobDescription={jobDescription}
                 colorTheme={selectedColorTheme}
+                updatedSummary={updatedSummary}
               />
             )}
           </>
