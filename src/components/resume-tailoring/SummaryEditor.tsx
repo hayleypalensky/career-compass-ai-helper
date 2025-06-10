@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,11 @@ const SummaryEditor = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+
+  // Sync with parent when currentSummary changes
+  useEffect(() => {
+    setEditedSummary(currentSummary);
+  }, [currentSummary]);
 
   // Generate summary suggestions using AI service
   const generateSummarySuggestions = async () => {
@@ -76,8 +81,9 @@ const SummaryEditor = ({
 
   // Handle manual edits to the summary
   const handleSummaryEdit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setEditedSummary(e.target.value);
-    onSummaryChange(e.target.value);
+    const newValue = e.target.value;
+    setEditedSummary(newValue);
+    onSummaryChange(newValue);
   };
 
   return (
