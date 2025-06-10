@@ -35,7 +35,7 @@ const TailorPage = () => {
         try {
           const parsedProfile = JSON.parse(savedProfile);
           setProfile(parsedProfile);
-          // Initialize updatedSummary with the current profile summary
+          // Always sync updatedSummary with the current profile summary
           setUpdatedSummary(parsedProfile.personalInfo.summary || "");
         } catch (error) {
           console.error("Error parsing profile from localStorage:", error);
@@ -75,6 +75,13 @@ const TailorPage = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  // Sync updatedSummary with profile changes
+  useEffect(() => {
+    if (profile) {
+      setUpdatedSummary(profile.personalInfo.summary || "");
+    }
+  }, [profile?.personalInfo.summary]);
 
   const handleAnalysisComplete = (
     relevant: string[], 
@@ -140,7 +147,7 @@ const TailorPage = () => {
     localStorage.setItem("resumeProfile", JSON.stringify(updatedProfile));
     setProfile(updatedProfile);
     
-    // Also update the local state for the tailor actions
+    // Update the local state to match the saved summary
     setUpdatedSummary(summary);
     
     // Trigger a storage event to notify other parts of the app
