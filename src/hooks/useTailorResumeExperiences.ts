@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
@@ -19,6 +18,7 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
   
   // Initialize selected experiences to include all by default
   const [selectedExperienceIds, setSelectedExperienceIds] = useState<string[]>([]);
+  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>([]);
   
   // Update selected experiences when profile changes to ensure all experiences are included
   useEffect(() => {
@@ -53,23 +53,17 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     }
   }, [profile.experiences]);
   
-  // Filter experiences based on selection
-  const selectedExperiences = profile.experiences?.filter(exp => 
-    selectedExperienceIds.includes(exp.id)
-  ) || [];
-  
-  console.log('useTailorResumeExperiences - Selected experiences:', selectedExperiences);
-  console.log('useTailorResumeExperiences - Number of selected experiences:', selectedExperiences.length);
-  
-  const [tailoredExperiences, setTailoredExperiences] = useState<Experience[]>([]);
-  
-  // Update tailored experiences when selection changes or profile changes
+  // Update tailored experiences when profile changes OR when selection changes
   useEffect(() => {
-    const newSelectedExperiences = profile.experiences?.filter(exp => 
-      selectedExperienceIds.includes(exp.id)
-    ) || [];
-    console.log('useTailorResumeExperiences - Updating tailored experiences:', newSelectedExperiences);
-    setTailoredExperiences(JSON.parse(JSON.stringify(newSelectedExperiences)));
+    if (profile.experiences && Array.isArray(profile.experiences)) {
+      const newSelectedExperiences = profile.experiences.filter(exp => 
+        selectedExperienceIds.includes(exp.id)
+      );
+      console.log('useTailorResumeExperiences - Updating tailored experiences with fresh profile data:', newSelectedExperiences);
+      
+      // Create a deep copy of the selected experiences to avoid mutation issues
+      setTailoredExperiences(JSON.parse(JSON.stringify(newSelectedExperiences)));
+    }
   }, [selectedExperienceIds, profile.experiences]);
   
   // Update tailored experiences when selection changes
