@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
@@ -28,25 +29,51 @@ const TailorPage = () => {
 
   // Load profile from localStorage
   useEffect(() => {
-    const savedProfile = localStorage.getItem("resumeProfile");
-    if (savedProfile) {
-      try {
-        setProfile(JSON.parse(savedProfile));
-      } catch (error) {
-        console.error("Error parsing profile from localStorage:", error);
+    const loadProfile = () => {
+      const savedProfile = localStorage.getItem("resumeProfile");
+      if (savedProfile) {
+        try {
+          const parsedProfile = JSON.parse(savedProfile);
+          setProfile(parsedProfile);
+          // Initialize updatedSummary with the current profile summary
+          setUpdatedSummary(parsedProfile.personalInfo.summary || "");
+        } catch (error) {
+          console.error("Error parsing profile from localStorage:", error);
+          toast({
+            title: "Error loading profile",
+            description: "There was an error loading your profile. Please check your profile page.",
+            variant: "destructive",
+          });
+        }
+      } else {
         toast({
-          title: "Error loading profile",
-          description: "There was an error loading your profile. Please check your profile page.",
+          title: "Profile not found",
+          description: "Please create your profile before tailoring your resume.",
           variant: "destructive",
         });
       }
-    } else {
-      toast({
-        title: "Profile not found",
-        description: "Please create your profile before tailoring your resume.",
-        variant: "destructive",
-      });
-    }
+    };
+
+    loadProfile();
+
+    // Listen for localStorage changes from other components
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "resumeProfile" && e.newValue) {
+        try {
+          const updatedProfile = JSON.parse(e.newValue);
+          setProfile(updatedProfile);
+          setUpdatedSummary(updatedProfile.personalInfo.summary || "");
+        } catch (error) {
+          console.error("Error parsing updated profile:", error);
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleAnalysisComplete = (
@@ -115,6 +142,9 @@ const TailorPage = () => {
     
     // Also update the local state for the tailor actions
     setUpdatedSummary(summary);
+    
+    // Trigger a storage event to notify other parts of the app
+    window.dispatchEvent(new Event('storage'));
   };
 
   // Handle reset for new job - clear all form fields and tailor section
@@ -134,9 +164,11 @@ const TailorPage = () => {
     setShowTailorSection(false);
     setIsTailored(false);
     
-    // Reset color theme and summary
+    // Reset color theme and summary to profile defaults
     setSelectedColorTheme("purple");
-    setUpdatedSummary("");
+    if (profile) {
+      setUpdatedSummary(profile.personalInfo.summary || "");
+    }
     
     // Trigger reset in JobDescriptionAnalyzer
     setResetTrigger(prev => !prev);
@@ -159,6 +191,15 @@ const TailorPage = () => {
     return <IncompleteProfileCard profile={profile} />;
   }
 
+  // Create profile with updated summary for components that need it
+  const profileWithUpdatedSummary = {
+    ...profile,
+    personalInfo: {
+      ...profile.personalInfo,
+      summary: updatedSummary
+    }
+  };
+
   return (
     <div className="space-y-8">
       <h1>Tailor Your Resume</h1>
@@ -173,7 +214,7 @@ const TailorPage = () => {
         {showTailorSection && (
           <>
             <TailorResume
-              profile={profile}
+              profile={profileWithUpdatedSummary}
               relevantSkills={relevantSkills}
               missingSkills={missingSkills}
               onUpdateResume={handleUpdateResume}
@@ -185,7 +226,7 @@ const TailorPage = () => {
             />
 
             <CoverLetterGenerator
-              profile={profile}
+              profile={profileWithUpdatedSummary}
               jobDescription={jobDescription}
               jobTitle={jobTitle}
               companyName={companyName}
@@ -194,7 +235,7 @@ const TailorPage = () => {
             
             {isTailored && (
               <TailorActionsRow
-                profile={profile}
+                profile={profileWithUpdatedSummary}
                 jobTitle={jobTitle}
                 companyName={companyName}
                 location={location}
