@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase, Json } from "@/integrations/supabase/client";
 import { Profile } from "@/types/profile";
@@ -25,6 +24,32 @@ export function useProfileData() {
       try {
         console.log("Loading profile for user:", user.id);
         
+        // First, let's check if there's a backup in localStorage before we overwrite anything
+        const savedProfile = localStorage.getItem("resumeProfile");
+        let localProfile: Profile | null = null;
+        
+        if (savedProfile) {
+          try {
+            localProfile = JSON.parse(savedProfile);
+            console.log("Found local backup profile:", localProfile);
+            
+            // Check if local profile has actual data (not empty like default)
+            const hasLocalData = localProfile && (
+              localProfile.personalInfo.name ||
+              localProfile.personalInfo.email ||
+              localProfile.experiences.length > 0 ||
+              localProfile.skills.length > 0 ||
+              localProfile.education.length > 0
+            );
+            
+            if (hasLocalData) {
+              console.log("Local profile has data, will use as fallback if needed");
+            }
+          } catch (error) {
+            console.error("Error parsing localStorage profile:", error);
+          }
+        }
+        
         // Check if we have the profile in Supabase first
         const { data: profileData, error } = await supabase
           .from('profiles')
@@ -37,47 +62,30 @@ export function useProfileData() {
           
           // Check if the error is because the profile doesn't exist yet
           if (error.code === 'PGRST116') {
-            console.log("Profile doesn't exist in Supabase, checking localStorage");
+            console.log("Profile doesn't exist in Supabase");
             
-            // Try to load profile from localStorage
-            const savedProfile = localStorage.getItem("resumeProfile");
-            let loadedProfile: Profile | null = null;
-            
-            if (savedProfile) {
-              try {
-                loadedProfile = JSON.parse(savedProfile);
-                console.log("Loaded profile from localStorage:", loadedProfile);
-                console.log("Experiences from localStorage:", loadedProfile?.experiences);
+            // If we have local data, use it and create the profile in Supabase
+            if (localProfile && localProfile.personalInfo.name) {
+              console.log("Using localStorage data to restore profile");
+              setProfile(localProfile);
+              
+              // Create profile in Supabase with localStorage data
+              const { error: insertError } = await supabase
+                .from('profiles')
+                .insert({ 
+                  id: user.id, 
+                  email: user.email,
+                  resume_data: localProfile as unknown as Json
+                });
                 
-                // Validate the loaded profile structure
-                if (loadedProfile && 
-                    typeof loadedProfile === 'object' && 
-                    'personalInfo' in loadedProfile && 
-                    'experiences' in loadedProfile &&
-                    'skills' in loadedProfile &&
-                    'education' in loadedProfile) {
-                  setProfile(loadedProfile);
-                  
-                  // Create profile in Supabase with localStorage data
-                  console.log("Creating profile in Supabase with localStorage data");
-                  const { error: insertError } = await supabase
-                    .from('profiles')
-                    .insert({ 
-                      id: user.id, 
-                      email: user.email,
-                      resume_data: loadedProfile as unknown as Json
-                    });
-                    
-                  if (insertError) {
-                    console.error("Error creating profile in Supabase:", insertError);
-                  }
-                } else {
-                  console.error("Invalid profile structure in localStorage");
-                  setProfile(defaultProfile);
-                }
-              } catch (error) {
-                console.error("Error parsing profile from localStorage:", error);
-                setProfile(defaultProfile);
+              if (insertError) {
+                console.error("Error creating profile in Supabase:", insertError);
+              } else {
+                console.log("Successfully restored profile from localStorage backup");
+                toast({
+                  title: "Profile restored",
+                  description: "Your profile has been restored from a local backup.",
+                });
               }
             } else {
               // No profile anywhere, create default
@@ -97,29 +105,21 @@ export function useProfileData() {
               }
             }
           } else {
-            toast({
-              title: "Error loading profile",
-              description: "There was an error loading your profile. Using local data if available.",
-              variant: "destructive",
-            });
-            
-            // Try to fall back to localStorage
-            const savedProfile = localStorage.getItem("resumeProfile");
-            if (savedProfile) {
-              try {
-                const loadedProfile = JSON.parse(savedProfile);
-                if (loadedProfile && 
-                    typeof loadedProfile === 'object' && 
-                    'personalInfo' in loadedProfile && 
-                    'experiences' in loadedProfile &&
-                    'skills' in loadedProfile &&
-                    'education' in loadedProfile) {
-                  setProfile(loadedProfile);
-                  console.log("Using localStorage fallback after Supabase error:", loadedProfile);
-                }
-              } catch (localError) {
-                console.error("Error loading from localStorage fallback:", localError);
-              }
+            // Other error, try to fall back to localStorage if it has data
+            if (localProfile && localProfile.personalInfo.name) {
+              console.log("Using localStorage fallback due to Supabase error");
+              setProfile(localProfile);
+              toast({
+                title: "Profile loaded from backup",
+                description: "Loaded your profile from local backup due to a connection issue.",
+                variant: "destructive",
+              });
+            } else {
+              toast({
+                title: "Error loading profile",
+                description: "There was an error loading your profile and no backup was found.",
+                variant: "destructive",
+              });
             }
           }
           
@@ -140,90 +140,87 @@ export function useProfileData() {
               'education' in resumeData) {
             
             console.log("Loaded profile from Supabase:", resumeData);
-            console.log("Experiences from Supabase:", resumeData.experiences);
             
-            // Ensure experiences have proper bullet points
-            if (resumeData.experiences) {
-              resumeData.experiences.forEach((exp: any, index: number) => {
-                console.log(`Experience ${index} bullets:`, exp.bullets);
+            // Check if the Supabase data is empty/default and we have better local data
+            const supabaseHasData = resumeData.personalInfo.name ||
+                                   resumeData.personalInfo.email ||
+                                   resumeData.experiences.length > 0 ||
+                                   resumeData.skills.length > 0 ||
+                                   resumeData.education.length > 0;
+            
+            const localHasData = localProfile && (
+              localProfile.personalInfo.name ||
+              localProfile.personalInfo.email ||
+              localProfile.experiences.length > 0 ||
+              localProfile.skills.length > 0 ||
+              localProfile.education.length > 0
+            );
+            
+            if (!supabaseHasData && localHasData) {
+              console.log("Supabase has empty data but localStorage has data, restoring from local");
+              setProfile(localProfile);
+              
+              // Update Supabase with the local data
+              await supabase
+                .from('profiles')
+                .update({ 
+                  resume_data: localProfile as unknown as Json
+                })
+                .eq('id', user.id);
+                
+              toast({
+                title: "Profile restored",
+                description: "Your profile has been restored from a local backup.",
               });
+            } else {
+              setProfile(resumeData as Profile);
+              
+              // Also update localStorage for offline access with the latest Supabase data
+              localStorage.setItem("resumeProfile", JSON.stringify(resumeData));
             }
-            
-            setProfile(resumeData as Profile);
-            
-            // Also update localStorage for offline access with the latest Supabase data
-            localStorage.setItem("resumeProfile", JSON.stringify(resumeData));
           } else {
             console.error("Resume data from Supabase doesn't match expected format", resumeData);
             
             // Try localStorage as fallback
-            const savedProfile = localStorage.getItem("resumeProfile");
-            if (savedProfile) {
-              try {
-                const loadedProfile = JSON.parse(savedProfile);
-                if (loadedProfile && 
-                    typeof loadedProfile === 'object' && 
-                    'personalInfo' in loadedProfile && 
-                    'experiences' in loadedProfile &&
-                    'skills' in loadedProfile &&
-                    'education' in loadedProfile) {
-                  setProfile(loadedProfile);
-                  console.log("Using localStorage profile as fallback for malformed Supabase data");
-                  
-                  // Try to fix the malformed Supabase data
-                  await supabase
-                    .from('profiles')
-                    .update({ 
-                      resume_data: loadedProfile as unknown as Json
-                    })
-                    .eq('id', user.id);
-                }
-              } catch (error) {
-                console.error("Error parsing localStorage fallback:", error);
-                setProfile(defaultProfile);
-              }
+            if (localProfile && localProfile.personalInfo.name) {
+              setProfile(localProfile);
+              console.log("Using localStorage profile as fallback for malformed Supabase data");
+              
+              // Try to fix the malformed Supabase data
+              await supabase
+                .from('profiles')
+                .update({ 
+                  resume_data: localProfile as unknown as Json
+                })
+                .eq('id', user.id);
             } else {
               setProfile(defaultProfile);
             }
           }
         } else {
           // No resume data in Supabase, check localStorage
-          const savedProfile = localStorage.getItem("resumeProfile");
-          if (savedProfile) {
-            try {
-              const loadedProfile = JSON.parse(savedProfile);
-              if (loadedProfile && 
-                  typeof loadedProfile === 'object' && 
-                  'personalInfo' in loadedProfile && 
-                  'experiences' in loadedProfile &&
-                  'skills' in loadedProfile &&
-                  'education' in loadedProfile) {
-                setProfile(loadedProfile);
-                console.log("No Supabase data, using localStorage profile:", loadedProfile);
-                
-                // Save to Supabase
-                await supabase
-                  .from('profiles')
-                  .update({ 
-                    resume_data: loadedProfile as unknown as Json
-                  })
-                  .eq('id', user.id);
-              }
-            } catch (error) {
-              console.error("Error parsing localStorage when no Supabase data:", error);
-              setProfile(defaultProfile);
-            }
+          if (localProfile && localProfile.personalInfo.name) {
+            setProfile(localProfile);
+            console.log("No Supabase data, using localStorage profile:", localProfile);
+            
+            // Save to Supabase
+            await supabase
+              .from('profiles')
+              .update({ 
+                resume_data: localProfile as unknown as Json
+              })
+              .eq('id', user.id);
+              
+            toast({
+              title: "Profile restored",
+              description: "Your profile has been restored from a local backup.",
+            });
           } else {
             setProfile(defaultProfile);
           }
         }
       } catch (error) {
         console.error("Error loading profile:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load your profile. Using saved local data if available.",
-          variant: "destructive",
-        });
         
         // Try to fall back to localStorage if there's an error
         try {
@@ -235,9 +232,14 @@ export function useProfileData() {
                 'personalInfo' in loadedProfile && 
                 'experiences' in loadedProfile &&
                 'skills' in loadedProfile &&
-                'education' in loadedProfile) {
+                'education' in loadedProfile &&
+                loadedProfile.personalInfo.name) {
               setProfile(loadedProfile);
               console.log("Falling back to localStorage after error:", loadedProfile);
+              toast({
+                title: "Profile loaded from backup",
+                description: "Your profile was restored from a local backup.",
+              });
             }
           }
         } catch (localError) {
