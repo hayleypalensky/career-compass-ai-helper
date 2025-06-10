@@ -24,14 +24,17 @@ const TailorActionsRow = ({
   colorTheme,
   updatedSummary
 }: TailorActionsRowProps) => {
-  // Create a profile with the updated summary for PDF export
-  const profileForPdf = updatedSummary ? {
+  // Always create a profile with the updated summary for PDF export
+  const profileForPdf = {
     ...profile,
     personalInfo: {
       ...profile.personalInfo,
-      summary: updatedSummary
+      summary: updatedSummary || profile.personalInfo.summary || ""
     }
-  } : profile;
+  };
+
+  console.log('TailorActionsRow - Updated summary for PDF:', updatedSummary);
+  console.log('TailorActionsRow - Profile summary for PDF:', profileForPdf.personalInfo.summary);
 
   return (
     <div className="flex flex-col md:flex-row gap-4 mt-6">

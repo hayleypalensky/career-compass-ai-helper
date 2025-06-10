@@ -15,6 +15,8 @@ import { getSelectedTheme } from "./pdf/helpers";
 export const generatePdf = async (options: PdfExportOptions): Promise<void> => {
   const { profile, jobTitle, companyName, colorTheme } = options;
   
+  console.log('PDF Generator - Profile summary:', profile.personalInfo.summary);
+  
   try {
     // Create PDF with US Letter dimensions
     const pdf = new jsPDF({
