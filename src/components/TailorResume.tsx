@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
@@ -28,7 +29,7 @@ interface TailorResumeProps {
   onColorThemeChange?: (theme: string) => void;
   onResetForNewJob?: () => void;
   onSummaryChange?: (summary: string) => void;
-  onSummarySave?: (summary: string) => void;
+  tailoredSummary?: string;
 }
 
 const TailorResume = ({
@@ -40,7 +41,7 @@ const TailorResume = ({
   onColorThemeChange,
   onResetForNewJob,
   onSummaryChange,
-  onSummarySave,
+  tailoredSummary = "",
 }: TailorResumeProps) => {
   // Use our refactored custom hook for state and logic
   const {
@@ -48,7 +49,6 @@ const TailorResume = ({
     skillsToAdd,
     skillsToRemove,
     selectedTheme,
-    updatedSummary,
     selectedExperienceIds,
     handleBulletChange,
     addBullet,
@@ -57,7 +57,6 @@ const TailorResume = ({
     toggleSkillRemoval,
     generateBulletSuggestions,
     handleThemeChange,
-    handleSummaryChange,
     handleExperienceSelectionChange,
     saveTailoredResume,
     resetTailoredResume
@@ -75,13 +74,6 @@ const TailorResume = ({
     }
   }, [selectedTheme, onColorThemeChange]);
 
-  // Notify parent component when summary changes
-  useEffect(() => {
-    if (onSummaryChange) {
-      onSummaryChange(updatedSummary);
-    }
-  }, [updatedSummary, onSummaryChange]);
-
   // Handle reset for new job - call both internal reset and parent reset
   const handleResetForNewJob = () => {
     resetTailoredResume();
@@ -90,16 +82,22 @@ const TailorResume = ({
     }
   };
 
+  // Handle summary changes - just pass through to parent
+  const handleSummaryChange = (summary: string) => {
+    if (onSummaryChange) {
+      onSummaryChange(summary);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
 
       <SummaryEditor
-        currentSummary={profile.personalInfo.summary || ""}
+        currentSummary={tailoredSummary || profile.personalInfo.summary || ""}
         jobDescription={jobDescription}
         relevantSkills={relevantSkills}
         onSummaryChange={handleSummaryChange}
-        onSummarySave={onSummarySave}
       />
 
       <ExperienceSelector
@@ -138,7 +136,7 @@ const TailorResume = ({
           ...profile,
           personalInfo: {
             ...profile.personalInfo,
-            summary: updatedSummary
+            summary: tailoredSummary || profile.personalInfo.summary || ""
           }
         }}
         experiences={tailoredExperiences}

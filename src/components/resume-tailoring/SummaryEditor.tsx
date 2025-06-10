@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { RefreshCw, CheckCircle2, Save } from "lucide-react";
+import { RefreshCw, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { aiService } from "@/services/aiService";
 
@@ -12,7 +12,6 @@ interface SummaryEditorProps {
   jobDescription: string;
   relevantSkills: string[];
   onSummaryChange: (summary: string) => void;
-  onSummarySave?: (summary: string) => void;
 }
 
 const SummaryEditor = ({
@@ -20,16 +19,11 @@ const SummaryEditor = ({
   jobDescription,
   relevantSkills,
   onSummaryChange,
-  onSummarySave,
 }: SummaryEditorProps) => {
   const [editedSummary, setEditedSummary] = useState(currentSummary);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
-
-  // Check if there are unsaved changes
-  const hasUnsavedChanges = editedSummary !== currentSummary;
 
   // Generate summary suggestions using AI service
   const generateSummarySuggestions = async () => {
@@ -76,7 +70,7 @@ const SummaryEditor = ({
     
     toast({
       title: "Summary updated",
-      description: "The AI-generated summary has been applied.",
+      description: "The AI-generated summary has been applied for this tailored resume.",
     });
   };
 
@@ -86,60 +80,21 @@ const SummaryEditor = ({
     onSummaryChange(e.target.value);
   };
 
-  // Save changes to profile
-  const handleSaveChanges = async () => {
-    if (!onSummarySave) return;
-    
-    setIsSaving(true);
-    
-    try {
-      await onSummarySave(editedSummary);
-      
-      toast({
-        title: "Summary saved",
-        description: "Your professional summary has been saved to your profile.",
-      });
-    } catch (error) {
-      console.error('Error saving summary:', error);
-      toast({
-        title: "Error saving summary",
-        description: "There was an error saving your summary. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex justify-between">
-          <span>Professional Summary</span>
-          <div className="flex gap-2">
-            {hasUnsavedChanges && onSummarySave && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSaveChanges}
-                disabled={isSaving}
-                className="flex items-center gap-1"
-              >
-                <Save className={`h-4 w-4 ${isSaving ? 'animate-pulse' : ''}`} />
-                {isSaving ? "Saving..." : "Save Changes"}
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={generateSummarySuggestions}
-              disabled={isGenerating || !jobDescription}
-              className="flex items-center gap-1"
-            >
-              <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              {isGenerating ? "Generating with AI..." : suggestions.length > 0 ? "Regenerate Suggestions" : "Generate AI Suggestions"}
-            </Button>
-          </div>
+          <span>Professional Summary (Tailored for this job)</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={generateSummarySuggestions}
+            disabled={isGenerating || !jobDescription}
+            className="flex items-center gap-1"
+          >
+            <RefreshCw className={`h-4 w-4 ${isGenerating ? 'animate-spin' : ''}`} />
+            {isGenerating ? "Generating with AI..." : suggestions.length > 0 ? "Regenerate Suggestions" : "Generate AI Suggestions"}
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -151,11 +106,9 @@ const SummaryEditor = ({
               onChange={handleSummaryEdit}
               className="h-24"
             />
-            {hasUnsavedChanges && (
-              <p className="text-sm text-amber-600 mt-1">
-                You have unsaved changes to your summary.
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground mt-1">
+              Changes here will only affect your tailored resume and PDF export, not your profile.
+            </p>
           </div>
 
           {suggestions.length > 0 && (

@@ -25,7 +25,8 @@ const TailorPage = () => {
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
   const [resetTrigger, setResetTrigger] = useState(false);
-  const [updatedSummary, setUpdatedSummary] = useState<string>("");
+  // This is the tailored summary used only for PDF export, separate from profile
+  const [tailoredSummary, setTailoredSummary] = useState<string>("");
 
   // Load profile from localStorage
   useEffect(() => {
@@ -35,8 +36,8 @@ const TailorPage = () => {
         try {
           const parsedProfile = JSON.parse(savedProfile);
           setProfile(parsedProfile);
-          // Always sync updatedSummary with the current profile summary
-          setUpdatedSummary(parsedProfile.personalInfo.summary || "");
+          // Initialize tailored summary with profile summary as default
+          setTailoredSummary(parsedProfile.personalInfo.summary || "");
         } catch (error) {
           console.error("Error parsing profile from localStorage:", error);
           toast({
@@ -62,7 +63,8 @@ const TailorPage = () => {
         try {
           const updatedProfile = JSON.parse(e.newValue);
           setProfile(updatedProfile);
-          setUpdatedSummary(updatedProfile.personalInfo.summary || "");
+          // Reset tailored summary to new profile summary when profile changes
+          setTailoredSummary(updatedProfile.personalInfo.summary || "");
         } catch (error) {
           console.error("Error parsing updated profile:", error);
         }
@@ -75,13 +77,6 @@ const TailorPage = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
-
-  // Sync updatedSummary with profile changes
-  useEffect(() => {
-    if (profile) {
-      setUpdatedSummary(profile.personalInfo.summary || "");
-    }
-  }, [profile?.personalInfo.summary]);
 
   const handleAnalysisComplete = (
     relevant: string[], 
@@ -125,33 +120,9 @@ const TailorPage = () => {
     setSelectedColorTheme(theme);
   };
 
-  // Handle summary updates from the tailor section
+  // Handle summary changes in the tailor section (for PDF export only)
   const handleSummaryChange = (summary: string) => {
-    setUpdatedSummary(summary);
-  };
-
-  // Handle saving summary changes to the profile
-  const handleSummarySave = async (summary: string) => {
-    if (!profile) return;
-
-    // Update profile with new summary
-    const updatedProfile = {
-      ...profile,
-      personalInfo: {
-        ...profile.personalInfo,
-        summary: summary
-      }
-    };
-
-    // Save to localStorage
-    localStorage.setItem("resumeProfile", JSON.stringify(updatedProfile));
-    setProfile(updatedProfile);
-    
-    // Update the local state to match the saved summary
-    setUpdatedSummary(summary);
-    
-    // Trigger a storage event to notify other parts of the app
-    window.dispatchEvent(new Event('storage'));
+    setTailoredSummary(summary);
   };
 
   // Handle reset for new job - clear all form fields and tailor section
@@ -174,7 +145,7 @@ const TailorPage = () => {
     // Reset color theme and summary to profile defaults
     setSelectedColorTheme("purple");
     if (profile) {
-      setUpdatedSummary(profile.personalInfo.summary || "");
+      setTailoredSummary(profile.personalInfo.summary || "");
     }
     
     // Trigger reset in JobDescriptionAnalyzer
@@ -198,12 +169,12 @@ const TailorPage = () => {
     return <IncompleteProfileCard profile={profile} />;
   }
 
-  // Create profile with updated summary for components that need it
-  const profileWithUpdatedSummary = {
+  // Create profile with tailored summary for components that need it (PDF export)
+  const profileWithTailoredSummary = {
     ...profile,
     personalInfo: {
       ...profile.personalInfo,
-      summary: updatedSummary
+      summary: tailoredSummary
     }
   };
 
@@ -221,7 +192,7 @@ const TailorPage = () => {
         {showTailorSection && (
           <>
             <TailorResume
-              profile={profileWithUpdatedSummary}
+              profile={profile}
               relevantSkills={relevantSkills}
               missingSkills={missingSkills}
               onUpdateResume={handleUpdateResume}
@@ -229,11 +200,11 @@ const TailorPage = () => {
               onColorThemeChange={handleColorThemeChange}
               onResetForNewJob={handleResetForNewJob}
               onSummaryChange={handleSummaryChange}
-              onSummarySave={handleSummarySave}
+              tailoredSummary={tailoredSummary}
             />
 
             <CoverLetterGenerator
-              profile={profileWithUpdatedSummary}
+              profile={profileWithTailoredSummary}
               jobDescription={jobDescription}
               jobTitle={jobTitle}
               companyName={companyName}
@@ -242,14 +213,14 @@ const TailorPage = () => {
             
             {isTailored && (
               <TailorActionsRow
-                profile={profileWithUpdatedSummary}
+                profile={profileWithTailoredSummary}
                 jobTitle={jobTitle}
                 companyName={companyName}
                 location={location}
                 remote={remote}
                 jobDescription={jobDescription}
                 colorTheme={selectedColorTheme}
-                updatedSummary={updatedSummary}
+                updatedSummary={tailoredSummary}
               />
             )}
           </>
