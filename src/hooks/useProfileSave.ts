@@ -15,18 +15,17 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
       if (!user) return;
       
       try {
-        // Save to localStorage as a backup
-        console.log("Saving profile to localStorage:", profile);
-        localStorage.setItem("resumeProfile", JSON.stringify(profile));
-        
-        // Log the experiences to verify they're being saved correctly
-        console.log("Experiences to save:", profile.experiences);
+        // Save to localStorage as a backup with deep copy to ensure all changes are captured
+        const profileToSave = JSON.parse(JSON.stringify(profile));
+        console.log("Saving profile to localStorage:", profileToSave);
+        console.log("Experiences being saved:", profileToSave.experiences);
+        localStorage.setItem("resumeProfile", JSON.stringify(profileToSave));
         
         // Save to Supabase - convert profile to a format compatible with Json type
         const { data, error } = await supabase
           .from('profiles')
           .update({ 
-            resume_data: profile as unknown as Json
+            resume_data: profileToSave as unknown as Json
           })
           .eq('id', user.id)
           .select();
@@ -41,7 +40,7 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
               .insert({ 
                 id: user.id, 
                 email: user.email,
-                resume_data: profile as unknown as Json
+                resume_data: profileToSave as unknown as Json
               });
               
             if (insertError) {
@@ -85,10 +84,12 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
   const handlePersonalInfoSave = (data: PersonalInfo) => {
     setProfile((prev) => {
       console.log("Saving personal info:", data);
-      return {
+      const newProfile = {
         ...prev,
         personalInfo: data,
       };
+      console.log("Updated profile with personal info:", newProfile);
+      return newProfile;
     });
     
     toast({
@@ -98,18 +99,30 @@ export function useProfileSave(profile: Profile, setProfile: React.Dispatch<Reac
   };
 
   const handleExperiencesSave = (experiences: any[]) => {
-    console.log("Saving experiences:", experiences);
-    setProfile((prev) => ({
-      ...prev,
-      experiences,
-    }));
+    console.log("Saving experiences with updated bullets:", experiences);
     
-    // Verify that the state is updated correctly
+    setProfile((prev) => {
+      const newProfile = {
+        ...prev,
+        experiences: JSON.parse(JSON.stringify(experiences)), // Deep copy to ensure all changes are captured
+      };
+      console.log("Updated profile with experiences:", newProfile);
+      return newProfile;
+    });
+    
+    // Force immediate save to localStorage to ensure persistence
     setTimeout(() => {
       const savedProfile = localStorage.getItem("resumeProfile");
       if (savedProfile) {
         const parsedProfile = JSON.parse(savedProfile);
-        console.log("Verified experiences in localStorage:", parsedProfile.experiences);
+        console.log("Verified experiences in localStorage after save:", parsedProfile.experiences);
+        
+        // Double-check that bullet points are saved
+        if (parsedProfile.experiences) {
+          parsedProfile.experiences.forEach((exp: any, index: number) => {
+            console.log(`Experience ${index} bullets:`, exp.bullets);
+          });
+        }
       }
     }, 100);
     
