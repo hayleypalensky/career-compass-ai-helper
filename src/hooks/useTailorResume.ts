@@ -13,13 +13,17 @@ interface UseTailorResumeProps {
   relevantSkills: string[];
   jobDescription: string;
   onUpdateResume: (experiences: Experience[], skills: Skill[]) => void;
+  onSummaryChange?: (summary: string) => void;
+  tailoredSummary?: string;
 }
 
 export const useTailorResume = ({ 
   profile, 
   relevantSkills, 
   jobDescription,
-  onUpdateResume 
+  onUpdateResume,
+  onSummaryChange,
+  tailoredSummary = ""
 }: UseTailorResumeProps) => {
   const { toast } = useToast();
   
@@ -35,6 +39,13 @@ export const useTailorResume = ({
     relevantSkills
   );
 
+  // Handle summary changes
+  const handleSummaryChange = (summary: string) => {
+    if (onSummaryChange) {
+      onSummaryChange(summary);
+    }
+  };
+
   // Reset all tailored changes
   const resetTailoredResume = () => {
     // Reset experiences to original profile state
@@ -46,6 +57,11 @@ export const useTailorResume = ({
     // Reset UI to original state
     uiHook.resetUI();
     
+    // Reset summary to profile default
+    if (onSummaryChange) {
+      onSummaryChange(profile.personalInfo.summary || "");
+    }
+    
     toast({
       title: "Resume reset",
       description: "All tailored changes have been cleared. Ready for a new job application.",
@@ -55,15 +71,6 @@ export const useTailorResume = ({
   // Save the tailored resume
   const saveTailoredResume = () => {
     const newSkills = createUpdatedSkills(profile, skillsHook.skillsToAdd, skillsHook.skillsToRemove);
-
-    // Create updated profile with new summary
-    const updatedProfile = {
-      ...profile,
-      personalInfo: {
-        ...profile.personalInfo,
-        summary: uiHook.updatedSummary
-      }
-    };
 
     onUpdateResume(experienceHook.tailoredExperiences, newSkills);
     
@@ -90,9 +97,10 @@ export const useTailorResume = ({
     
     // UI management
     selectedTheme: uiHook.selectedTheme,
-    updatedSummary: uiHook.updatedSummary,
     handleThemeChange: uiHook.handleThemeChange,
-    handleSummaryChange: uiHook.handleSummaryChange,
+    
+    // Summary management
+    handleSummaryChange,
     
     // Utility functions
     generateBulletSuggestions,

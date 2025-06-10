@@ -59,12 +59,15 @@ const TailorResume = ({
     handleThemeChange,
     handleExperienceSelectionChange,
     saveTailoredResume,
-    resetTailoredResume
+    resetTailoredResume,
+    handleSummaryChange
   } = useTailorResume({
     profile,
     relevantSkills,
     jobDescription,
-    onUpdateResume
+    onUpdateResume,
+    onSummaryChange,
+    tailoredSummary
   });
 
   // Notify parent component when theme changes
@@ -79,13 +82,6 @@ const TailorResume = ({
     resetTailoredResume();
     if (onResetForNewJob) {
       onResetForNewJob();
-    }
-  };
-
-  // Handle summary changes - just pass through to parent
-  const handleSummaryChange = (summary: string) => {
-    if (onSummaryChange) {
-      onSummaryChange(summary);
     }
   };
 
