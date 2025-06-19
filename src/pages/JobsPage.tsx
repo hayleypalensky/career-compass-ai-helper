@@ -72,8 +72,8 @@ const JobsPage = () => {
     archived: filteredJobs.filter(job => job.status === "archived").length
   };
 
-  // Check if we have an active search with results
-  const hasActiveSearch = searchTerm.trim().length > 0;
+  // Check if we have an active search with results (only show search results when user has stopped typing)
+  const hasActiveSearch = searchTerm.trim().length > 0 && filteredJobs.length !== jobs.length;
   const hasSearchResults = filteredJobs.length > 0;
 
   return (
