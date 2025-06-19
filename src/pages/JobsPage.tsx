@@ -59,10 +59,10 @@ const JobsPage = () => {
     return <JobsLoading />;
   }
 
-  // Filter jobs based on the current tab
+  // Filter jobs based on the current tab from the already filtered/sorted jobs
   const tabJobs = filteredJobs.filter(job => job.status === activeTab);
   
-  // Count jobs in each status category
+  // Count jobs in each status category from the filtered results
   const statusCounts = {
     applied: filteredJobs.filter(job => job.status === "applied").length,
     interviewing: filteredJobs.filter(job => job.status === "interviewing").length,
