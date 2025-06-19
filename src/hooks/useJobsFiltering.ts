@@ -1,36 +1,40 @@
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Job, JobStatus } from "@/types/job";
 
 export const useJobsFiltering = (jobs: Job[], defaultActiveTab: JobStatus = "applied") => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [activeSearchTerm, setActiveSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<JobStatus>(defaultActiveTab);
 
-  // Debounce the search term
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 300); // Wait 300ms after user stops typing
+  const triggerSearch = () => {
+    setActiveSearchTerm(searchTerm);
+  };
 
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
+  const clearSearch = () => {
+    setSearchTerm("");
+    setActiveSearchTerm("");
+  };
 
-  // Filter jobs based on debounced search term only
+  // Filter jobs based on active search term only
   const filteredJobs = useMemo(() => {
+    if (!activeSearchTerm.trim()) {
+      return jobs;
+    }
+    
     return jobs.filter((job) => {
       return (
-        job.title.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        job.company.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        job.description?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-        job.notes?.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+        job.title.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+        job.company.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+        job.description?.toLowerCase().includes(activeSearchTerm.toLowerCase()) ||
+        job.notes?.toLowerCase().includes(activeSearchTerm.toLowerCase())
       );
     });
-  }, [jobs, debouncedSearchTerm]);
+  }, [jobs, activeSearchTerm]);
 
   // Sort jobs by relevance when searching, otherwise by creation order
   const sortedJobs = useMemo(() => {
-    if (!debouncedSearchTerm.trim()) {
+    if (!activeSearchTerm.trim()) {
       // No search term - sort by creation order (newest first)
       return [...filteredJobs].sort((a, b) => {
         const aTime = new Date(a.updatedAt || a.appliedDate).getTime();
@@ -40,7 +44,7 @@ export const useJobsFiltering = (jobs: Job[], defaultActiveTab: JobStatus = "app
     }
 
     // Active search - sort by relevance
-    const searchLower = debouncedSearchTerm.toLowerCase();
+    const searchLower = activeSearchTerm.toLowerCase();
     
     return [...filteredJobs].sort((a, b) => {
       // Calculate relevance scores
@@ -77,7 +81,7 @@ export const useJobsFiltering = (jobs: Job[], defaultActiveTab: JobStatus = "app
       const bTime = new Date(b.updatedAt || b.appliedDate).getTime();
       return bTime - aTime;
     });
-  }, [filteredJobs, debouncedSearchTerm]);
+  }, [filteredJobs, activeSearchTerm]);
 
   return {
     searchTerm,
@@ -85,5 +89,8 @@ export const useJobsFiltering = (jobs: Job[], defaultActiveTab: JobStatus = "app
     activeTab,
     setActiveTab,
     filteredJobs: sortedJobs,
+    triggerSearch,
+    clearSearch,
+    hasActiveSearch: activeSearchTerm.trim().length > 0,
   };
 };

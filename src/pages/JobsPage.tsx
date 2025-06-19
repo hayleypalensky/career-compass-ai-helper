@@ -35,7 +35,10 @@ const JobsPage = () => {
     setSearchTerm,
     activeTab,
     setActiveTab,
-    filteredJobs
+    filteredJobs,
+    triggerSearch,
+    clearSearch,
+    hasActiveSearch
   } = useJobsFiltering(jobs, "applied");
   
   // Load view preference from localStorage
@@ -72,8 +75,6 @@ const JobsPage = () => {
     archived: filteredJobs.filter(job => job.status === "archived").length
   };
 
-  // Check if we have an active search with results (only show search results when user has stopped typing)
-  const hasActiveSearch = searchTerm.trim().length > 0 && filteredJobs.length !== jobs.length;
   const hasSearchResults = filteredJobs.length > 0;
 
   return (
@@ -98,6 +99,9 @@ const JobsPage = () => {
               <JobSearchBar 
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
+                onSearch={triggerSearch}
+                onClear={clearSearch}
+                hasActiveSearch={hasActiveSearch}
               />
             </div>
             
@@ -119,6 +123,9 @@ const JobsPage = () => {
               <JobSearchBar 
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
+                onSearch={triggerSearch}
+                onClear={clearSearch}
+                hasActiveSearch={hasActiveSearch}
               />
             </div>
             <div className="text-center py-12">
@@ -144,6 +151,9 @@ const JobsPage = () => {
               <JobSearchBar 
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
+                onSearch={triggerSearch}
+                onClear={clearSearch}
+                hasActiveSearch={hasActiveSearch}
               />
             </div>
             
