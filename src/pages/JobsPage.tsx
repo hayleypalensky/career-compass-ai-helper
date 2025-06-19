@@ -12,6 +12,7 @@ import JobStatusCounts from "@/components/jobs/JobStatusCounts";
 import JobSearchBar from "@/components/jobs/JobSearchBar";
 import JobTabsContent from "@/components/jobs/JobTabsContent";
 import JobsLoading from "@/components/jobs/JobsLoading";
+import SearchResultsView from "@/components/jobs/SearchResultsView";
 
 const JobsPage = () => {
   const { user } = useAuth();
@@ -71,6 +72,10 @@ const JobsPage = () => {
     archived: filteredJobs.filter(job => job.status === "archived").length
   };
 
+  // Check if we have an active search with results
+  const hasActiveSearch = searchTerm.trim().length > 0;
+  const hasSearchResults = filteredJobs.length > 0;
+
   return (
     <div className="space-y-8">
       <h1>Job Applications Tracker</h1>
@@ -83,33 +88,74 @@ const JobsPage = () => {
           setViewMode={setViewMode} 
         />
         
-        <Tabs 
-          defaultValue="applied" 
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as JobStatus)}
-          className="w-full"
-        >
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
-            <JobStatusCounts 
-              statusCounts={statusCounts}
-              activeTab={activeTab}
-              onTabChange={setActiveTab}
-            />
+        {hasActiveSearch && hasSearchResults ? (
+          // Show search results grouped by status
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <h2 className="text-xl font-semibold">
+                Search Results for "{searchTerm}" ({filteredJobs.length} found)
+              </h2>
+              <JobSearchBar 
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+              />
+            </div>
             
-            <JobSearchBar 
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
+            <SearchResultsView
+              filteredJobs={filteredJobs}
+              viewMode={viewMode}
+              onUpdate={updateJob}
+              onArchive={archiveJob}
+              onDelete={deleteJob}
             />
           </div>
-          
-          <JobTabsContent 
-            tabJobs={tabJobs}
-            viewMode={viewMode}
-            onUpdate={updateJob}
-            onArchive={archiveJob}
-            onDelete={deleteJob}
-          />
-        </Tabs>
+        ) : hasActiveSearch && !hasSearchResults ? (
+          // Show no results message
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <h2 className="text-xl font-semibold">
+                No results found for "{searchTerm}"
+              </h2>
+              <JobSearchBar 
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+              />
+            </div>
+            <div className="text-center py-12">
+              <p className="text-gray-500">No job applications match your search.</p>
+              <p className="text-gray-400">Try adjusting your search terms.</p>
+            </div>
+          </div>
+        ) : (
+          // Show normal tabbed view when no search
+          <Tabs 
+            defaultValue="applied" 
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as JobStatus)}
+            className="w-full"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <JobStatusCounts 
+                statusCounts={statusCounts}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+              
+              <JobSearchBar 
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+              />
+            </div>
+            
+            <JobTabsContent 
+              tabJobs={tabJobs}
+              viewMode={viewMode}
+              onUpdate={updateJob}
+              onArchive={archiveJob}
+              onDelete={deleteJob}
+            />
+          </Tabs>
+        )}
       </div>
     </div>
   );
