@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Tabs } from "@/components/ui/tabs";
 import { useAuth } from "@/context/AuthContext";
@@ -7,19 +6,16 @@ import { useAuth } from "@/context/AuthContext";
 import JobsHeader from "@/components/jobs/JobsHeader";
 import { useJobManagement } from "@/hooks/useJobManagement";
 import { useJobsFiltering } from "@/hooks/useJobsFiltering";
-import { useJobTrackerSettings } from "@/hooks/useJobTrackerSettings";
 import { JobStatus } from "@/types/job";
 import JobStatusCounts from "@/components/jobs/JobStatusCounts";
 import JobSearchBar from "@/components/jobs/JobSearchBar";
 import JobTabsContent from "@/components/jobs/JobTabsContent";
 import JobsLoading from "@/components/jobs/JobsLoading";
 import SearchResultsView from "@/components/jobs/SearchResultsView";
-import JobTrackerSettings from "@/components/jobs/JobTrackerSettings";
 
 const JobsPage = () => {
   const { user } = useAuth();
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [showSettings, setShowSettings] = useState(false);
   
   // Get job management methods from our custom hook
   const { 
@@ -43,9 +39,6 @@ const JobsPage = () => {
     clearSearch,
     hasActiveSearch
   } = useJobsFiltering(jobs, "applied");
-
-  // Get job tracker settings
-  const { autoAddJobs, toggleAutoAddJobs } = useJobTrackerSettings();
   
   // Load view preference from localStorage
   useEffect(() => {
@@ -85,22 +78,7 @@ const JobsPage = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1>Job Applications Tracker</h1>
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="text-sm text-blue-600 hover:text-blue-800"
-        >
-          {showSettings ? "Hide Settings" : "Settings"}
-        </button>
-      </div>
-
-      {showSettings && (
-        <JobTrackerSettings
-          autoAddJobs={autoAddJobs}
-          onToggleAutoAdd={toggleAutoAddJobs}
-        />
-      )}
+      <h1>Job Applications Tracker</h1>
       
       <div className="flex flex-col space-y-8">
         {/* Jobs header with add button and view toggle */}
