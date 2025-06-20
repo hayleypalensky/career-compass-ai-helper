@@ -13,11 +13,13 @@ interface JobFormProps {
   remote: boolean;
   jobDescription: string;
   isAnalyzing: boolean;
+  autoAddJobs: boolean;
   onJobTitleChange: (value: string) => void;
   onCompanyNameChange: (value: string) => void;
   onLocationChange: (value: string) => void;
   onRemoteChange: (value: boolean) => void;
   onJobDescriptionChange: (value: string) => void;
+  onAutoAddJobsChange: (value: boolean) => void;
   onSubmit: () => void;
 }
 
@@ -28,11 +30,13 @@ const JobForm = ({
   remote,
   jobDescription,
   isAnalyzing,
+  autoAddJobs,
   onJobTitleChange,
   onCompanyNameChange,
   onLocationChange,
   onRemoteChange,
   onJobDescriptionChange,
+  onAutoAddJobsChange,
   onSubmit
 }: JobFormProps) => {
   return (
@@ -68,7 +72,7 @@ const JobForm = ({
             onChange={(e) => onLocationChange(e.target.value)}
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <Switch
               id="remote"
@@ -76,6 +80,21 @@ const JobForm = ({
               onCheckedChange={onRemoteChange}
             />
             <Label htmlFor="remote">Remote Position</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="auto-add-jobs"
+              checked={autoAddJobs}
+              onCheckedChange={onAutoAddJobsChange}
+            />
+            <div className="space-y-0.5">
+              <Label htmlFor="auto-add-jobs" className="text-sm font-medium">
+                Auto-add to Job Tracker
+              </Label>
+              <p className="text-xs text-gray-500">
+                Automatically add this job to your tracker after analysis
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -10,6 +10,8 @@ import { analyzeJobDescription } from "./SkillAnalyzer";
 
 interface JobDescriptionAnalyzerProps {
   profile: Profile;
+  autoAddJobs: boolean;
+  onAutoAddJobsChange: (value: boolean) => void;
   onAnalysisComplete: (
     relevantSkills: string[],
     missingSkills: string[],
@@ -18,7 +20,13 @@ interface JobDescriptionAnalyzerProps {
   resetTrigger?: boolean;
 }
 
-const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete, resetTrigger }: JobDescriptionAnalyzerProps) => {
+const JobDescriptionAnalyzer = ({ 
+  profile, 
+  autoAddJobs, 
+  onAutoAddJobsChange, 
+  onAnalysisComplete, 
+  resetTrigger 
+}: JobDescriptionAnalyzerProps) => {
   const { toast } = useToast();
   const [jobTitle, setJobTitle] = useState("");
   const [companyName, setCompanyName] = useState("");
@@ -99,11 +107,13 @@ const JobDescriptionAnalyzer = ({ profile, onAnalysisComplete, resetTrigger }: J
           remote={remote}
           jobDescription={jobDescription}
           isAnalyzing={isAnalyzing}
+          autoAddJobs={autoAddJobs}
           onJobTitleChange={setJobTitle}
           onCompanyNameChange={setCompanyName}
           onLocationChange={setLocation}
           onRemoteChange={setRemote}
           onJobDescriptionChange={setJobDescription}
+          onAutoAddJobsChange={onAutoAddJobsChange}
           onSubmit={handleAnalyze}
         />
       </CardContent>

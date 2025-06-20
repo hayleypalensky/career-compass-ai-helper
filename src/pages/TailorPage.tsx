@@ -13,7 +13,6 @@ import { useJobTrackerSettings } from "@/hooks/useJobTrackerSettings";
 import { useAuth } from "@/context/AuthContext";
 import { createJob } from "@/services/jobService";
 import { Job } from "@/types/job";
-import JobTrackerSettings from "@/components/jobs/JobTrackerSettings";
 
 const TailorPage = () => {
   const { toast } = useToast();
@@ -212,13 +211,10 @@ const TailorPage = () => {
     <div className="space-y-8">
       <h1>Tailor Your Resume</h1>
       
-      <JobTrackerSettings
-        autoAddJobs={autoAddJobs}
-        onToggleAutoAdd={toggleAutoAddJobs}
-      />
-      
       <JobDescriptionAnalyzer 
         profile={profile} 
+        autoAddJobs={autoAddJobs}
+        onAutoAddJobsChange={toggleAutoAddJobs}
         onAnalysisComplete={handleAnalysisComplete} 
         resetTrigger={resetTrigger}
       />
