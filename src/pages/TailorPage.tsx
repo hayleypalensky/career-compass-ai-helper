@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import JobDescriptionAnalyzer from "@/components/job-description-analyzer/JobDescriptionAnalyzer";
@@ -10,9 +9,16 @@ import { Skill } from "@/components/SkillsForm";
 import ProfileNotFoundMessage from "@/components/resume-tailoring/ProfileNotFoundMessage";
 import IncompleteProfileCard from "@/components/resume-tailoring/IncompleteProfileCard";
 import TailorActionsRow from "@/components/resume-tailoring/TailorActionsRow";
+import { useJobTrackerSettings } from "@/hooks/useJobTrackerSettings";
+import { useAuth } from "@/context/AuthContext";
+import { createJob } from "@/services/jobService";
+import { Job } from "@/types/job";
 
 const TailorPage = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { autoAddJobs } = useJobTrackerSettings();
+  
   const [profile, setProfile] = useState<Profile | null>(null);
   const [relevantSkills, setRelevantSkills] = useState<string[]>([]);
   const [missingSkills, setMissingSkills] = useState<string[]>([]);
@@ -25,7 +31,6 @@ const TailorPage = () => {
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
   const [resetTrigger, setResetTrigger] = useState(false);
-  // This is the tailored summary used only for PDF export, separate from profile
   const [tailoredSummary, setTailoredSummary] = useState<string>("");
 
   // Load profile from localStorage
@@ -36,7 +41,6 @@ const TailorPage = () => {
         try {
           const parsedProfile = JSON.parse(savedProfile);
           setProfile(parsedProfile);
-          // Initialize tailored summary with profile summary as default
           setTailoredSummary(parsedProfile.personalInfo.summary || "");
         } catch (error) {
           console.error("Error parsing profile from localStorage:", error);
@@ -57,13 +61,11 @@ const TailorPage = () => {
 
     loadProfile();
 
-    // Listen for localStorage changes from other components
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "resumeProfile" && e.newValue) {
         try {
           const updatedProfile = JSON.parse(e.newValue);
           setProfile(updatedProfile);
-          // Reset tailored summary to new profile summary when profile changes
           setTailoredSummary(updatedProfile.personalInfo.summary || "");
         } catch (error) {
           console.error("Error parsing updated profile:", error);
@@ -78,7 +80,40 @@ const TailorPage = () => {
     };
   }, []);
 
-  const handleAnalysisComplete = (
+  // Auto-add job to tracker when analysis is complete
+  const autoAddToJobTracker = async (jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }) => {
+    if (!autoAddJobs || !user || !jobInfo.title || !jobInfo.company) {
+      return;
+    }
+
+    try {
+      const newJob: Job = {
+        id: crypto.randomUUID(),
+        title: jobInfo.title,
+        company: jobInfo.company,
+        location: jobInfo.location || "",
+        remote: jobInfo.remote || false,
+        description: jobInfo.description || "",
+        notes: "Added automatically from Tailor Resume page",
+        appliedDate: new Date().toISOString().split("T")[0],
+        status: "applied",
+        updatedAt: new Date().toISOString(),
+        attachments: [],
+      };
+
+      await createJob(user.id, newJob);
+      
+      toast({
+        title: "Job auto-added to tracker",
+        description: `"${jobInfo.title}" at "${jobInfo.company}" has been automatically added to your job tracker.`,
+      });
+    } catch (error) {
+      console.error("Error auto-adding job:", error);
+      // Don't show error toast for auto-add failures to avoid being disruptive
+    }
+  };
+
+  const handleAnalysisComplete = async (
     relevant: string[], 
     missing: string[], 
     jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }
@@ -91,20 +126,22 @@ const TailorPage = () => {
     setLocation(jobInfo.location || "");
     setRemote(jobInfo.remote || false);
     setJobDescription(jobInfo.description || "");
+    
+    // Auto-add to job tracker if enabled
+    await autoAddToJobTracker(jobInfo);
+    
     console.log('Job analysis complete:', { title: jobInfo.title, company: jobInfo.company, location: jobInfo.location, remote: jobInfo.remote });
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
     if (!profile) return;
 
-    // Update profile with tailored experiences and skills
     const updatedProfile = {
       ...profile,
       experiences: experiences,
       skills: skills,
     };
 
-    // Save to localStorage
     localStorage.setItem("resumeProfile", JSON.stringify(updatedProfile));
     setProfile(updatedProfile);
     setIsTailored(true);
@@ -115,40 +152,32 @@ const TailorPage = () => {
     });
   };
 
-  // Update selected color theme when it changes in TailorResume
   const handleColorThemeChange = (theme: string) => {
     setSelectedColorTheme(theme);
   };
 
-  // Handle summary changes in the tailor section (for PDF export only)
   const handleSummaryChange = (summary: string) => {
     setTailoredSummary(summary);
   };
 
-  // Handle reset for new job - clear all form fields and tailor section
   const handleResetForNewJob = () => {
-    // Clear job form fields
     setJobTitle("");
     setCompanyName("");
     setLocation("");
     setRemote(false);
     setJobDescription("");
     
-    // Clear analysis results
     setRelevantSkills([]);
     setMissingSkills([]);
     
-    // Hide tailor section
     setShowTailorSection(false);
     setIsTailored(false);
     
-    // Reset color theme and summary to profile defaults
     setSelectedColorTheme("purple");
     if (profile) {
       setTailoredSummary(profile.personalInfo.summary || "");
     }
     
-    // Trigger reset in JobDescriptionAnalyzer
     setResetTrigger(prev => !prev);
   };
 

@@ -27,13 +27,12 @@ const JobSearchBar = ({
   return (
     <div className="relative max-w-sm flex">
       <div className="relative flex-1">
-        <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
         <Input
           placeholder="Search jobs..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyPress={handleKeyPress}
-          className="pl-8 pr-8"
+          className="pr-8"
         />
         {hasActiveSearch && (
           <Button
