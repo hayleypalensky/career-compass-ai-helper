@@ -12,6 +12,7 @@ interface JobFormProps {
   location: string;
   remote: boolean;
   jobDescription: string;
+  notes: string;
   isAnalyzing: boolean;
   autoAddJobs: boolean;
   onJobTitleChange: (value: string) => void;
@@ -19,6 +20,7 @@ interface JobFormProps {
   onLocationChange: (value: string) => void;
   onRemoteChange: (value: boolean) => void;
   onJobDescriptionChange: (value: string) => void;
+  onNotesChange: (value: string) => void;
   onAutoAddJobsChange: (value: boolean) => void;
   onSubmit: () => void;
 }
@@ -29,6 +31,7 @@ const JobForm = ({
   location,
   remote,
   jobDescription,
+  notes,
   isAnalyzing,
   autoAddJobs,
   onJobTitleChange,
@@ -36,6 +39,7 @@ const JobForm = ({
   onLocationChange,
   onRemoteChange,
   onJobDescriptionChange,
+  onNotesChange,
   onAutoAddJobsChange,
   onSubmit
 }: JobFormProps) => {
@@ -109,6 +113,19 @@ const JobForm = ({
           onChange={(e) => onJobDescriptionChange(e.target.value)}
         />
       </div>
+
+      {autoAddJobs && (
+        <div className="space-y-2">
+          <Label htmlFor="notes">Notes (will be added to job tracker)</Label>
+          <Textarea
+            id="notes"
+            placeholder="Add any notes about this job application..."
+            rows={3}
+            value={notes}
+            onChange={(e) => onNotesChange(e.target.value)}
+          />
+        </div>
+      )}
       
       <Button
         onClick={onSubmit}

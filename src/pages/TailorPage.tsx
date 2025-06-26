@@ -28,6 +28,7 @@ const TailorPage = () => {
   const [location, setLocation] = useState<string>("");
   const [remote, setRemote] = useState<boolean>(false);
   const [jobDescription, setJobDescription] = useState<string>("");
+  const [jobNotes, setJobNotes] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
   const [resetTrigger, setResetTrigger] = useState(false);
@@ -81,7 +82,7 @@ const TailorPage = () => {
   }, []);
 
   // Auto-add job to tracker when analysis is complete
-  const autoAddToJobTracker = async (jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }) => {
+  const autoAddToJobTracker = async (jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string; notes?: string }) => {
     if (!autoAddJobs || !user || !jobInfo.title || !jobInfo.company) {
       return;
     }
@@ -94,7 +95,7 @@ const TailorPage = () => {
         location: jobInfo.location || "",
         remote: jobInfo.remote || false,
         description: jobInfo.description || "",
-        notes: "Added automatically from Tailor Resume page",
+        notes: jobInfo.notes || "Added automatically from Tailor Resume page",
         appliedDate: new Date().toISOString().split("T")[0],
         status: "applied",
         updatedAt: new Date().toISOString(),
@@ -116,7 +117,7 @@ const TailorPage = () => {
   const handleAnalysisComplete = async (
     relevant: string[], 
     missing: string[], 
-    jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }
+    jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string; notes?: string }
   ) => {
     setRelevantSkills(relevant);
     setMissingSkills(missing);
@@ -126,11 +127,12 @@ const TailorPage = () => {
     setLocation(jobInfo.location || "");
     setRemote(jobInfo.remote || false);
     setJobDescription(jobInfo.description || "");
+    setJobNotes(jobInfo.notes || "");
     
     // Auto-add to job tracker if enabled
     await autoAddToJobTracker(jobInfo);
     
-    console.log('Job analysis complete:', { title: jobInfo.title, company: jobInfo.company, location: jobInfo.location, remote: jobInfo.remote });
+    console.log('Job analysis complete:', { title: jobInfo.title, company: jobInfo.company, location: jobInfo.location, remote: jobInfo.remote, notes: jobInfo.notes });
   };
 
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
@@ -166,6 +168,7 @@ const TailorPage = () => {
     setLocation("");
     setRemote(false);
     setJobDescription("");
+    setJobNotes("");
     
     setRelevantSkills([]);
     setMissingSkills([]);

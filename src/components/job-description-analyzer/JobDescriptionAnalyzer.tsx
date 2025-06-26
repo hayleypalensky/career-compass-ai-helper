@@ -15,7 +15,7 @@ interface JobDescriptionAnalyzerProps {
   onAnalysisComplete: (
     relevantSkills: string[],
     missingSkills: string[],
-    jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string }
+    jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string; notes?: string }
   ) => void;
   resetTrigger?: boolean;
 }
@@ -33,6 +33,7 @@ const JobDescriptionAnalyzer = ({
   const [location, setLocation] = useState("");
   const [remote, setRemote] = useState(false);
   const [jobDescription, setJobDescription] = useState("");
+  const [notes, setNotes] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Reset form fields when resetTrigger changes
@@ -43,6 +44,7 @@ const JobDescriptionAnalyzer = ({
       setLocation("");
       setRemote(false);
       setJobDescription("");
+      setNotes("");
     }
   }, [resetTrigger]);
 
@@ -73,7 +75,8 @@ const JobDescriptionAnalyzer = ({
             company: companyName,
             location: location,
             remote: remote,
-            description: jobDescription 
+            description: jobDescription,
+            notes: notes 
           }
         );
         
@@ -106,6 +109,7 @@ const JobDescriptionAnalyzer = ({
           location={location}
           remote={remote}
           jobDescription={jobDescription}
+          notes={notes}
           isAnalyzing={isAnalyzing}
           autoAddJobs={autoAddJobs}
           onJobTitleChange={setJobTitle}
@@ -113,6 +117,7 @@ const JobDescriptionAnalyzer = ({
           onLocationChange={setLocation}
           onRemoteChange={setRemote}
           onJobDescriptionChange={setJobDescription}
+          onNotesChange={setNotes}
           onAutoAddJobsChange={onAutoAddJobsChange}
           onSubmit={handleAnalyze}
         />
