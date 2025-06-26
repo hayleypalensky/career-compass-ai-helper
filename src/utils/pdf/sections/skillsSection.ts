@@ -1,46 +1,81 @@
 
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { FONT_SIZES, SPACING } from "../constants";
+import { FONT_SIZES, SPACING, COLORS } from "../constants";
 
 export const renderSkills = (
   pdf: jsPDF,
   profile: Profile,
   leftMargin: number,
   contentWidth: number,
-  yPos: number,
-  themeColors: { heading: string; accent: string; border: string }
+  yPosition: number,
+  themeColors: { heading: string; accent: string; border: string },
+  scaleFactor: number = 1.0
 ): number => {
   if (!profile.skills || profile.skills.length === 0) {
-    return yPos;
+    return yPosition;
   }
   
-  let currentY = yPos;
+  let currentY = yPosition;
+  
+  // Scale font sizes and spacing
+  const headingSize = Math.round(FONT_SIZES.heading * scaleFactor);
+  const bodySize = Math.round(FONT_SIZES.body * scaleFactor);
+  const lineSpacing = SPACING.line * scaleFactor;
+  const subsectionSpacing = SPACING.subsection * scaleFactor;
   
   // Section heading
-  pdf.setFontSize(FONT_SIZES.heading);
+  pdf.setFontSize(headingSize);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text("SKILLS", leftMargin, currentY);
-  currentY += SPACING.line;
+  currentY += lineSpacing;
   
-  // Add line under heading
-  pdf.setDrawColor(themeColors.heading);
-  pdf.setLineWidth(0.01);
+  // Add underline
+  pdf.setDrawColor(themeColors.border);
+  pdf.setLineWidth(0.5);
   pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
-  currentY += SPACING.line * 1.5;
+  currentY += subsectionSpacing;
   
-  // Skills list
-  pdf.setFontSize(FONT_SIZES.body);
-  pdf.setFont("helvetica", "normal");
-  pdf.setTextColor("#000000"); // Keep content black for readability
+  // Group skills by category
+  const skillsByCategory = profile.skills.reduce((acc, skill) => {
+    const category = skill.category || 'General';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(skill.name);
+    return acc;
+  }, {} as Record<string, string[]>);
   
-  const skillNames = profile.skills.map(skill => skill.name);
-  const skillsText = skillNames.join(", ");
-  const skillsLines = pdf.splitTextToSize(skillsText, contentWidth);
-  
-  pdf.text(skillsLines, leftMargin, currentY);
-  currentY += skillsLines.length * SPACING.line;
+  // Render skills by category with adaptive layout
+  Object.entries(skillsByCategory).forEach(([category, skills], categoryIndex) => {
+    if (categoryIndex > 0) {
+      currentY += subsectionSpacing * 0.7;
+    }
+    
+    // Category name (if there are multiple categories)
+    const hasMultipleCategories = Object.keys(skillsByCategory).length > 1;
+    if (hasMultipleCategories && category !== 'General') {
+      pdf.setFontSize(Math.round(FONT_SIZES.subheading * scaleFactor));
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(COLORS.black);
+      pdf.text(`${category}:`, leftMargin, currentY);
+      currentY += lineSpacing;
+    }
+    
+    // Skills as comma-separated text (more compact for PDF)
+    pdf.setFontSize(bodySize);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(COLORS.black);
+    
+    const skillsText = skills.join(", ");
+    const wrappedSkills = pdf.splitTextToSize(skillsText, contentWidth);
+    
+    wrappedSkills.forEach((line: string) => {
+      pdf.text(line, leftMargin, currentY);
+      currentY += lineSpacing * 0.9; // Slightly tighter spacing for skills
+    });
+  });
   
   return currentY;
 };

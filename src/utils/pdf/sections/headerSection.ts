@@ -1,65 +1,49 @@
 
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { FONT_SIZES, SPACING } from "../constants";
+import { FONT_SIZES, SPACING, COLORS } from "../constants";
 
 export const renderHeader = (
   pdf: jsPDF,
   profile: Profile,
   leftMargin: number,
   contentWidth: number,
-  yPos: number,
-  themeColors: { heading: string; accent: string; border: string }
+  yPosition: number,
+  themeColors: { heading: string; accent: string; border: string },
+  scaleFactor: number = 1.0
 ): number => {
-  let currentY = yPos;
+  let currentY = yPosition;
+  const { personalInfo } = profile;
+  
+  // Scale font sizes
+  const nameSize = Math.round(FONT_SIZES.name * scaleFactor);
+  const bodySize = Math.round(FONT_SIZES.body * scaleFactor);
+  const lineSpacing = SPACING.line * scaleFactor;
   
   // Name
-  pdf.setFontSize(FONT_SIZES.name);
-  pdf.setFont("helvetica", "bold");
-  pdf.setTextColor(themeColors.heading);
-  pdf.text(profile.personalInfo.name || "Resume", leftMargin, currentY);
-  currentY += SPACING.line * 2;
+  if (personalInfo.name) {
+    pdf.setFontSize(nameSize);
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(COLORS.black);
+    pdf.text(personalInfo.name, leftMargin, currentY);
+    currentY += lineSpacing * 1.5;
+  }
   
-  // Contact information
-  pdf.setFontSize(FONT_SIZES.body);
-  pdf.setFont("helvetica", "normal");
-  pdf.setTextColor("#000000"); // Keep contact info black for readability
-  
+  // Contact information line
   const contactInfo = [];
-  if (profile.personalInfo.email) contactInfo.push(profile.personalInfo.email);
-  if (profile.personalInfo.phone) contactInfo.push(profile.personalInfo.phone);
-  if (profile.personalInfo.location) contactInfo.push(profile.personalInfo.location);
-  if (profile.personalInfo.website) contactInfo.push(profile.personalInfo.website);
+  if (personalInfo.email) contactInfo.push(personalInfo.email);
+  if (personalInfo.phone) contactInfo.push(personalInfo.phone);
+  if (personalInfo.location) contactInfo.push(personalInfo.location);
+  if (personalInfo.linkedin) contactInfo.push(personalInfo.linkedin);
+  if (personalInfo.website) contactInfo.push(personalInfo.website);
   
   if (contactInfo.length > 0) {
-    const contactLine = contactInfo.join(" | ");
-    pdf.text(contactLine, leftMargin, currentY);
-    currentY += SPACING.line;
-  }
-  
-  // Professional Summary
-  if (profile.personalInfo.summary) {
-    currentY += SPACING.section; // Add consistent spacing before summary section
-    
-    pdf.setFontSize(FONT_SIZES.heading);
-    pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(themeColors.heading);
-    pdf.text("PROFESSIONAL SUMMARY", leftMargin, currentY);
-    currentY += SPACING.line;
-    
-    // Add line under heading
-    pdf.setDrawColor(themeColors.heading);
-    pdf.setLineWidth(0.01);
-    pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
-    currentY += SPACING.line;
-    
-    pdf.setFontSize(FONT_SIZES.body);
+    pdf.setFontSize(bodySize);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor("#000000"); // Keep body text black for readability
-    const summaryLines = pdf.splitTextToSize(profile.personalInfo.summary, contentWidth);
-    pdf.text(summaryLines, leftMargin, currentY);
-    currentY += summaryLines.length * SPACING.line;
+    pdf.setTextColor(COLORS.gray);
+    pdf.text(contactInfo.join(" • "), leftMargin, currentY);
+    currentY += lineSpacing * 1.2;
   }
   
-  return currentY;
+  return currentY + (SPACING.subsection * scaleFactor);
 };

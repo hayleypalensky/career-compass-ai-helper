@@ -1,81 +1,103 @@
 
-import { jsPDF } from "jspdf";
+import jsPDF from "jspdf";
 import { Profile } from "@/types/profile";
-import { FONT_SIZES, SPACING, BULLET_CHAR } from "../constants";
-import { formatDate } from "../helpers";
+import { FONT_SIZES, SPACING, COLORS, BULLET_CHAR } from "../constants";
 
 export const renderExperience = (
   pdf: jsPDF,
   profile: Profile,
   leftMargin: number,
   contentWidth: number,
-  yPos: number,
-  themeColors: { heading: string; accent: string; border: string }
+  yPosition: number,
+  themeColors: { heading: string; accent: string; border: string },
+  scaleFactor: number = 1.0
 ): number => {
   if (!profile.experiences || profile.experiences.length === 0) {
-    return yPos;
+    return yPosition;
   }
   
-  let currentY = yPos;
+  let currentY = yPosition;
+  
+  // Scale font sizes and spacing
+  const headingSize = Math.round(FONT_SIZES.heading * scaleFactor);
+  const subheadingSize = Math.round(FONT_SIZES.subheading * scaleFactor);
+  const bodySize = Math.round(FONT_SIZES.body * scaleFactor);
+  const lineSpacing = SPACING.line * scaleFactor;
+  const subsectionSpacing = SPACING.subsection * scaleFactor;
+  const bulletSpacing = SPACING.bullet * scaleFactor;
   
   // Section heading
-  pdf.setFontSize(FONT_SIZES.heading);
+  pdf.setFontSize(headingSize);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text("EXPERIENCE", leftMargin, currentY);
-  currentY += SPACING.line;
+  currentY += lineSpacing;
   
-  // Add line under heading
-  pdf.setDrawColor(themeColors.heading);
-  pdf.setLineWidth(0.01);
+  // Add underline
+  pdf.setDrawColor(themeColors.border);
+  pdf.setLineWidth(0.5);
   pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
-  currentY += SPACING.line * 1.5;
+  currentY += subsectionSpacing;
   
   // Experience entries
-  for (const exp of profile.experiences) {
+  profile.experiences.forEach((exp, index) => {
+    if (index > 0) {
+      currentY += subsectionSpacing;
+    }
+    
     // Job title
-    pdf.setFontSize(FONT_SIZES.subheading);
+    pdf.setFontSize(subheadingSize);
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor("#000000"); // Keep content black for readability
-    pdf.text(exp.title, leftMargin, currentY);
-    currentY += SPACING.line * 1.5; // Further increased spacing between title and company
+    pdf.setTextColor(COLORS.black);
+    pdf.text(exp.title || "", leftMargin, currentY);
+    currentY += lineSpacing;
     
     // Company and dates
-    pdf.setFontSize(FONT_SIZES.body);
+    pdf.setFontSize(bodySize);
     pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(COLORS.gray);
     
-    const companyText = exp.company + (exp.location ? `, ${exp.location}` : '');
-    const dateText = `${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`;
+    const companyLine = [];
+    if (exp.company) companyLine.push(exp.company);
+    if (exp.startDate || exp.endDate) {
+      const dateRange = `${exp.startDate || ''} - ${exp.endDate || 'Present'}`;
+      companyLine.push(dateRange);
+    }
     
-    pdf.text(companyText, leftMargin, currentY);
-    
-    // Right-align dates
-    const dateWidth = pdf.getTextWidth(dateText);
-    pdf.text(dateText, leftMargin + contentWidth - dateWidth, currentY);
-    currentY += SPACING.line * 1.2; // Add slight extra spacing before bullets
+    if (companyLine.length > 0) {
+      pdf.text(companyLine.join(" • "), leftMargin, currentY);
+      currentY += lineSpacing;
+    }
     
     // Bullet points
     if (exp.bullets && exp.bullets.length > 0) {
-      pdf.setFontSize(FONT_SIZES.body);
-      const bulletIndent = 0.15; // Indent for bullets
+      currentY += bulletSpacing;
       
-      for (const bullet of exp.bullets) {
+      exp.bullets.forEach((bullet) => {
         if (bullet.trim()) {
-          // Add bullet character
-          pdf.text(BULLET_CHAR, leftMargin + bulletIndent, currentY);
+          pdf.setFontSize(bodySize);
+          pdf.setFont("helvetica", "normal");
+          pdf.setTextColor(COLORS.black);
           
-          // Wrap bullet text
-          const bulletLines = pdf.splitTextToSize(bullet, contentWidth - bulletIndent - 0.1);
-          pdf.text(bulletLines, leftMargin + bulletIndent + 0.1, currentY);
+          // Add bullet point
+          pdf.text(BULLET_CHAR, leftMargin + 0.1, currentY);
           
-          // Use proper line spacing for multi-line bullets
-          currentY += bulletLines.length * SPACING.line * 1.3; // Increased line spacing multiplier
+          // Wrap text for bullet points with scaled width
+          const bulletText = bullet.trim();
+          const maxBulletWidth = contentWidth - 0.3; // Account for bullet indent
+          const wrappedLines = pdf.splitTextToSize(bulletText, maxBulletWidth);
+          
+          wrappedLines.forEach((line: string, lineIndex: number) => {
+            const xOffset = lineIndex === 0 ? 0.2 : 0.2; // Indent wrapped lines
+            pdf.text(line, leftMargin + xOffset, currentY);
+            currentY += lineSpacing * 0.9; // Slightly tighter line spacing for bullets
+          });
+          
+          currentY += bulletSpacing * 0.5;
         }
-      }
+      });
     }
-    
-    currentY += SPACING.subsection;
-  }
+  });
   
   return currentY;
 };
