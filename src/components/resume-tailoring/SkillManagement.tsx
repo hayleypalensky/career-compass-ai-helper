@@ -78,6 +78,9 @@ const SkillManagement = ({
     }
   };
 
+  // Filter skillsToAdd to show only custom skills (not from missing skills)
+  const customSkillsAdded = skillsToAdd.filter(skill => !missingSkills.includes(skill));
+
   return (
     <Card>
       <CardHeader>
@@ -159,6 +162,25 @@ const SkillManagement = ({
               <p className="text-xs text-gray-500 mt-1">
                 Add skills that are relevant to the job but weren't detected in the analysis.
               </p>
+
+              {/* Show custom skills that have been added */}
+              {customSkillsAdded.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs font-medium text-green-700 mb-2">Custom Skills Added:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {customSkillsAdded.map((skill, index) => (
+                      <Badge 
+                        key={index}
+                        className="bg-green-100 text-green-800 cursor-pointer hover:bg-green-200"
+                        onClick={() => onToggleSkillToAdd(skill)}
+                      >
+                        {skill}
+                        <X className="ml-1 h-3 w-3" />
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </TabsContent>
 
