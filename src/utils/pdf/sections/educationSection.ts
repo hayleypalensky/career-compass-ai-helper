@@ -1,89 +1,90 @@
 
-import jsPDF from "jspdf";
+import { jsPDF } from "jspdf";
 import { Profile } from "@/types/profile";
-import { FONT_SIZES, SPACING, COLORS } from "../constants";
+import { FONT_SIZES, SPACING } from "../constants";
+import { formatDate as formatDateFromUtils } from "@/utils/resumeFormatters";
 
 export const renderEducation = (
   pdf: jsPDF,
   profile: Profile,
   leftMargin: number,
   contentWidth: number,
-  yPosition: number,
-  themeColors: { heading: string; accent: string; border: string },
-  scaleFactor: number = 1.0
+  yPos: number,
+  themeColors: { heading: string; accent: string; border: string }
 ): number => {
   if (!profile.education || profile.education.length === 0) {
-    return yPosition;
+    return yPos;
   }
   
-  let currentY = yPosition;
-  
-  // Scale font sizes and spacing
-  const headingSize = Math.round(FONT_SIZES.heading * scaleFactor);
-  const subheadingSize = Math.round(FONT_SIZES.subheading * scaleFactor);
-  const bodySize = Math.round(FONT_SIZES.body * scaleFactor);
-  const lineSpacing = SPACING.line * scaleFactor;
-  const subsectionSpacing = SPACING.subsection * scaleFactor;
+  let currentY = yPos;
   
   // Section heading
-  pdf.setFontSize(headingSize);
+  pdf.setFontSize(FONT_SIZES.heading);
   pdf.setFont("helvetica", "bold");
   pdf.setTextColor(themeColors.heading);
   pdf.text("EDUCATION", leftMargin, currentY);
-  currentY += lineSpacing;
+  currentY += SPACING.line;
   
-  // Add underline
-  pdf.setDrawColor(themeColors.border);
-  pdf.setLineWidth(0.5);
+  // Add line under heading
+  pdf.setDrawColor(themeColors.heading);
+  pdf.setLineWidth(0.01);
   pdf.line(leftMargin, currentY, leftMargin + contentWidth, currentY);
-  currentY += subsectionSpacing;
+  currentY += SPACING.line * 1.5;
+  
+  // Sort education by date (most recent first)
+  const sortedEducation = [...profile.education].sort((a, b) => {
+    const dateA = a.endDate || a.startDate;
+    const dateB = b.endDate || b.startDate;
+    return new Date(dateB).getTime() - new Date(dateA).getTime();
+  });
   
   // Education entries
-  profile.education.forEach((edu, index) => {
-    if (index > 0) {
-      currentY += subsectionSpacing * 0.8;
-    }
+  for (let i = 0; i < sortedEducation.length; i++) {
+    const edu = sortedEducation[i];
     
     // Degree and field
-    pdf.setFontSize(subheadingSize);
+    pdf.setFontSize(FONT_SIZES.subheading);
     pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(COLORS.black);
+    pdf.setTextColor("#000000"); // Keep content black for readability
+    pdf.text(`${edu.degree} in ${edu.field}`, leftMargin, currentY);
+    currentY += SPACING.line * 1.5; // Match experience section spacing
     
-    const degreeText = `${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`;
-    pdf.text(degreeText, leftMargin, currentY);
-    currentY += lineSpacing;
-    
-    // School and date
-    pdf.setFontSize(bodySize);
+    // School and dates
+    pdf.setFontSize(FONT_SIZES.body);
     pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(COLORS.gray);
     
-    const schoolLine = [];
-    if (edu.school) schoolLine.push(edu.school);
-    if (edu.endDate) {
-      const dateText = edu.startDate ? `${edu.startDate} - ${edu.endDate}` : edu.endDate;
-      schoolLine.push(dateText);
-    } else if (edu.startDate) {
-      schoolLine.push(`${edu.startDate} - Present`);
+    const schoolText = edu.school + ('location' in edu && edu.location ? `, ${edu.location}` : '');
+    
+    // Format dates using the same formatter as the resume components
+    let dateText;
+    if (edu.endDate && edu.endDate.toLowerCase() !== 'present') {
+      dateText = `${formatDateFromUtils(edu.startDate)} - ${formatDateFromUtils(edu.endDate)}`;
+    } else {
+      dateText = `${formatDateFromUtils(edu.startDate)} - Present`;
     }
     
-    if (schoolLine.length > 0) {
-      pdf.text(schoolLine.join(" • "), leftMargin, currentY);
-      currentY += lineSpacing;
-    }
+    pdf.text(schoolText, leftMargin, currentY);
     
-    // Description if provided
+    // Right-align dates
+    const dateWidth = pdf.getTextWidth(dateText);
+    pdf.text(dateText, leftMargin + contentWidth - dateWidth, currentY);
+    currentY += SPACING.line;
+    
+    // Description if available
     if (edu.description) {
-      pdf.setFontSize(bodySize);
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(COLORS.black);
-      const wrappedDescription = pdf.splitTextToSize(edu.description, contentWidth);
-      wrappedDescription.forEach((line: string) => {
-        pdf.text(line, leftMargin, currentY);
-        currentY += lineSpacing * 0.9;
-      });
+      pdf.setFontSize(FONT_SIZES.small);
+      pdf.setTextColor("#666666");
+      const descLines = pdf.splitTextToSize(edu.description, contentWidth);
+      pdf.text(descLines, leftMargin, currentY);
+      currentY += descLines.length * SPACING.line;
+      pdf.setTextColor("#000000");
     }
-  });
+    
+    // Add spacing between education entries (but not after the last one)
+    if (i < sortedEducation.length - 1) {
+      currentY += SPACING.subsection;
+    }
+  }
   
   return currentY;
 };
