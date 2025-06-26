@@ -34,7 +34,6 @@ export const renderHeader = (
   if (personalInfo.email) contactInfo.push(personalInfo.email);
   if (personalInfo.phone) contactInfo.push(personalInfo.phone);
   if (personalInfo.location) contactInfo.push(personalInfo.location);
-  if (personalInfo.linkedin) contactInfo.push(personalInfo.linkedin);
   if (personalInfo.website) contactInfo.push(personalInfo.website);
   
   if (contactInfo.length > 0) {

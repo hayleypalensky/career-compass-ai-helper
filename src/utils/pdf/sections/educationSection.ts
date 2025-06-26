@@ -44,33 +44,44 @@ export const renderEducation = (
       currentY += subsectionSpacing * 0.8;
     }
     
-    // Degree and institution
+    // Degree and field
     pdf.setFontSize(subheadingSize);
     pdf.setFont("helvetica", "bold");
     pdf.setTextColor(COLORS.black);
     
-    const degreeText = `${edu.degree}${edu.major ? ` in ${edu.major}` : ''}`;
+    const degreeText = `${edu.degree}${edu.field ? ` in ${edu.field}` : ''}`;
     pdf.text(degreeText, leftMargin, currentY);
     currentY += lineSpacing;
     
-    // Institution and date
+    // School and date
     pdf.setFontSize(bodySize);
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(COLORS.gray);
     
-    const institutionLine = [];
-    if (edu.institution) institutionLine.push(edu.institution);
-    if (edu.graduationDate) institutionLine.push(edu.graduationDate);
+    const schoolLine = [];
+    if (edu.school) schoolLine.push(edu.school);
+    if (edu.endDate) {
+      const dateText = edu.startDate ? `${edu.startDate} - ${edu.endDate}` : edu.endDate;
+      schoolLine.push(dateText);
+    } else if (edu.startDate) {
+      schoolLine.push(`${edu.startDate} - Present`);
+    }
     
-    if (institutionLine.length > 0) {
-      pdf.text(institutionLine.join(" • "), leftMargin, currentY);
+    if (schoolLine.length > 0) {
+      pdf.text(schoolLine.join(" • "), leftMargin, currentY);
       currentY += lineSpacing;
     }
     
-    // GPA if provided
-    if (edu.gpa) {
-      pdf.text(`GPA: ${edu.gpa}`, leftMargin, currentY);
-      currentY += lineSpacing;
+    // Description if provided
+    if (edu.description) {
+      pdf.setFontSize(bodySize);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(COLORS.black);
+      const wrappedDescription = pdf.splitTextToSize(edu.description, contentWidth);
+      wrappedDescription.forEach((line: string) => {
+        pdf.text(line, leftMargin, currentY);
+        currentY += lineSpacing * 0.9;
+      });
     }
   });
   
