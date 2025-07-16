@@ -119,6 +119,40 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     });
   };
 
+  // Move a bullet point up
+  const moveBulletUp = (expIndex: number, bulletIndex: number) => {
+    if (bulletIndex > 0) {
+      setTailoredExperiences((prevExperiences) => {
+        const newExperiences = [...prevExperiences];
+        if (newExperiences[expIndex]) {
+          const newBullets = [...newExperiences[expIndex].bullets];
+          [newBullets[bulletIndex - 1], newBullets[bulletIndex]] = [newBullets[bulletIndex], newBullets[bulletIndex - 1]];
+          newExperiences[expIndex] = {
+            ...newExperiences[expIndex],
+            bullets: newBullets,
+          };
+        }
+        return newExperiences;
+      });
+    }
+  };
+
+  // Move a bullet point down
+  const moveBulletDown = (expIndex: number, bulletIndex: number) => {
+    setTailoredExperiences((prevExperiences) => {
+      const newExperiences = [...prevExperiences];
+      if (newExperiences[expIndex] && bulletIndex < newExperiences[expIndex].bullets.length - 1) {
+        const newBullets = [...newExperiences[expIndex].bullets];
+        [newBullets[bulletIndex], newBullets[bulletIndex + 1]] = [newBullets[bulletIndex + 1], newBullets[bulletIndex]];
+        newExperiences[expIndex] = {
+          ...newExperiences[expIndex],
+          bullets: newBullets,
+        };
+      }
+      return newExperiences;
+    });
+  };
+
   // Reset experiences to original profile state
   const resetExperiences = () => {
     if (profile.experiences && Array.isArray(profile.experiences)) {
@@ -135,6 +169,8 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     handleBulletChange,
     addBullet,
     removeBullet,
+    moveBulletUp,
+    moveBulletDown,
     resetExperiences,
   };
 };

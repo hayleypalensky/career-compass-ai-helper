@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, Pencil, RotateCw, Plus, RefreshCw } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { X, MessageSquare, Pencil, RotateCw, Plus, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ExperienceBulletPointProps {
   bullet: string;
@@ -11,8 +11,11 @@ interface ExperienceBulletPointProps {
   expIndex: number;
   onBulletChange: (expIndex: number, bulletIndex: number, value: string) => void;
   onRemoveBullet: (expIndex: number, bulletIndex: number) => void;
+  onMoveBulletUp: (expIndex: number, bulletIndex: number) => void;
+  onMoveBulletDown: (expIndex: number, bulletIndex: number) => void;
   generateSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription?: string;
+  totalBullets: number;
 }
 
 const ExperienceBulletPoint = ({
@@ -21,8 +24,11 @@ const ExperienceBulletPoint = ({
   expIndex,
   onBulletChange,
   onRemoveBullet,
+  onMoveBulletUp,
+  onMoveBulletDown,
   generateSuggestions,
   jobDescription = "",
+  totalBullets,
 }: ExperienceBulletPointProps) => {
   const { toast } = useToast();
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -103,6 +109,28 @@ const ExperienceBulletPoint = ({
   return (
     <div className="space-y-2">
       <div className="flex gap-2">
+        <div className="flex flex-col">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onMoveBulletUp(expIndex, bulletIndex)}
+            disabled={bulletIndex === 0}
+            className="h-6 px-2"
+          >
+            <ChevronUp className="h-3 w-3" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => onMoveBulletDown(expIndex, bulletIndex)}
+            disabled={bulletIndex === totalBullets - 1}
+            className="h-6 px-2"
+          >
+            <ChevronDown className="h-3 w-3" />
+          </Button>
+        </div>
         <Textarea
           value={bullet}
           onChange={(e) => onBulletChange(expIndex, bulletIndex, e.target.value)}

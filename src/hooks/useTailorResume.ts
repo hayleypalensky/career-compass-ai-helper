@@ -2,7 +2,7 @@
 import { Profile } from '@/types/profile';
 import { Experience } from '@/components/ExperienceForm';
 import { Skill } from '@/components/SkillsForm';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useTailorResumeExperiences } from './useTailorResumeExperiences';
 import { useTailorResumeSkills } from './useTailorResumeSkills';
 import { useTailorResumeUI } from './useTailorResumeUI';
@@ -87,6 +87,8 @@ export const useTailorResume = ({
     handleBulletChange: experienceHook.handleBulletChange,
     addBullet: experienceHook.addBullet,
     removeBullet: experienceHook.removeBullet,
+    moveBulletUp: experienceHook.moveBulletUp,
+    moveBulletDown: experienceHook.moveBulletDown,
     handleExperienceSelectionChange: experienceHook.handleExperienceSelectionChange,
     
     // Skills management

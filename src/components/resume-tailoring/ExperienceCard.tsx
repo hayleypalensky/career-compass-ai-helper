@@ -5,7 +5,7 @@ import { Experience } from "@/components/ExperienceForm";
 import ExperienceBulletPoint from "./ExperienceBulletPoint";
 import { PlusCircle, Plus, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { generateNewBulletSuggestions } from "./BulletSuggestionGenerator";
 
 interface ExperienceCardProps {
@@ -14,6 +14,8 @@ interface ExperienceCardProps {
   onBulletChange: (expIndex: number, bulletIndex: number, value: string) => void;
   onRemoveBullet: (expIndex: number, bulletIndex: number) => void;
   onAddBullet: (expIndex: number) => void;
+  onMoveBulletUp: (expIndex: number, bulletIndex: number) => void;
+  onMoveBulletDown: (expIndex: number, bulletIndex: number) => void;
   generateBulletSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription: string;
   relevantSkills: string[];
@@ -25,6 +27,8 @@ const ExperienceCard = ({
   onBulletChange,
   onRemoveBullet,
   onAddBullet,
+  onMoveBulletUp,
+  onMoveBulletDown,
   generateBulletSuggestions,
   jobDescription,
   relevantSkills,
@@ -129,8 +133,11 @@ const ExperienceCard = ({
             expIndex={expIndex}
             onBulletChange={onBulletChange}
             onRemoveBullet={onRemoveBullet}
+            onMoveBulletUp={onMoveBulletUp}
+            onMoveBulletDown={onMoveBulletDown}
             generateSuggestions={generateBulletSuggestions}
             jobDescription={jobDescription}
+            totalBullets={experience.bullets.length}
           />
         ))}
         <div className="flex flex-wrap gap-2">
