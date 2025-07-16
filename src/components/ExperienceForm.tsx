@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
-import { X } from "lucide-react";
+import { X, ChevronUp, ChevronDown } from "lucide-react";
 
 export interface Experience {
   id: string;
@@ -67,6 +67,27 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
     setCurrentExperience((prev) => {
       const newBullets = prev.bullets.filter((_, i) => i !== index);
       return { ...prev, bullets: newBullets.length ? newBullets : [""] };
+    });
+  };
+
+  const moveBulletUp = (index: number) => {
+    if (index > 0) {
+      setCurrentExperience((prev) => {
+        const newBullets = [...prev.bullets];
+        [newBullets[index - 1], newBullets[index]] = [newBullets[index], newBullets[index - 1]];
+        return { ...prev, bullets: newBullets };
+      });
+    }
+  };
+
+  const moveBulletDown = (index: number) => {
+    setCurrentExperience((prev) => {
+      if (index < prev.bullets.length - 1) {
+        const newBullets = [...prev.bullets];
+        [newBullets[index], newBullets[index + 1]] = [newBullets[index + 1], newBullets[index]];
+        return { ...prev, bullets: newBullets };
+      }
+      return prev;
     });
   };
 
@@ -220,10 +241,33 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
               <Label>Bullet Points (Achievements & Responsibilities)</Label>
               {currentExperience.bullets.map((bullet, index) => (
                 <div key={index} className="flex items-center gap-2">
+                  <div className="flex flex-col">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => moveBulletUp(index)}
+                      disabled={index === 0}
+                      className="h-6 px-2"
+                    >
+                      <ChevronUp className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => moveBulletDown(index)}
+                      disabled={index === currentExperience.bullets.length - 1}
+                      className="h-6 px-2"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  </div>
                   <Input
                     value={bullet}
                     onChange={(e) => handleBulletChange(index, e.target.value)}
                     placeholder="Describe an achievement or responsibility"
+                    className="flex-1"
                   />
                   <Button
                     type="button"
