@@ -87,6 +87,40 @@ const TailorResume = ({
     }
   };
 
+  // Handle syncing bullet changes back to profile
+  const handleSyncToProfile = (experienceId: string, bulletIndex: number | null, newBullet: string) => {
+    // Create updated experiences array
+    const updatedExperiences = profile.experiences.map(exp => {
+      if (exp.id === experienceId) {
+        if (bulletIndex === null) {
+          // Add new bullet
+          return {
+            ...exp,
+            bullets: [...exp.bullets, newBullet]
+          };
+        } else {
+          // Replace existing bullet
+          const updatedBullets = [...exp.bullets];
+          updatedBullets[bulletIndex] = newBullet;
+          return {
+            ...exp,
+            bullets: updatedBullets
+          };
+        }
+      }
+      return exp;
+    });
+
+    // Update the profile with new experiences
+    const updatedProfile = {
+      ...profile,
+      experiences: updatedExperiences
+    };
+
+    // Call the onUpdateResume callback to persist changes
+    onUpdateResume(updatedExperiences, profile.skills);
+  };
+
   return (
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
@@ -129,6 +163,8 @@ const TailorResume = ({
         generateBulletSuggestions={generateBulletSuggestions}
         jobDescription={jobDescription}
         relevantSkills={relevantSkills}
+        profile={profile}
+        onSyncToProfile={handleSyncToProfile}
       />
 
       <ResumePreview 

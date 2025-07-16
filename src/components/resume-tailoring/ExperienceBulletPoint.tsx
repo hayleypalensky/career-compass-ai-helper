@@ -2,8 +2,10 @@
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { X, MessageSquare, Pencil, RotateCw, Plus, RefreshCw, ChevronUp, ChevronDown } from "lucide-react";
+import { X, MessageSquare, Pencil, RotateCw, Plus, RefreshCw, ChevronUp, ChevronDown, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Profile } from "@/types/profile";
+import BulletSyncOptions from "./BulletSyncOptions";
 
 interface ExperienceBulletPointProps {
   bullet: string;
@@ -16,6 +18,8 @@ interface ExperienceBulletPointProps {
   generateSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription?: string;
   totalBullets: number;
+  profile: Profile;
+  onSyncToProfile: (experienceId: string, bulletIndex: number | null, newBullet: string) => void;
 }
 
 const ExperienceBulletPoint = ({
@@ -29,11 +33,14 @@ const ExperienceBulletPoint = ({
   generateSuggestions,
   jobDescription = "",
   totalBullets,
+  profile,
+  onSyncToProfile,
 }: ExperienceBulletPointProps) => {
   const { toast } = useToast();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showSyncOptions, setShowSyncOptions] = useState(false);
 
   const generateBulletSuggestions = async () => {
     if (!jobDescription.trim()) {
@@ -151,6 +158,14 @@ const ExperienceBulletPoint = ({
             </div>
           </Button>
           <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => setShowSyncOptions(!showSyncOptions)}
+            title="Sync to profile"
+          >
+            <Save className="h-4 w-4" />
+          </Button>
+          <Button
             variant="destructive"
             size="icon"
             onClick={() => onRemoveBullet(expIndex, bulletIndex)}
@@ -160,6 +175,16 @@ const ExperienceBulletPoint = ({
           </Button>
         </div>
       </div>
+      
+      {/* Sync Options */}
+      {showSyncOptions && (
+        <BulletSyncOptions
+          bullet={bullet}
+          profile={profile}
+          onSyncToProfile={onSyncToProfile}
+          onClose={() => setShowSyncOptions(false)}
+        />
+      )}
       
       {/* AI Suggestions panel */}
       {showSuggestions && (

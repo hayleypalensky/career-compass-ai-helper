@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Experience } from "@/components/ExperienceForm";
+import { Profile } from "@/types/profile";
 import ExperienceBulletPoint from "./ExperienceBulletPoint";
 import { PlusCircle, Plus, RefreshCw } from "lucide-react";
 import { useState } from "react";
@@ -19,6 +20,8 @@ interface ExperienceCardProps {
   generateBulletSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription: string;
   relevantSkills: string[];
+  profile: Profile;
+  onSyncToProfile: (experienceId: string, bulletIndex: number | null, newBullet: string) => void;
 }
 
 const ExperienceCard = ({
@@ -32,6 +35,8 @@ const ExperienceCard = ({
   generateBulletSuggestions,
   jobDescription,
   relevantSkills,
+  profile,
+  onSyncToProfile,
 }: ExperienceCardProps) => {
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState(false);
@@ -138,6 +143,8 @@ const ExperienceCard = ({
             generateSuggestions={generateBulletSuggestions}
             jobDescription={jobDescription}
             totalBullets={experience.bullets.length}
+            profile={profile}
+            onSyncToProfile={onSyncToProfile}
           />
         ))}
         <div className="flex flex-wrap gap-2">

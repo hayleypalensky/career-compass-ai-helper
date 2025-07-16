@@ -1,6 +1,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Experience } from "@/components/ExperienceForm";
+import { Profile } from "@/types/profile";
 import ExperienceCard from "./ExperienceCard";
 
 interface ExperienceEditorProps {
@@ -13,6 +14,8 @@ interface ExperienceEditorProps {
   generateBulletSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription?: string;
   relevantSkills: string[];
+  profile: Profile;
+  onSyncToProfile: (experienceId: string, bulletIndex: number | null, newBullet: string) => void;
 }
 
 const ExperienceEditor = ({
@@ -25,6 +28,8 @@ const ExperienceEditor = ({
   generateBulletSuggestions,
   jobDescription = "",
   relevantSkills = [],
+  profile,
+  onSyncToProfile,
 }: ExperienceEditorProps) => {
   return (
     <Card>
@@ -46,6 +51,8 @@ const ExperienceEditor = ({
               generateBulletSuggestions={generateBulletSuggestions}
               jobDescription={jobDescription}
               relevantSkills={relevantSkills}
+              profile={profile}
+              onSyncToProfile={onSyncToProfile}
             />
           ))}
         </div>
