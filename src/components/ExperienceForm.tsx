@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
@@ -36,14 +36,13 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
     location: "",
     startDate: "",
     endDate: "",
-    description: "",
     bullets: [""],
     excludeFromResume: false,
   });
   const [editing, setEditing] = useState<number | null>(null);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setCurrentExperience((prev) => ({ ...prev, [name]: value }));
@@ -96,7 +95,6 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
       location: "",
       startDate: "",
       endDate: "",
-      description: "",
       bullets: [""],
       excludeFromResume: false,
     });
@@ -126,7 +124,6 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
         location: "",
         startDate: "",
         endDate: "",
-        description: "",
         bullets: [""],
         excludeFromResume: false,
       });
@@ -218,17 +215,6 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={currentExperience.description}
-                onChange={handleChange}
-                placeholder="Brief overview of your role"
-                rows={2}
-              />
-            </div>
 
             <div className="space-y-4">
               <Label>Bullet Points (Achievements & Responsibilities)</Label>
@@ -288,9 +274,6 @@ const ExperienceForm = ({ onSave, initialData }: ExperienceFormProps) => {
                       <p>{exp.location}</p>
                     </div>
                   </div>
-                  {exp.description && (
-                    <p className="text-gray-600 mt-2 mb-2">{exp.description}</p>
-                  )}
                   {exp.bullets.length > 0 && (
                     <ul className="list-disc list-inside space-y-1 ml-2">
                       {exp.bullets.map((bullet, i) => (
