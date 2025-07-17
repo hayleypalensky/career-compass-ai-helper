@@ -1,11 +1,11 @@
 
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Experience } from "@/components/ExperienceForm";
 import { Profile } from "@/types/profile";
 import ExperienceBulletPoint from "./ExperienceBulletPoint";
 import { PlusCircle, Plus, RefreshCw } from "lucide-react";
-import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { generateNewBulletSuggestions } from "./BulletSuggestionGenerator";
 import {

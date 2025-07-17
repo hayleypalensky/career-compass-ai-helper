@@ -1,4 +1,5 @@
 
+import React, { StrictMode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,7 +15,6 @@ import HelpPage from "./pages/HelpPage";
 import NotFound from "./pages/NotFound";
 import RequireAuth from "./components/RequireAuth";
 import { AuthProvider } from "./context/AuthContext";
-import { StrictMode } from "react";
 
 const queryClient = new QueryClient();
 
