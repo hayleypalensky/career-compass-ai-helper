@@ -62,7 +62,9 @@ export const fetchJobs = async (userId: string) => {
     throw error;
   }
   
-  return data ? data.map(formatJobFromDb) : [];
+  // Sort by application date (most recent first) to ensure consistent ordering
+  const jobs = data ? data.map(formatJobFromDb) : [];
+  return jobs.sort((a, b) => new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime());
 };
 
 /**
