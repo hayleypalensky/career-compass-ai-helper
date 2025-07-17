@@ -8,6 +8,25 @@ import { PlusCircle, Plus, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { generateNewBulletSuggestions } from "./BulletSuggestionGenerator";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
+  restrictToVerticalAxis,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
 
 interface ExperienceCardProps {
   experience: Experience;
@@ -15,8 +34,7 @@ interface ExperienceCardProps {
   onBulletChange: (expIndex: number, bulletIndex: number, value: string) => void;
   onRemoveBullet: (expIndex: number, bulletIndex: number) => void;
   onAddBullet: (expIndex: number) => void;
-  onMoveBulletUp: (expIndex: number, bulletIndex: number) => void;
-  onMoveBulletDown: (expIndex: number, bulletIndex: number) => void;
+  onReorderBullets: (expIndex: number, oldIndex: number, newIndex: number) => void;
   generateBulletSuggestions: (expIndex: number, bulletIndex: number) => Promise<string[]>;
   jobDescription: string;
   relevantSkills: string[];
@@ -30,8 +48,7 @@ const ExperienceCard = ({
   onBulletChange,
   onRemoveBullet,
   onAddBullet,
-  onMoveBulletUp,
-  onMoveBulletDown,
+  onReorderBullets,
   generateBulletSuggestions,
   jobDescription,
   relevantSkills,
@@ -42,6 +59,26 @@ const ExperienceCard = ({
   const [expandedSuggestions, setExpandedSuggestions] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [newSuggestions, setNewSuggestions] = useState<string[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = experience.bullets.findIndex((_, i) => `${expIndex}-${i}` === active.id);
+      const newIndex = experience.bullets.findIndex((_, i) => `${expIndex}-${i}` === over.id);
+      
+      if (oldIndex !== -1 && newIndex !== -1) {
+        onReorderBullets(expIndex, oldIndex, newIndex);
+      }
+    }
+  };
 
   // Generate 3 new bullet point suggestions for an experience using AI (job description only)
   const generateNewSuggestionsForExperience = async (): Promise<string[]> => {
@@ -130,23 +167,34 @@ const ExperienceCard = ({
       
       <div className="space-y-2">
         <Label>Bullet Points</Label>
-        {experience.bullets.map((bullet, bulletIndex) => (
-          <ExperienceBulletPoint
-            key={bulletIndex}
-            bullet={bullet}
-            bulletIndex={bulletIndex}
-            expIndex={expIndex}
-            onBulletChange={onBulletChange}
-            onRemoveBullet={onRemoveBullet}
-            onMoveBulletUp={onMoveBulletUp}
-            onMoveBulletDown={onMoveBulletDown}
-            generateSuggestions={generateBulletSuggestions}
-            jobDescription={jobDescription}
-            totalBullets={experience.bullets.length}
-            profile={profile}
-            onSyncToProfile={onSyncToProfile}
-          />
-        ))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+        >
+          <SortableContext
+            items={experience.bullets.map((_, i) => `${expIndex}-${i}`)}
+            strategy={verticalListSortingStrategy}
+          >
+            {experience.bullets.map((bullet, bulletIndex) => (
+              <ExperienceBulletPoint
+                key={`${expIndex}-${bulletIndex}`}
+                id={`${expIndex}-${bulletIndex}`}
+                bullet={bullet}
+                bulletIndex={bulletIndex}
+                expIndex={expIndex}
+                onBulletChange={onBulletChange}
+                onRemoveBullet={onRemoveBullet}
+                generateSuggestions={generateBulletSuggestions}
+                jobDescription={jobDescription}
+                totalBullets={experience.bullets.length}
+                profile={profile}
+                onSyncToProfile={onSyncToProfile}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
         <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"

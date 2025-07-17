@@ -119,31 +119,14 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     });
   };
 
-  // Move a bullet point up
-  const moveBulletUp = (expIndex: number, bulletIndex: number) => {
-    if (bulletIndex > 0) {
-      setTailoredExperiences((prevExperiences) => {
-        const newExperiences = [...prevExperiences];
-        if (newExperiences[expIndex]) {
-          const newBullets = [...newExperiences[expIndex].bullets];
-          [newBullets[bulletIndex - 1], newBullets[bulletIndex]] = [newBullets[bulletIndex], newBullets[bulletIndex - 1]];
-          newExperiences[expIndex] = {
-            ...newExperiences[expIndex],
-            bullets: newBullets,
-          };
-        }
-        return newExperiences;
-      });
-    }
-  };
-
-  // Move a bullet point down
-  const moveBulletDown = (expIndex: number, bulletIndex: number) => {
+  // Reorder bullets via drag and drop
+  const reorderBullets = (expIndex: number, oldIndex: number, newIndex: number) => {
     setTailoredExperiences((prevExperiences) => {
       const newExperiences = [...prevExperiences];
-      if (newExperiences[expIndex] && bulletIndex < newExperiences[expIndex].bullets.length - 1) {
+      if (newExperiences[expIndex]) {
         const newBullets = [...newExperiences[expIndex].bullets];
-        [newBullets[bulletIndex], newBullets[bulletIndex + 1]] = [newBullets[bulletIndex + 1], newBullets[bulletIndex]];
+        const [removed] = newBullets.splice(oldIndex, 1);
+        newBullets.splice(newIndex, 0, removed);
         newExperiences[expIndex] = {
           ...newExperiences[expIndex],
           bullets: newBullets,
@@ -169,8 +152,7 @@ export const useTailorResumeExperiences = ({ profile }: UseTailorResumeExperienc
     handleBulletChange,
     addBullet,
     removeBullet,
-    moveBulletUp,
-    moveBulletDown,
+    reorderBullets,
     resetExperiences,
   };
 };

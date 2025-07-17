@@ -53,8 +53,7 @@ const TailorResume = ({
     handleBulletChange,
     addBullet,
     removeBullet,
-    moveBulletUp,
-    moveBulletDown,
+    reorderBullets,
     toggleSkillSelection,
     toggleSkillRemoval,
     generateBulletSuggestions,
@@ -158,8 +157,7 @@ const TailorResume = ({
         onBulletChange={handleBulletChange}
         onRemoveBullet={removeBullet}
         onAddBullet={addBullet}
-        onMoveBulletUp={moveBulletUp}
-        onMoveBulletDown={moveBulletDown}
+        onReorderBullets={reorderBullets}
         generateBulletSuggestions={generateBulletSuggestions}
         jobDescription={jobDescription}
         relevantSkills={relevantSkills}

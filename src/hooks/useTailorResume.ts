@@ -87,8 +87,7 @@ export const useTailorResume = ({
     handleBulletChange: experienceHook.handleBulletChange,
     addBullet: experienceHook.addBullet,
     removeBullet: experienceHook.removeBullet,
-    moveBulletUp: experienceHook.moveBulletUp,
-    moveBulletDown: experienceHook.moveBulletDown,
+    reorderBullets: experienceHook.reorderBullets,
     handleExperienceSelectionChange: experienceHook.handleExperienceSelectionChange,
     
     // Skills management
