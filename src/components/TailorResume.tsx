@@ -120,6 +120,23 @@ const TailorResume = ({
     onUpdateResume(updatedExperiences, profile.skills);
   };
 
+  // Handle syncing reordered bullets back to profile
+  const handleSyncReorderedBullets = (experienceId: string, newBullets: string[]) => {
+    // Create updated experiences array with reordered bullets
+    const updatedExperiences = profile.experiences.map(exp => {
+      if (exp.id === experienceId) {
+        return {
+          ...exp,
+          bullets: newBullets
+        };
+      }
+      return exp;
+    });
+
+    // Call the onUpdateResume callback to persist changes
+    onUpdateResume(updatedExperiences, profile.skills);
+  };
+
   return (
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
@@ -163,6 +180,7 @@ const TailorResume = ({
         relevantSkills={relevantSkills}
         profile={profile}
         onSyncToProfile={handleSyncToProfile}
+        onSyncReorderedBullets={handleSyncReorderedBullets}
       />
 
       <ResumePreview 

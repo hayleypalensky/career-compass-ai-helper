@@ -40,6 +40,7 @@ interface ExperienceCardProps {
   relevantSkills: string[];
   profile: Profile;
   onSyncToProfile: (experienceId: string, bulletIndex: number | null, newBullet: string) => void;
+  onSyncReorderedBullets: (experienceId: string, newBullets: string[]) => void;
 }
 
 const ExperienceCard = ({
@@ -54,6 +55,7 @@ const ExperienceCard = ({
   relevantSkills,
   profile,
   onSyncToProfile,
+  onSyncReorderedBullets,
 }: ExperienceCardProps) => {
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState(false);
@@ -76,6 +78,12 @@ const ExperienceCard = ({
       
       if (oldIndex !== -1 && newIndex !== -1) {
         onReorderBullets(expIndex, oldIndex, newIndex);
+        
+        // Automatically sync the reordered bullets back to the profile
+        const newBullets = [...experience.bullets];
+        const [removed] = newBullets.splice(oldIndex, 1);
+        newBullets.splice(newIndex, 0, removed);
+        onSyncReorderedBullets(experience.id, newBullets);
       }
     }
   };
