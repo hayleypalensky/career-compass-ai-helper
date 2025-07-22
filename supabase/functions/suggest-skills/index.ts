@@ -17,19 +17,29 @@ serve(async (req) => {
   try {
     const { jobDescription, currentSkills } = await req.json();
 
-    const prompt = `You are a professional resume writer. Analyze this job description and suggest relevant skills that are missing from the current skill set:
+    const prompt = `You are an expert ATS (Applicant Tracking System) analyzer and resume writer. Analyze this job description and identify the most important skills that should be on a resume to match this role:
 
 Job Description: ${jobDescription}
-Current Skills: ${currentSkills.join(', ')}
 
-Requirements:
-- Only suggest skills that are explicitly mentioned or clearly implied in the job description
-- Don't suggest skills already in the current skills list
-- Focus on technical skills, tools, and specific competencies
-- Limit to 10 most relevant missing skills
-- Return skills as they would appear on a resume
+Current Skills Already Listed: ${currentSkills.join(', ')}
 
-Return ONLY a JSON array of skill strings, no other text.`;
+Instructions:
+1. Extract skills that are explicitly mentioned or strongly implied in the job description
+2. Include technical skills, programming languages, frameworks, tools, certifications, and methodologies
+3. Include soft skills that are specifically mentioned or critical for the role
+4. Prioritize skills that appear multiple times or are emphasized in the job posting
+5. Don't suggest skills already in the current skills list
+6. Format skills exactly as they would appear on a professional resume (proper capitalization, common industry terms)
+7. Limit to the 8 most critical missing skills for this specific role
+8. Focus on skills that would help pass ATS screening
+
+Return ONLY a JSON array of skill strings, no explanations or other text.
+
+Examples of good skill formatting:
+- "React.js" not "react" or "ReactJS"
+- "Python" not "python programming"
+- "Project Management" not "managing projects"
+- "AWS" not "Amazon Web Services (AWS)"`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -38,13 +48,15 @@ Return ONLY a JSON array of skill strings, no other text.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-2025-04-14',
         messages: [
-          { role: 'system', content: 'You are a professional resume writer that returns only valid JSON arrays.' },
+          { 
+            role: 'system', 
+            content: 'You are an expert ATS analyzer and resume writer. Return only valid JSON arrays of skills. Be precise and use proper skill formatting for professional resumes.' 
+          },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.3,
-      }),
+        temperature: 0.2,
     });
 
     const data = await response.json();
