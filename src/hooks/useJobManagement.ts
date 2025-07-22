@@ -67,9 +67,17 @@ export const useJobManagement = ({ user }: UseJobManagementProps) => {
       await updateJobById(updatedJob.id, updatedJob);
       
       // Update the job in the state
-      setJobs((prevJobs) =>
-        prevJobs.map((job) => (job.id === updatedJob.id ? updatedJob : job))
-      );
+      setJobs((prevJobs) => {
+        const originalJob = prevJobs.find(job => job.id === updatedJob.id);
+        const updatedJobs = prevJobs.map((job) => (job.id === updatedJob.id ? updatedJob : job));
+        
+        // Only re-sort if the application date changed
+        if (originalJob && originalJob.appliedDate !== updatedJob.appliedDate) {
+          return updatedJobs.sort((a, b) => new Date(b.appliedDate).getTime() - new Date(a.appliedDate).getTime());
+        }
+        
+        return updatedJobs;
+      });
       
       toast({
         title: "Job updated",
