@@ -57,6 +57,7 @@ Examples of good skill formatting:
           { role: 'user', content: prompt }
         ],
         temperature: 0.2,
+      }),
     });
 
     const data = await response.json();
