@@ -95,7 +95,7 @@ const TailorPage = () => {
         location: jobInfo.location || "",
         remote: jobInfo.remote || false,
         description: jobInfo.description || "",
-        notes: jobInfo.notes || "Added automatically from Tailor Resume page",
+        notes: jobInfo.notes || "",
         appliedDate: new Date().toISOString().split("T")[0],
         status: "applied",
         updatedAt: new Date().toISOString(),
