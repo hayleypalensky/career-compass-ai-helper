@@ -7,7 +7,7 @@ import { Profile } from "@/types/profile";
 import ExperienceBulletPoint from "./ExperienceBulletPoint";
 import { PlusCircle, Plus, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { generateNewBulletSuggestions, generateJobFocusedSuggestions } from "./BulletSuggestionGenerator";
+import { generateNewBulletSuggestions } from "./BulletSuggestionGenerator";
 import {
   DndContext,
   closestCenter,
@@ -60,8 +60,7 @@ const ExperienceCard = ({
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  const [experienceSuggestions, setExperienceSuggestions] = useState<string[]>([]);
-  const [jobFocusedSuggestions, setJobFocusedSuggestions] = useState<string[]>([]);
+  const [newSuggestions, setNewSuggestions] = useState<string[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -89,41 +88,42 @@ const ExperienceCard = ({
     }
   };
 
-  // Generate both types of bullet point suggestions
-  const generateAllSuggestions = async (): Promise<void> => {
+  // Generate 3 new bullet point suggestions for an experience using AI (job description only)
+  const generateNewSuggestionsForExperience = async (): Promise<string[]> => {
     if (!jobDescription.trim()) {
       toast({
         title: "Job description required",
         description: "Please enter a job description to generate AI suggestions.",
         variant: "destructive",
       });
-      return;
+      return [];
     }
 
     try {
       setLoadingSuggestions(true);
       
-      console.log('Generating both types of bullet suggestions for experience:', experience.title);
+      console.log('Generating new bullet suggestions for experience:', experience.title);
       
-      // Generate both experience-based and job-focused suggestions in parallel
-      const [experienceBasedSuggestions, jobBasedSuggestions] = await Promise.all([
-        generateNewBulletSuggestions(experience, jobDescription, relevantSkills),
-        generateJobFocusedSuggestions(experience, jobDescription, relevantSkills)
-      ]);
+      // Use the new function that only considers job description
+      const aiSuggestions = await generateNewBulletSuggestions(
+        experience,
+        jobDescription,
+        relevantSkills
+      );
       
-      console.log('Received experience-based suggestions:', experienceBasedSuggestions);
-      console.log('Received job-focused suggestions:', jobBasedSuggestions);
+      console.log('Received AI suggestions:', aiSuggestions);
       
-      setExperienceSuggestions(experienceBasedSuggestions);
-      setJobFocusedSuggestions(jobBasedSuggestions);
-      
-      if (experienceBasedSuggestions.length === 0 && jobBasedSuggestions.length === 0) {
+      if (aiSuggestions.length === 0) {
         toast({
           title: "No suggestions available",
           description: "Unable to generate AI suggestions for this experience.",
           variant: "default",
         });
+      } else {
+        setNewSuggestions(aiSuggestions);
       }
+      
+      return aiSuggestions;
     } catch (error) {
       console.error('Error generating suggestions:', error);
       toast({
@@ -131,6 +131,7 @@ const ExperienceCard = ({
         description: "There was an error generating AI suggestions. Please try again.",
         variant: "destructive",
       });
+      return [];
     } finally {
       setLoadingSuggestions(false);
     }
@@ -160,7 +161,7 @@ const ExperienceCard = ({
       
       // Generate suggestions when expanding
       if (!loadingSuggestions) {
-        await generateAllSuggestions();
+        await generateNewSuggestionsForExperience();
       }
     }
   };
@@ -225,86 +226,48 @@ const ExperienceCard = ({
 
         {/* AI-powered suggestions for new bullet points */}
         {expandedSuggestions && (
-          <div className="mt-3 space-y-4">
-            {/* Experience-Based Suggestions */}
-            <div className="p-3 bg-blue-50 rounded-md border border-blue-200">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="text-sm font-medium text-blue-800">
-                  AI Suggestions Based on Your Experience:
-                </h4>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={generateAllSuggestions}
-                  disabled={loadingSuggestions}
-                  className="h-7 text-xs flex items-center gap-1 text-blue-600"
-                >
-                  <RefreshCw className={`h-3 w-3 ${loadingSuggestions ? 'animate-spin' : ''}`} />
-                  {loadingSuggestions ? "Generating..." : "Regenerate"}
-                </Button>
-              </div>
-              {loadingSuggestions ? (
-                <div className="text-sm text-blue-600">Generating suggestions with AI...</div>
-              ) : (
-                <div className="space-y-2">
-                  {experienceSuggestions.length > 0 ? (
-                    experienceSuggestions.map((suggestion, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-xs whitespace-nowrap"
-                          onClick={() => handleAddSuggestion(suggestion)}
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Add
-                        </Button>
-                        <p className="text-sm">{suggestion}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-blue-600">
-                      Experience-based suggestions will appear here after generation is complete.
-                    </div>
-                  )}
-                </div>
-              )}
+          <div className="mt-3 p-3 bg-blue-50 rounded-md border border-blue-200">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-blue-800">
+                AI-Generated bullet points based on job description:
+              </h4>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={generateNewSuggestionsForExperience}
+                disabled={loadingSuggestions}
+                className="h-7 text-xs flex items-center gap-1 text-blue-600"
+              >
+                <RefreshCw className={`h-3 w-3 ${loadingSuggestions ? 'animate-spin' : ''}`} />
+                {loadingSuggestions ? "Generating..." : "Regenerate"}
+              </Button>
             </div>
-
-            {/* Job-Focused Suggestions */}
-            <div className="p-3 bg-green-50 rounded-md border border-green-200">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="text-sm font-medium text-green-800">
-                  AI Suggestions Based on Job Requirements:
-                </h4>
-              </div>
-              {loadingSuggestions ? (
-                <div className="text-sm text-green-600">Generating suggestions with AI...</div>
-              ) : (
-                <div className="space-y-2">
-                  {jobFocusedSuggestions.length > 0 ? (
-                    jobFocusedSuggestions.map((suggestion, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="text-xs whitespace-nowrap"
-                          onClick={() => handleAddSuggestion(suggestion)}
-                        >
-                          <Plus className="h-3 w-3 mr-1" />
-                          Add
-                        </Button>
-                        <p className="text-sm">{suggestion}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm text-green-600">
-                      Job-focused suggestions will appear here after generation is complete.
+            {loadingSuggestions ? (
+              <div className="text-sm text-blue-600">Generating suggestions with AI...</div>
+            ) : (
+              <div className="space-y-2">
+                {newSuggestions.length > 0 ? (
+                  newSuggestions.map((suggestion, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="text-xs whitespace-nowrap"
+                        onClick={() => handleAddSuggestion(suggestion)}
+                      >
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add
+                      </Button>
+                      <p className="text-sm">{suggestion}</p>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
+                  ))
+                ) : (
+                  <div className="text-sm text-blue-600">
+                    AI suggestions will appear here after generation is complete.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

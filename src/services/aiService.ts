@@ -36,14 +36,13 @@ export const aiService = {
     }
   },
 
-  async generateBulletPoints(currentBullet: string, jobTitle: string, jobDescription: string, relevantSkills: string[], suggestionType: 'experience-based' | 'job-focused' = 'experience-based'): Promise<string[]> {
+  async generateBulletPoints(currentBullet: string, jobTitle: string, jobDescription: string, relevantSkills: string[]): Promise<string[]> {
     try {
       console.log('Calling generate-bullets function with:', {
         currentBullet,
         jobTitle,
         hasJobDescription: !!jobDescription,
-        relevantSkillsCount: relevantSkills.length,
-        suggestionType
+        relevantSkillsCount: relevantSkills.length
       });
 
       const { data, error } = await supabase.functions.invoke('generate-bullets', {
@@ -51,8 +50,7 @@ export const aiService = {
           currentBullet,
           jobTitle,
           jobDescription,
-          relevantSkills,
-          suggestionType
+          relevantSkills
         }
       });
 
