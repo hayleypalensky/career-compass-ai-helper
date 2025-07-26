@@ -33,7 +33,8 @@ export const generateBulletSuggestions = async (
       currentBullet,
       experience.title,
       jobDescription,
-      relevantSkills
+      relevantSkills,
+      'experience-based'
     );
     
     console.log('AI suggestions received for existing bullet:', aiSuggestions);
@@ -74,13 +75,52 @@ export const generateNewBulletSuggestions = async (
       genericPlaceholder,
       experience.title,
       jobDescription,
-      relevantSkills
+      relevantSkills,
+      'experience-based'
     );
     
     console.log('AI suggestions received for new bullets:', aiSuggestions);
     return aiSuggestions;
   } catch (error) {
     console.error('Error generating new bullet suggestions:', error);
+    // Return empty array if AI fails
+    return [];
+  }
+};
+
+// Generate job-focused bullet point suggestions based purely on job description requirements
+export const generateJobFocusedSuggestions = async (
+  experience: Experience,
+  jobDescription: string,
+  relevantSkills: string[]
+): Promise<string[]> => {
+  // If no job description, return empty array
+  if (!jobDescription.trim()) {
+    console.log('Missing job description, skipping job-focused generation');
+    return [];
+  }
+  
+  try {
+    console.log('Calling AI service for job-focused suggestions:', {
+      jobTitle: experience.title,
+      company: experience.company,
+      hasJobDescription: !!jobDescription,
+      relevantSkillsCount: relevantSkills.length
+    });
+    
+    // Use AI service to generate suggestions focused purely on job requirements
+    const aiSuggestions = await aiService.generateBulletPoints(
+      '', // Empty current bullet to focus on job description
+      experience.title,
+      jobDescription,
+      relevantSkills,
+      'job-focused'
+    );
+    
+    console.log('AI job-focused suggestions received:', aiSuggestions);
+    return aiSuggestions;
+  } catch (error) {
+    console.error('Error generating job-focused suggestions:', error);
     // Return empty array if AI fails
     return [];
   }

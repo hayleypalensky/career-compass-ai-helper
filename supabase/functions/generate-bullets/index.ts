@@ -15,24 +15,44 @@ serve(async (req) => {
   }
 
   try {
-    const { currentBullet, jobTitle, jobDescription, relevantSkills } = await req.json();
-
-    // Determine if this is for improving an existing bullet or creating new ones
-    const isNewBulletGeneration = !currentBullet || currentBullet.trim() === "" || 
-                                  currentBullet === `Contributed to ${jobTitle} responsibilities`;
+    const { currentBullet, jobTitle, jobDescription, relevantSkills, suggestionType } = await req.json();
 
     let prompt;
 
-    if (isNewBulletGeneration) {
-      // For NEW bullet points - only consider job description
-      prompt = `You are a professional resume writer. Based ONLY on the job description provided, create 3 completely new and distinct bullet points for someone in this role:
+    if (suggestionType === 'job-focused') {
+      // Pure job description based suggestions - ignore current experience
+      prompt = `You are a professional resume writer. Create 3 bullet points that would be highly relevant for this specific job, focusing on the key requirements and responsibilities mentioned in the job description:
 
 Job Title: ${jobTitle}
 Job Description: ${jobDescription}
 Relevant Skills to Incorporate: ${relevantSkills.join(', ')}
 
 Requirements:
-- Create entirely NEW bullet points based ONLY on the job description requirements
+- Create bullet points that directly address the job description requirements
+- Focus on achievements someone in this role could realistically accomplish
+- Use keywords and phrases from the job description for ATS optimization
+- Start with strong action verbs (Led, Developed, Implemented, Designed, etc.)
+- Include realistic quantifiable achievements (15%, 25%, 30%, etc.)
+- Make them aspirational but achievable for this specific role
+- Each should be 1-2 lines maximum
+- Focus on impact and value specific to this job posting
+
+Return ONLY a JSON array with 3 strings, no other text.`;
+    } else {
+      // Experience-based suggestions (current implementation)
+      const isNewBulletGeneration = !currentBullet || currentBullet.trim() === "" || 
+                                    currentBullet === `Contributed to ${jobTitle} responsibilities`;
+
+      if (isNewBulletGeneration) {
+        // For NEW bullet points based on experience
+        prompt = `You are a professional resume writer. Based on the job description provided, create 3 completely new and distinct bullet points for someone in this role:
+
+Job Title: ${jobTitle}
+Job Description: ${jobDescription}
+Relevant Skills to Incorporate: ${relevantSkills.join(', ')}
+
+Requirements:
+- Create entirely NEW bullet points based on the job description requirements
 - DO NOT reference any existing content
 - Start with strong action verbs (Led, Developed, Implemented, Designed, etc.)
 - Include realistic but varied quantifiable achievements (use different percentages like 15%, 25%, 30%, etc.)
@@ -42,9 +62,9 @@ Requirements:
 - Focus on impact and results that would be relevant to this specific job
 
 Return ONLY a JSON array with 3 strings, no other text.`;
-    } else {
-      // For EXISTING bullet points - consider both current content and job description
-      prompt = `You are a professional resume writer. Improve and tailor the following bullet point to better match the job description:
+      } else {
+        // For EXISTING bullet points - consider both current content and job description
+        prompt = `You are a professional resume writer. Improve and tailor the following bullet point to better match the job description:
 
 Current Bullet Point: "${currentBullet}"
 Job Title: ${jobTitle}
@@ -62,6 +82,7 @@ Requirements:
 - Focus on impact and results that match what the job is looking for
 
 Return ONLY a JSON array with 3 improved versions of the bullet point, no other text.`;
+      }
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
