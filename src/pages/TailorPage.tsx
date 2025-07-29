@@ -13,13 +13,14 @@ import { useJobTrackerSettings } from "@/hooks/useJobTrackerSettings";
 import { useAuth } from "@/context/AuthContext";
 import { createJob } from "@/services/jobService";
 import { Job } from "@/types/job";
+import { useProfileManager } from "@/hooks/useProfileManager";
 
 const TailorPage = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { autoAddJobs, toggleAutoAddJobs } = useJobTrackerSettings();
+  const { profile, handleExperiencesSave } = useProfileManager();
   
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [relevantSkills, setRelevantSkills] = useState<string[]>([]);
   const [missingSkills, setMissingSkills] = useState<string[]>([]);
   const [showTailorSection, setShowTailorSection] = useState(false);
@@ -34,52 +35,12 @@ const TailorPage = () => {
   const [resetTrigger, setResetTrigger] = useState(false);
   const [tailoredSummary, setTailoredSummary] = useState<string>("");
 
-  // Load profile from localStorage
+  // Set initial tailored summary when profile loads
   useEffect(() => {
-    const loadProfile = () => {
-      const savedProfile = localStorage.getItem("resumeProfile");
-      if (savedProfile) {
-        try {
-          const parsedProfile = JSON.parse(savedProfile);
-          setProfile(parsedProfile);
-          setTailoredSummary(parsedProfile.personalInfo.summary || "");
-        } catch (error) {
-          console.error("Error parsing profile from localStorage:", error);
-          toast({
-            title: "Error loading profile",
-            description: "There was an error loading your profile. Please check your profile page.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        toast({
-          title: "Profile not found",
-          description: "Please create your profile before tailoring your resume.",
-          variant: "destructive",
-        });
-      }
-    };
-
-    loadProfile();
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "resumeProfile" && e.newValue) {
-        try {
-          const updatedProfile = JSON.parse(e.newValue);
-          setProfile(updatedProfile);
-          setTailoredSummary(updatedProfile.personalInfo.summary || "");
-        } catch (error) {
-          console.error("Error parsing updated profile:", error);
-        }
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+    if (profile) {
+      setTailoredSummary(profile.personalInfo.summary || "");
+    }
+  }, [profile]);
 
   // Auto-add job to tracker when analysis is complete
   const autoAddToJobTracker = async (jobInfo: { title?: string; company?: string; location?: string; remote?: boolean; description?: string; notes?: string }) => {
@@ -138,14 +99,8 @@ const TailorPage = () => {
   const handleUpdateResume = (experiences: Experience[], skills: Skill[]) => {
     if (!profile) return;
 
-    const updatedProfile = {
-      ...profile,
-      experiences: experiences,
-      skills: skills,
-    };
-
-    localStorage.setItem("resumeProfile", JSON.stringify(updatedProfile));
-    setProfile(updatedProfile);
+    // Use the proper profile saving mechanism for experiences
+    handleExperiencesSave(experiences);
     setIsTailored(true);
 
     toast({
