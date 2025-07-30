@@ -137,6 +137,24 @@ const TailorResume = ({
     onUpdateResume(updatedExperiences, profile.skills);
   };
 
+  // Handle syncing bullet removal back to profile
+  const handleSyncBulletRemoval = (experienceId: string, bulletIndex: number) => {
+    // Create updated experiences array with bullet removed
+    const updatedExperiences = profile.experiences.map(exp => {
+      if (exp.id === experienceId) {
+        const updatedBullets = exp.bullets.filter((_, i) => i !== bulletIndex);
+        return {
+          ...exp,
+          bullets: updatedBullets
+        };
+      }
+      return exp;
+    });
+
+    // Call the onUpdateResume callback to persist changes
+    onUpdateResume(updatedExperiences, profile.skills);
+  };
+
   return (
     <div className="space-y-8">
       <RelevantSkillsCard relevantSkills={relevantSkills} />
@@ -181,6 +199,7 @@ const TailorResume = ({
         profile={profile}
         onSyncToProfile={handleSyncToProfile}
         onSyncReorderedBullets={handleSyncReorderedBullets}
+        onSyncBulletRemoval={handleSyncBulletRemoval}
       />
 
       <ResumePreview 

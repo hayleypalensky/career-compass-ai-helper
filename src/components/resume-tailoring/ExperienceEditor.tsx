@@ -16,6 +16,7 @@ interface ExperienceEditorProps {
   profile: Profile;
   onSyncToProfile: (experienceId: string, bulletIndex: number | null, newBullet: string) => void;
   onSyncReorderedBullets: (experienceId: string, newBullets: string[]) => void;
+  onSyncBulletRemoval: (experienceId: string, bulletIndex: number) => void;
 }
 
 const ExperienceEditor = ({
@@ -30,6 +31,7 @@ const ExperienceEditor = ({
   profile,
   onSyncToProfile,
   onSyncReorderedBullets,
+  onSyncBulletRemoval,
 }: ExperienceEditorProps) => {
   return (
     <Card>
@@ -53,6 +55,7 @@ const ExperienceEditor = ({
               profile={profile}
               onSyncToProfile={onSyncToProfile}
               onSyncReorderedBullets={onSyncReorderedBullets}
+              onSyncBulletRemoval={onSyncBulletRemoval}
             />
           ))}
         </div>

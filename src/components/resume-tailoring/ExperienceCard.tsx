@@ -41,6 +41,7 @@ interface ExperienceCardProps {
   profile: Profile;
   onSyncToProfile: (experienceId: string, bulletIndex: number | null, newBullet: string) => void;
   onSyncReorderedBullets: (experienceId: string, newBullets: string[]) => void;
+  onSyncBulletRemoval: (experienceId: string, bulletIndex: number) => void;
 }
 
 const ExperienceCard = ({
@@ -56,6 +57,7 @@ const ExperienceCard = ({
   profile,
   onSyncToProfile,
   onSyncReorderedBullets,
+  onSyncBulletRemoval,
 }: ExperienceCardProps) => {
   const { toast } = useToast();
   const [expandedSuggestions, setExpandedSuggestions] = useState(false);
@@ -193,7 +195,11 @@ const ExperienceCard = ({
                 bulletIndex={bulletIndex}
                 expIndex={expIndex}
                 onBulletChange={onBulletChange}
-                onRemoveBullet={onRemoveBullet}
+                onRemoveBullet={(expIdx, bulletIdx) => {
+                  onRemoveBullet(expIdx, bulletIdx);
+                  // Also sync the removal to the profile
+                  onSyncBulletRemoval(experience.id, bulletIdx);
+                }}
                 generateSuggestions={generateBulletSuggestions}
                 jobDescription={jobDescription}
                 totalBullets={experience.bullets.length}
