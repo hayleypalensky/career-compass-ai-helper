@@ -197,8 +197,7 @@ const ExperienceCard = ({
                 onBulletChange={onBulletChange}
                 onRemoveBullet={(expIdx, bulletIdx) => {
                   onRemoveBullet(expIdx, bulletIdx);
-                  // Also sync the removal to the profile
-                  onSyncBulletRemoval(experience.id, bulletIdx);
+                  // Note: Not syncing bullet removal to profile - only affects tailored resume
                 }}
                 generateSuggestions={generateBulletSuggestions}
                 jobDescription={jobDescription}
