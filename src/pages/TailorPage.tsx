@@ -19,7 +19,7 @@ const TailorPage = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { autoAddJobs, toggleAutoAddJobs } = useJobTrackerSettings();
-  const { profile, handleExperiencesSave } = useProfileManager();
+  const { profile, handleExperiencesSave, handlePersonalInfoSave } = useProfileManager();
   
   const [relevantSkills, setRelevantSkills] = useState<string[]>([]);
   const [missingSkills, setMissingSkills] = useState<string[]>([]);
@@ -101,6 +101,15 @@ const TailorPage = () => {
 
     // Use the proper profile saving mechanism for experiences
     handleExperiencesSave(experiences);
+    
+    // Also save the tailored summary to the profile
+    if (tailoredSummary !== profile.personalInfo.summary) {
+      handlePersonalInfoSave({
+        ...profile.personalInfo,
+        summary: tailoredSummary
+      });
+    }
+    
     setIsTailored(true);
 
     toast({
