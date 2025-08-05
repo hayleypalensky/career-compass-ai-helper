@@ -30,6 +30,7 @@ interface TailorResumeProps {
   onResetForNewJob?: () => void;
   onSummaryChange?: (summary: string) => void;
   tailoredSummary?: string;
+  onTailoredDataChange?: (experiences: any[], skillsToAdd: string[], skillsToRemove: string[]) => void;
 }
 
 const TailorResume = ({
@@ -42,6 +43,7 @@ const TailorResume = ({
   onResetForNewJob,
   onSummaryChange,
   tailoredSummary = "",
+  onTailoredDataChange,
 }: TailorResumeProps) => {
   // Use our refactored custom hook for state and logic
   const {
@@ -77,6 +79,13 @@ const TailorResume = ({
       onColorThemeChange(selectedTheme);
     }
   }, [selectedTheme, onColorThemeChange]);
+
+  // Notify parent about tailored data changes
+  useEffect(() => {
+    if (onTailoredDataChange) {
+      onTailoredDataChange(tailoredExperiences, skillsToAdd, skillsToRemove);
+    }
+  }, [tailoredExperiences, skillsToAdd, skillsToRemove, onTailoredDataChange]);
 
   // Handle reset for new job - call both internal reset and parent reset
   const handleResetForNewJob = () => {

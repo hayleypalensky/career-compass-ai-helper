@@ -1,7 +1,9 @@
 
 import ResumePdfExport from "@/components/ResumePdfExport";
+import ResumeApiExport from "@/components/ResumeApiExport";
 import AddToJobTracker from "@/components/AddToJobTracker";
 import { Profile } from "@/types/profile";
+import { Experience } from "@/components/ExperienceForm";
 
 interface TailorActionsRowProps {
   profile: Profile;
@@ -12,6 +14,9 @@ interface TailorActionsRowProps {
   jobDescription: string;
   colorTheme: string;
   updatedSummary?: string;
+  tailoredExperiences?: Experience[];
+  skillsToAdd?: string[];
+  skillsToRemove?: string[];
 }
 
 const TailorActionsRow = ({
@@ -22,7 +27,10 @@ const TailorActionsRow = ({
   remote,
   jobDescription,
   colorTheme,
-  updatedSummary
+  updatedSummary,
+  tailoredExperiences = [],
+  skillsToAdd = [],
+  skillsToRemove = []
 }: TailorActionsRowProps) => {
   // Always create a profile with the updated summary for PDF export
   const profileForPdf = {
@@ -38,6 +46,15 @@ const TailorActionsRow = ({
 
   return (
     <div className="flex flex-col md:flex-row gap-4 mt-6">
+      <ResumeApiExport 
+        profile={profileForPdf}
+        tailoredExperiences={tailoredExperiences}
+        skillsToAdd={skillsToAdd}
+        skillsToRemove={skillsToRemove}
+        jobTitle={jobTitle}
+        companyName={companyName}
+      />
+      
       <ResumePdfExport 
         profile={profileForPdf}
         jobTitle={jobTitle}

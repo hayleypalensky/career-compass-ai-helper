@@ -34,6 +34,9 @@ const TailorPage = () => {
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
   const [resetTrigger, setResetTrigger] = useState(false);
   const [tailoredSummary, setTailoredSummary] = useState<string>("");
+  const [tailoredExperiences, setTailoredExperiences] = useState<any[]>([]);
+  const [skillsToAdd, setSkillsToAdd] = useState<string[]>([]);
+  const [skillsToRemove, setSkillsToRemove] = useState<string[]>([]);
 
   // Set initial tailored summary when profile loads
   useEffect(() => {
@@ -130,13 +133,13 @@ const TailorPage = () => {
     
     setShowTailorSection(false);
     setIsTailored(false);
+    setResetTrigger(prev => !prev);
+    setTailoredSummary(profile?.personalInfo.summary || "");
+    setTailoredExperiences([]);
+    setSkillsToAdd([]);
+    setSkillsToRemove([]);
     
     setSelectedColorTheme("purple");
-    if (profile) {
-      setTailoredSummary(profile.personalInfo.summary || "");
-    }
-    
-    setResetTrigger(prev => !prev);
   };
 
   // If there's no profile, show message to create one
@@ -190,6 +193,11 @@ const TailorPage = () => {
               onResetForNewJob={handleResetForNewJob}
               onSummaryChange={handleSummaryChange}
               tailoredSummary={tailoredSummary}
+              onTailoredDataChange={(experiences, skillsAdd, skillsRemove) => {
+                setTailoredExperiences(experiences);
+                setSkillsToAdd(skillsAdd);
+                setSkillsToRemove(skillsRemove);
+              }}
             />
 
             <CoverLetterGenerator
@@ -210,6 +218,9 @@ const TailorPage = () => {
                 jobDescription={jobDescription}
                 colorTheme={selectedColorTheme}
                 updatedSummary={tailoredSummary}
+                tailoredExperiences={tailoredExperiences}
+                skillsToAdd={skillsToAdd}
+                skillsToRemove={skillsToRemove}
               />
             )}
           </>
