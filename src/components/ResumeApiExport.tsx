@@ -50,9 +50,12 @@ const ResumeApiExport = ({
       });
     } catch (error) {
       console.error("Resume export error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to connect to resume API";
       toast({
         title: "Export failed",
-        description: "There was an error generating your resume. Please try again.",
+        description: errorMessage.includes('CORS') || errorMessage.includes('connect') 
+          ? "Unable to connect to the resume formatting service. The server may be unavailable or there may be a connection issue."
+          : errorMessage,
         variant: "destructive",
       });
     } finally {
