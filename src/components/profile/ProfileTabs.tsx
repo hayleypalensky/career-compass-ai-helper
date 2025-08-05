@@ -4,6 +4,7 @@ import PersonalInfoForm from "@/components/PersonalInfoForm";
 import ExperienceForm from "@/components/ExperienceForm";
 import SkillsForm from "@/components/SkillsForm";
 import EducationForm from "@/components/EducationForm";
+import ResumePreview from "@/components/resume-tailoring/ResumePreview";
 import { useProfile } from "@/context/ProfileContext";
 
 const ProfileTabs = () => {
@@ -17,11 +18,12 @@ const ProfileTabs = () => {
 
   return (
     <Tabs defaultValue="personal" className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="personal">Personal Info</TabsTrigger>
         <TabsTrigger value="experience">Experience</TabsTrigger>
         <TabsTrigger value="education">Education</TabsTrigger>
         <TabsTrigger value="skills">Skills</TabsTrigger>
+        <TabsTrigger value="resume">Resume Preview</TabsTrigger>
       </TabsList>
       
       <TabsContent value="personal" className="mt-6">
@@ -49,6 +51,17 @@ const ProfileTabs = () => {
         <SkillsForm 
           onSave={handleSkillsSave}
           initialData={profile.skills}
+        />
+      </TabsContent>
+      
+      <TabsContent value="resume" className="mt-6">
+        <ResumePreview 
+          profile={profile}
+          experiences={profile.experiences}
+          skillsToAdd={[]}
+          skillsToRemove={[]}
+          relevantSkills={[]}
+          colorTheme="purple"
         />
       </TabsContent>
     </Tabs>
