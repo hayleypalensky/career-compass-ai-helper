@@ -77,32 +77,48 @@ export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> 
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    // Use a longer timeout for the free tier API that may take time to spin up
-    const { data: responseData, error } = await supabase.functions.invoke('generate-resume-pdf', {
+    // Call the edge function and get the raw response
+    const response = await supabase.functions.invoke('generate-resume-pdf', {
       body: data,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
-    if (error) {
-      console.error('Supabase function error:', error);
-      throw new Error(`Resume generation failed: ${error.message}`);
+    if (response.error) {
+      console.error('Supabase function error:', response.error);
+      throw new Error(`Resume generation failed: ${response.error.message}`);
     }
 
-    if (!responseData) {
+    if (!response.data) {
       throw new Error('No data received from resume generation service');
     }
 
-    // The edge function should return the PDF as binary data
+    // The edge function returns an ArrayBuffer, convert it to a proper PDF blob
     let blob: Blob;
-    if (responseData instanceof ArrayBuffer) {
-      blob = new Blob([responseData], { type: 'application/pdf' });
-    } else if (responseData instanceof Blob) {
-      blob = responseData;
+    
+    if (response.data instanceof ArrayBuffer) {
+      console.log('Received ArrayBuffer, size:', response.data.byteLength);
+      blob = new Blob([response.data], { type: 'application/pdf' });
+    } else if (response.data instanceof Uint8Array) {
+      console.log('Received Uint8Array, size:', response.data.length);
+      blob = new Blob([response.data], { type: 'application/pdf' });
+    } else if (response.data instanceof Blob) {
+      console.log('Received Blob directly, size:', response.data.size);
+      blob = response.data;
     } else {
-      // If it's base64 or other format, convert appropriately
-      blob = new Blob([responseData], { type: 'application/pdf' });
+      // Try to convert whatever we got to a blob
+      console.log('Received unknown data type, attempting conversion:', typeof response.data);
+      blob = new Blob([response.data], { type: 'application/pdf' });
     }
     
-    console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
+    console.log('Successfully created blob, size:', blob.size, 'type:', blob.type);
+    
+    // Validate that we have a non-empty blob
+    if (blob.size === 0) {
+      throw new Error('Received empty PDF file from server');
+    }
+    
     return blob;
   } catch (error) {
     console.error('Resume generation error:', error);
