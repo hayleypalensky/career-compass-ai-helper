@@ -44,9 +44,9 @@ const ResumeApiExport = ({
       console.log('API data being sent:', JSON.stringify(apiData, null, 2));
       const blob = await generateResumeFromApi(apiData);
       
-      const filename = jobTitle && companyName 
-        ? `${profile.personalInfo.name.replace(/\s+/g, '_')}_${jobTitle}_${companyName}.pdf`.replace(/[^a-zA-Z0-9._-]/g, '')
-        : `${profile.personalInfo.name.replace(/\s+/g, '_')}_resume.pdf`;
+      const filename = companyName 
+        ? `${profile.personalInfo.name} Resume - ${companyName}.pdf`
+        : `${profile.personalInfo.name} Resume.pdf`;
       
       
       downloadResumeBlob(blob, filename);
