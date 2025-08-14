@@ -40,8 +40,11 @@ serve(async (req) => {
     const pdfBlob = await response.blob();
     console.log('Successfully received PDF blob, size:', pdfBlob.size);
 
+    // Convert blob to array buffer for proper handling
+    const arrayBuffer = await pdfBlob.arrayBuffer();
+    
     // Return the PDF with proper headers
-    return new Response(pdfBlob, {
+    return new Response(arrayBuffer, {
       headers: {
         ...corsHeaders,
         'Content-Type': 'application/pdf',

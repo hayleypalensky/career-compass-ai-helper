@@ -73,12 +73,12 @@ export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> 
       throw new Error(`Supabase function error: ${error.message}`);
     }
 
-    // The edge function returns a blob directly
+    // The edge function returns binary data as an ArrayBuffer
     if (!responseData) {
       throw new Error('No data received from resume generation service');
     }
 
-    // Convert the response to a blob
+    // Convert the ArrayBuffer response to a blob
     const blob = new Blob([responseData], { type: 'application/pdf' });
     console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
     return blob;
