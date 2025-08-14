@@ -59,11 +59,11 @@ export const transformProfileForApi = (
 };
 
 export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> => {
-  console.log('Making API request to:', 'https://resume-pdf-api.onrender.com/generate');
+  console.log('Making API request via Supabase Edge Function');
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    const response = await fetch('https://resume-pdf-api.onrender.com/generate', {
+    const response = await fetch('/functions/v1/generate-resume-pdf', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
