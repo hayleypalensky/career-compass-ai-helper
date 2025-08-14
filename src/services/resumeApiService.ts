@@ -73,34 +73,29 @@ export const transformProfileForApi = (
 };
 
 export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> => {
-  console.log('Making API request via Supabase Edge Function');
+  console.log('Making API request directly to Render API');
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    // Get the current user's session for auth
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    // Use direct fetch to call the edge function with proper body
-    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-resume-pdf`, {
+    // Call your Render API directly
+    const response = await fetch('https://resume-pdf-api.onrender.com/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
       },
       body: JSON.stringify(data)
     });
 
-    console.log('Edge function response status:', response.status);
-    console.log('Edge function response ok:', response.ok);
+    console.log('Render API response status:', response.status);
+    console.log('Render API response ok:', response.ok);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Edge function error response:', errorText);
-      throw new Error(`Edge function failed with status ${response.status}: ${errorText}`);
+      console.error('Render API error response:', errorText);
+      throw new Error(`Render API failed with status ${response.status}: ${errorText}`);
     }
 
-    // Get the PDF blob from the edge function response
+    // Get the PDF blob from the API response
     const blob = await response.blob();
     console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
     
