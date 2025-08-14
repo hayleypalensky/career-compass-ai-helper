@@ -196,6 +196,7 @@ const TailorPage = () => {
               onUpdateResume={handleUpdateResume}
               jobDescription={jobDescription}
               onColorThemeChange={handleColorThemeChange}
+              onCustomColorChange={handleCustomColorChange}
               onResetForNewJob={handleResetForNewJob}
               onSummaryChange={handleSummaryChange}
               tailoredSummary={tailoredSummary}

@@ -39,8 +39,9 @@ const ResumeApiExport = ({
         description: "Please wait while we create your formatted PDF. This may take up to 60 seconds if the service needs to start up...",
       });
       
+      console.log('ResumeApiExport - selectedTheme:', selectedTheme, 'customColor:', customColor);
       const apiData = transformProfileForApi(profile, tailoredExperiences, skillsToAdd, skillsToRemove, selectedTheme, customColor);
-      console.log('Transformed data for API:', JSON.stringify(apiData, null, 2));
+      console.log('API data being sent:', JSON.stringify(apiData, null, 2));
       const blob = await generateResumeFromApi(apiData);
       
       const filename = jobTitle && companyName 
