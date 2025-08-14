@@ -43,6 +43,7 @@ const ResumeApiExport = ({
         ? `${profile.personalInfo.name.replace(/\s+/g, '_')}_${jobTitle}_${companyName}.pdf`.replace(/[^a-zA-Z0-9._-]/g, '')
         : `${profile.personalInfo.name.replace(/\s+/g, '_')}_resume.pdf`;
       
+      
       downloadResumeBlob(blob, filename);
       
       toast({

@@ -1,7 +1,6 @@
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { formatDate } from "@/utils/resumeFormatters";
-import { supabase } from "@/integrations/supabase/client";
 
 interface ResumeApiData {
   name: string;
@@ -60,26 +59,28 @@ export const transformProfileForApi = (
 };
 
 export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> => {
-  console.log('Making API request via Supabase Edge Function');
+  console.log('Making direct API request to:', 'https://resume-pdf-api.onrender.com/generate');
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    const { data: responseData, error } = await supabase.functions.invoke('generate-resume-pdf', {
-      body: data,
+    const response = await fetch('https://resume-pdf-api.onrender.com/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     });
 
-    if (error) {
-      console.error('Supabase function error:', error);
-      throw new Error(`Supabase function error: ${error.message}`);
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API error response:', errorText);
+      throw new Error(`API responded with ${response.status}: ${errorText || response.statusText}`);
     }
 
-    // The edge function returns binary data as an ArrayBuffer
-    if (!responseData) {
-      throw new Error('No data received from resume generation service');
-    }
-
-    // Convert the ArrayBuffer response to a blob
-    const blob = new Blob([responseData], { type: 'application/pdf' });
+    const blob = await response.blob();
     console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
     return blob;
   } catch (error) {
