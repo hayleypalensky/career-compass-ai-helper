@@ -16,7 +16,8 @@ serve(async (req) => {
     console.log('Resume PDF generation request received');
     
     const requestData = await req.json();
-    console.log('Request data:', JSON.stringify(requestData, null, 2));
+    console.log('Request data received:', JSON.stringify(requestData, null, 2));
+    console.log('About to call external API...');
 
     // Forward the request to the external resume API
     const response = await fetch('https://resume-pdf-api.onrender.com/generate', {
@@ -29,6 +30,7 @@ serve(async (req) => {
 
     console.log('External API response status:', response.status);
     console.log('External API response ok:', response.ok);
+    console.log('External API response headers:', Object.fromEntries(response.headers));
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -38,10 +40,11 @@ serve(async (req) => {
 
     // Get the PDF blob from the external API
     const pdfBlob = await response.blob();
-    console.log('Successfully received PDF blob, size:', pdfBlob.size);
+    console.log('Successfully received PDF blob, size:', pdfBlob.size, 'type:', pdfBlob.type);
 
     // Convert blob to array buffer for proper handling
     const arrayBuffer = await pdfBlob.arrayBuffer();
+    console.log('Converted to ArrayBuffer, size:', arrayBuffer.byteLength);
     
     // Return the PDF with proper headers
     return new Response(arrayBuffer, {

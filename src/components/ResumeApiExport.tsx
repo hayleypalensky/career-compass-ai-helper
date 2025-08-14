@@ -36,6 +36,7 @@ const ResumeApiExport = ({
       });
       
       const apiData = transformProfileForApi(profile, tailoredExperiences, skillsToAdd, skillsToRemove);
+      console.log('Transformed data for API:', JSON.stringify(apiData, null, 2));
       const blob = await generateResumeFromApi(apiData);
       
       const filename = jobTitle && companyName 
