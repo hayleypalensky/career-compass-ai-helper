@@ -77,42 +77,32 @@ export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> 
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    // Call the edge function and get the raw response
-    const response = await supabase.functions.invoke('generate-resume-pdf', {
-      body: data,
+    // Get the current user's session for auth
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Use direct fetch to call the edge function with proper body
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-resume-pdf`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
       },
+      body: JSON.stringify(data)
     });
 
-    if (response.error) {
-      console.error('Supabase function error:', response.error);
-      throw new Error(`Resume generation failed: ${response.error.message}`);
+    console.log('Edge function response status:', response.status);
+    console.log('Edge function response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Edge function error response:', errorText);
+      throw new Error(`Edge function failed with status ${response.status}: ${errorText}`);
     }
 
-    if (!response.data) {
-      throw new Error('No data received from resume generation service');
-    }
-
-    // The edge function returns an ArrayBuffer, convert it to a proper PDF blob
-    let blob: Blob;
-    
-    if (response.data instanceof ArrayBuffer) {
-      console.log('Received ArrayBuffer, size:', response.data.byteLength);
-      blob = new Blob([response.data], { type: 'application/pdf' });
-    } else if (response.data instanceof Uint8Array) {
-      console.log('Received Uint8Array, size:', response.data.length);
-      blob = new Blob([response.data], { type: 'application/pdf' });
-    } else if (response.data instanceof Blob) {
-      console.log('Received Blob directly, size:', response.data.size);
-      blob = response.data;
-    } else {
-      // Try to convert whatever we got to a blob
-      console.log('Received unknown data type, attempting conversion:', typeof response.data);
-      blob = new Blob([response.data], { type: 'application/pdf' });
-    }
-    
-    console.log('Successfully created blob, size:', blob.size, 'type:', blob.type);
+    // Get the PDF blob from the edge function response
+    const blob = await response.blob();
+    console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
     
     // Validate that we have a non-empty blob
     if (blob.size === 0) {
