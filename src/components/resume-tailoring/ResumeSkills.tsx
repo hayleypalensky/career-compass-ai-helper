@@ -16,6 +16,9 @@ const ResumeSkills = ({ skills, skillsToAdd, skillsToRemove, relevantSkills, the
     !skillsToRemove.includes(skill.id)
   );
 
+  const headerStyle = theme.id === "custom" ? { color: theme.hexColor } : {};
+  const headerClass = theme.id === "custom" ? "text-base font-semibold border-b pb-1 mb-3" : `text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`;
+
   return (
     <div className="mb-2 skills-wrapper" style={{ 
       display: "block", 
@@ -23,7 +26,7 @@ const ResumeSkills = ({ skills, skillsToAdd, skillsToRemove, relevantSkills, the
       visibility: "visible",
       opacity: 1
     }}>
-      <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Skills</h3>
+      <h3 className={headerClass} style={headerStyle}>Skills</h3>
       <div className="flex flex-wrap gap-2 mb-2" style={{
         display: "flex",
         flexWrap: "wrap", 

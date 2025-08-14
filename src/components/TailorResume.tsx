@@ -237,6 +237,7 @@ const TailorResume = ({
         skillsToRemove={skillsToRemove}
         relevantSkills={relevantSkills}
         colorTheme={selectedTheme}
+        customColor={customColor}
       />
 
       <div className="flex gap-4">

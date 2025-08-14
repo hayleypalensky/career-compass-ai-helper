@@ -21,9 +21,12 @@ interface ResumeExperienceProps {
 const ResumeExperience = ({ experiences, theme }: ResumeExperienceProps) => {
   if (!experiences || experiences.length === 0) return null;
   
+  const headerStyle = theme.id === "custom" ? { color: theme.hexColor } : {};
+  const headerClass = theme.id === "custom" ? "text-base font-semibold border-b pb-1 mb-3" : `text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`;
+  
   return (
     <div className="mb-6">
-      <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Experience</h3>
+      <h3 className={headerClass} style={headerStyle}>Experience</h3>
       <div className="space-y-4">
         {experiences.map((exp) => (
           <div key={exp.id} className="mb-3">

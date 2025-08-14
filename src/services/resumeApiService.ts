@@ -45,11 +45,14 @@ export const transformProfileForApi = (
   // Get the hex color for the selected theme
   let headerColor: string;
   if (selectedTheme === "custom" && customColor) {
+    console.log('Using custom color for API:', customColor);
     headerColor = customColor;
   } else {
+    console.log('Using preset theme for API:', selectedTheme);
     const selectedColorTheme = colorThemes.find(theme => theme.id === selectedTheme);
     headerColor = selectedColorTheme?.hexColor || "#6B46C1"; // default to purple
   }
+  console.log('Final header color for API:', headerColor);
 
   // Format phone number with dashes if it doesn't have them
   const formatPhone = (phone?: string) => {

@@ -79,11 +79,13 @@ const ResumeColorSelector = ({
   const [isCustomSelected, setIsCustomSelected] = useState(selectedTheme === "custom");
 
   const handlePresetSelect = (themeId: string) => {
+    console.log('Preset color selected:', themeId);
     setIsCustomSelected(false);
     onThemeChange(themeId);
   };
 
   const handleCustomColorChange = (color: string) => {
+    console.log('Custom color selected:', color);
     setIsCustomSelected(true);
     onThemeChange("custom");
     onCustomColorChange?.(color);

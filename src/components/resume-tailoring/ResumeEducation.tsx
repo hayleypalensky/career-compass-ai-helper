@@ -11,9 +11,12 @@ interface ResumeEducationProps {
 const ResumeEducation = ({ education, theme }: ResumeEducationProps) => {
   if (!education || education.length === 0) return null;
 
+  const headerStyle = theme.id === "custom" ? { color: theme.hexColor } : {};
+  const headerClass = theme.id === "custom" ? "text-base font-semibold border-b pb-1 mb-3" : `text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`;
+
   return (
     <div className="mb-6">
-      <h3 className={`text-base font-semibold border-b pb-1 mb-3 ${theme.headingColor}`}>Education</h3>
+      <h3 className={headerClass} style={headerStyle}>Education</h3>
       <div className="space-y-3">
         {education.map((edu) => (
           <div key={edu.id} className="mb-2">

@@ -9,9 +9,12 @@ interface ResumeHeaderProps {
 }
 
 const ResumeHeader = ({ personalInfo, theme }: ResumeHeaderProps) => {
+  const headerStyle = theme.id === "custom" ? { color: theme.hexColor } : {};
+  const headerClass = theme.id === "custom" ? "text-2xl font-bold mb-3" : `text-2xl font-bold mb-3 ${theme.headingColor}`;
+  
   return (
     <div className="mb-6 pb-3 border-b">
-      <h2 className={`text-2xl font-bold mb-3 ${theme.headingColor}`}>{personalInfo.name}</h2>
+      <h2 className={headerClass} style={headerStyle}>{personalInfo.name}</h2>
       
       <div className="flex flex-wrap gap-3 text-sm">
         {personalInfo.email && (

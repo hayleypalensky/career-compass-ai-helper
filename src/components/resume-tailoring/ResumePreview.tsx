@@ -15,6 +15,7 @@ interface ResumePreviewProps {
   skillsToRemove: string[];
   relevantSkills: string[];
   colorTheme?: string;
+  customColor?: string;
 }
 
 const ResumePreview = ({ 
@@ -23,10 +24,30 @@ const ResumePreview = ({
   skillsToAdd,
   skillsToRemove,
   relevantSkills,
-  colorTheme = "purple"
+  colorTheme = "purple",
+  customColor
 }: ResumePreviewProps) => {
-  // Find the selected theme object
-  const theme: ResumeColorTheme = colorThemes.find(theme => theme.id === colorTheme) || colorThemes[0];
+  console.log('ResumePreview - colorTheme:', colorTheme, 'customColor:', customColor);
+  
+  // Handle custom color theme
+  let theme: ResumeColorTheme;
+  
+  if (colorTheme === "custom" && customColor) {
+    console.log('Using custom color:', customColor);
+    // Create a custom theme object with the user's color
+    theme = {
+      id: "custom",
+      name: "Custom",
+      headingColor: "text-gray-800", // Use the custom color via style
+      borderColor: "border-gray-200",
+      accentColor: "bg-gray-100 text-gray-800",
+      hexColor: customColor
+    };
+  } else {
+    console.log('Using preset theme:', colorTheme);
+    // Find the selected preset theme
+    theme = colorThemes.find(theme => theme.id === colorTheme) || colorThemes[0];
+  }
 
   return (
     <div className="space-y-4" id="resume-content">
