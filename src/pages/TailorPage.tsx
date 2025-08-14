@@ -32,6 +32,7 @@ const TailorPage = () => {
   const [jobNotes, setJobNotes] = useState<string>("");
   const [isTailored, setIsTailored] = useState(false);
   const [selectedColorTheme, setSelectedColorTheme] = useState<string>("purple");
+  const [customColor, setCustomColor] = useState<string>("#6B46C1");
   const [resetTrigger, setResetTrigger] = useState(false);
   const [tailoredSummary, setTailoredSummary] = useState<string>("");
   const [tailoredExperiences, setTailoredExperiences] = useState<any[]>([]);
@@ -116,6 +117,10 @@ const TailorPage = () => {
     setSelectedColorTheme(theme);
   };
 
+  const handleCustomColorChange = (color: string) => {
+    setCustomColor(color);
+  };
+
   const handleSummaryChange = (summary: string) => {
     setTailoredSummary(summary);
   };
@@ -140,6 +145,7 @@ const TailorPage = () => {
     setSkillsToRemove([]);
     
     setSelectedColorTheme("purple");
+    setCustomColor("#6B46C1");
   };
 
   // If there's no profile, show message to create one
@@ -219,6 +225,7 @@ const TailorPage = () => {
                 colorTheme={selectedColorTheme}
                 updatedSummary={tailoredSummary}
                 tailoredExperiences={tailoredExperiences}
+                customColor={customColor}
                 skillsToAdd={skillsToAdd}
                 skillsToRemove={skillsToRemove}
               />

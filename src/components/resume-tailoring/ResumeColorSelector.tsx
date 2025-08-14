@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export type ResumeColorTheme = {
   id: string;
@@ -67,39 +66,83 @@ const colorThemes: ResumeColorTheme[] = [
 interface ResumeColorSelectorProps {
   selectedTheme: string;
   onThemeChange: (themeId: string) => void;
+  customColor?: string;
+  onCustomColorChange?: (color: string) => void;
 }
 
 const ResumeColorSelector = ({
   selectedTheme,
   onThemeChange,
+  customColor,
+  onCustomColorChange,
 }: ResumeColorSelectorProps) => {
+  const [isCustomSelected, setIsCustomSelected] = useState(selectedTheme === "custom");
+
+  const handlePresetSelect = (themeId: string) => {
+    setIsCustomSelected(false);
+    onThemeChange(themeId);
+  };
+
+  const handleCustomColorChange = (color: string) => {
+    setIsCustomSelected(true);
+    onThemeChange("custom");
+    onCustomColorChange?.(color);
+  };
+
   return (
     <Card>
       <CardHeader className="pb-3">
-        <CardTitle className="text-base">Resume Color Theme</CardTitle>
+        <CardTitle className="text-lg">Resume Color Theme</CardTitle>
       </CardHeader>
-      <CardContent>
-        <RadioGroup
-          defaultValue={selectedTheme}
-          value={selectedTheme}
-          onValueChange={onThemeChange}
-          className="flex flex-wrap gap-4"
-        >
-          {colorThemes.map((theme) => (
-            <div key={theme.id} className="flex items-center space-x-2">
-              <RadioGroupItem value={theme.id} id={`theme-${theme.id}`} />
-              <Label
-                htmlFor={`theme-${theme.id}`}
-                className="flex items-center cursor-pointer"
+      <CardContent className="space-y-4">
+        {/* Preset Color Swatches */}
+        <div>
+          <Label className="text-sm font-medium mb-3 block">Preset Colors</Label>
+          <div className="flex flex-wrap gap-3">
+            {colorThemes.map((theme) => (
+              <button
+                key={theme.id}
+                onClick={() => handlePresetSelect(theme.id)}
+                className={cn(
+                  "relative w-12 h-12 rounded-lg border-2 transition-all duration-200 hover:scale-105",
+                  selectedTheme === theme.id && !isCustomSelected
+                    ? "border-primary shadow-md scale-105"
+                    : "border-gray-200 hover:border-gray-300"
+                )}
+                style={{ backgroundColor: theme.hexColor }}
+                title={theme.name}
               >
-                <span
-                  className={`w-4 h-4 rounded-full mr-2 ${theme.accentColor.split(" ")[0]}`}
-                />
-                {theme.name}
-              </Label>
-            </div>
-          ))}
-        </RadioGroup>
+                {selectedTheme === theme.id && !isCustomSelected && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-3 h-3 bg-white rounded-full shadow-sm" />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Custom Color Picker */}
+        <div>
+          <Label className="text-sm font-medium mb-3 block">Pick Your Own Color</Label>
+          <div className="flex items-center gap-3">
+            <input
+              type="color"
+              value={customColor || "#6B46C1"}
+              onChange={(e) => handleCustomColorChange(e.target.value)}
+              className={cn(
+                "w-12 h-12 rounded-lg border-2 cursor-pointer transition-all duration-200",
+                isCustomSelected
+                  ? "border-primary shadow-md scale-105"
+                  : "border-gray-200 hover:border-gray-300"
+              )}
+              title="Custom Color"
+            />
+            <span className="text-sm text-muted-foreground">
+              {isCustomSelected ? "Custom color selected" : "Click to choose a custom color"}
+            </span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

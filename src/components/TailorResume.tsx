@@ -27,6 +27,7 @@ interface TailorResumeProps {
   onUpdateResume: (experiences: Experience[], skills: Skill[]) => void;
   jobDescription?: string;
   onColorThemeChange?: (theme: string) => void;
+  onCustomColorChange?: (color: string) => void;
   onResetForNewJob?: () => void;
   onSummaryChange?: (summary: string) => void;
   tailoredSummary?: string;
@@ -40,6 +41,7 @@ const TailorResume = ({
   onUpdateResume,
   jobDescription = "",
   onColorThemeChange,
+  onCustomColorChange,
   onResetForNewJob,
   onSummaryChange,
   tailoredSummary = "",
@@ -51,6 +53,7 @@ const TailorResume = ({
     skillsToAdd,
     skillsToRemove,
     selectedTheme,
+    customColor,
     selectedExperienceIds,
     handleBulletChange,
     addBullet,
@@ -60,6 +63,7 @@ const TailorResume = ({
     toggleSkillRemoval,
     generateBulletSuggestions,
     handleThemeChange,
+    handleCustomColorChange,
     handleExperienceSelectionChange,
     saveTailoredResume,
     resetTailoredResume,
@@ -73,12 +77,18 @@ const TailorResume = ({
     tailoredSummary
   });
 
-  // Notify parent component when theme changes
+  // Notify parent component when theme or custom color changes
   useEffect(() => {
     if (onColorThemeChange) {
       onColorThemeChange(selectedTheme);
     }
   }, [selectedTheme, onColorThemeChange]);
+
+  useEffect(() => {
+    if (onCustomColorChange) {
+      onCustomColorChange(customColor);
+    }
+  }, [customColor, onCustomColorChange]);
 
   // Notify parent about tailored data changes
   useEffect(() => {
@@ -210,6 +220,8 @@ const TailorResume = ({
       <ResumeColorSelector 
         selectedTheme={selectedTheme} 
         onThemeChange={handleThemeChange}
+        customColor={customColor}
+        onCustomColorChange={handleCustomColorChange}
       />
 
       <ResumePreview

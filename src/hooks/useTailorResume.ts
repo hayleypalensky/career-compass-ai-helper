@@ -98,7 +98,9 @@ export const useTailorResume = ({
     
     // UI management
     selectedTheme: uiHook.selectedTheme,
+    customColor: uiHook.customColor,
     handleThemeChange: uiHook.handleThemeChange,
+    handleCustomColorChange: uiHook.handleCustomColorChange,
     
     // Summary management
     handleSummaryChange,

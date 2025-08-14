@@ -13,6 +13,7 @@ interface TailorActionsRowProps {
   remote: boolean;
   jobDescription: string;
   colorTheme: string;
+  customColor?: string;
   updatedSummary?: string;
   tailoredExperiences?: Experience[];
   skillsToAdd?: string[];
@@ -27,6 +28,7 @@ const TailorActionsRow = ({
   remote,
   jobDescription,
   colorTheme,
+  customColor,
   updatedSummary,
   tailoredExperiences = [],
   skillsToAdd = [],
@@ -60,6 +62,7 @@ const TailorActionsRow = ({
           jobTitle={jobTitle}
           companyName={companyName}
           selectedTheme={colorTheme}
+          customColor={customColor}
         />
         <p className="text-sm text-muted-foreground">
           Professional formatting with optimized layout and styling

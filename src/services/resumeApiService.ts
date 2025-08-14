@@ -30,7 +30,8 @@ export const transformProfileForApi = (
   tailoredExperiences: Experience[] = [],
   skillsToAdd: string[] = [],
   skillsToRemove: string[] = [],
-  selectedTheme: string = "purple"
+  selectedTheme: string = "purple",
+  customColor?: string
 ): ResumeApiData => {
   // Use tailored experiences if provided, otherwise use profile experiences
   const experiences = tailoredExperiences.length > 0 ? tailoredExperiences : profile.experiences;
@@ -42,8 +43,13 @@ export const transformProfileForApi = (
   const finalSkills = [...existingSkills, ...skillsToAdd];
 
   // Get the hex color for the selected theme
-  const selectedColorTheme = colorThemes.find(theme => theme.id === selectedTheme);
-  const headerColor = selectedColorTheme?.hexColor || "#6B46C1"; // default to purple
+  let headerColor: string;
+  if (selectedTheme === "custom" && customColor) {
+    headerColor = customColor;
+  } else {
+    const selectedColorTheme = colorThemes.find(theme => theme.id === selectedTheme);
+    headerColor = selectedColorTheme?.hexColor || "#6B46C1"; // default to purple
+  }
 
   // Format phone number with dashes if it doesn't have them
   const formatPhone = (phone?: string) => {
