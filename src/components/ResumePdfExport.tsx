@@ -54,10 +54,10 @@ const ResumePdfExport = ({ profile, jobTitle, companyName, colorTheme = "purple"
       onClick={exportToPdf} 
       variant="outline" 
       disabled={isExporting}
-      className="flex items-center gap-2"
+      className="flex items-center gap-2 w-full"
     >
       <FileText className="h-4 w-4" />
-      {isExporting ? "Generating PDF..." : "Export ATS-friendly PDF"}
+      {isExporting ? "Generating..." : "Basic PDF (Fallback)"}
     </Button>
   );
 };
