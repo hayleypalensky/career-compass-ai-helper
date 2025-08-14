@@ -38,10 +38,20 @@ export const transformProfileForApi = (
     .map(skill => skill.name);
   const finalSkills = [...existingSkills, ...skillsToAdd];
 
-  return {
+  // Format phone number with dashes if it doesn't have them
+  const formatPhone = (phone?: string) => {
+    if (!phone) return undefined;
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10) {
+      return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+    }
+    return phone;
+  };
+
+  const transformedData = {
     name: profile.personalInfo.name,
     email: profile.personalInfo.email,
-    phone: profile.personalInfo.phone,
+    phone: formatPhone(profile.personalInfo.phone),
     website: profile.personalInfo.website,
     summary: profile.personalInfo.summary,
     education: profile.education.map(edu => ({
@@ -57,6 +67,9 @@ export const transformProfileForApi = (
     })),
     skills: finalSkills.join(', ')
   };
+
+  console.log('Final transformed data for API:', JSON.stringify(transformedData, null, 2));
+  return transformedData;
 };
 
 export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> => {
