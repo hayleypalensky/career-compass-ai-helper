@@ -1,6 +1,7 @@
 import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { formatDate } from "@/utils/resumeFormatters";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ResumeApiData {
   name: string;
@@ -59,38 +60,39 @@ export const transformProfileForApi = (
 };
 
 export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> => {
-  console.log('Making direct API request to:', 'https://resume-pdf-api.onrender.com/generate');
+  console.log('Making API request via Supabase Edge Function');
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    const response = await fetch('https://resume-pdf-api.onrender.com/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
+    // Use a longer timeout for the free tier API that may take time to spin up
+    const { data: responseData, error } = await supabase.functions.invoke('generate-resume-pdf', {
+      body: data,
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API error response:', errorText);
-      throw new Error(`API responded with ${response.status}: ${errorText || response.statusText}`);
+    if (error) {
+      console.error('Supabase function error:', error);
+      throw new Error(`Resume generation failed: ${error.message}`);
     }
 
-    const blob = await response.blob();
+    if (!responseData) {
+      throw new Error('No data received from resume generation service');
+    }
+
+    // The edge function should return the PDF as binary data
+    let blob: Blob;
+    if (responseData instanceof ArrayBuffer) {
+      blob = new Blob([responseData], { type: 'application/pdf' });
+    } else if (responseData instanceof Blob) {
+      blob = responseData;
+    } else {
+      // If it's base64 or other format, convert appropriately
+      blob = new Blob([responseData], { type: 'application/pdf' });
+    }
+    
     console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
     return blob;
   } catch (error) {
-    console.error('Fetch error details:', error);
-    
-    // Check if it's a network/CORS error
-    if (error instanceof TypeError && (error.message.includes('fetch') || error.message.includes('NetworkError'))) {
-      throw new Error('Unable to connect to the resume formatting service. This might be due to:\n• CORS restrictions\n• Server unavailable\n• Network connectivity issues\n\nPlease try again or contact support if the issue persists.');
-    }
-    
+    console.error('Resume generation error:', error);
     throw error;
   }
 };

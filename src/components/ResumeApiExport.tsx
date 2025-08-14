@@ -32,7 +32,7 @@ const ResumeApiExport = ({
     try {
       toast({
         title: "Generating professional resume",
-        description: "Please wait while we create your formatted PDF...",
+        description: "Please wait while we create your formatted PDF. This may take up to 60 seconds if the service needs to start up...",
       });
       
       const apiData = transformProfileForApi(profile, tailoredExperiences, skillsToAdd, skillsToRemove);
