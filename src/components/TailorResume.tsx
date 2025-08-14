@@ -191,10 +191,6 @@ const TailorResume = ({
         onToggleSkillToRemove={toggleSkillRemoval}
       />
 
-      <ResumeColorSelector 
-        selectedTheme={selectedTheme} 
-        onThemeChange={handleThemeChange}
-      />
 
       <ExperienceEditor 
         experiences={tailoredExperiences}
@@ -211,7 +207,12 @@ const TailorResume = ({
         onSyncBulletRemoval={handleSyncBulletRemoval}
       />
 
-      <ResumePreview 
+      <ResumeColorSelector 
+        selectedTheme={selectedTheme} 
+        onThemeChange={handleThemeChange}
+      />
+
+      <ResumePreview
         profile={{
           ...profile,
           personalInfo: {
