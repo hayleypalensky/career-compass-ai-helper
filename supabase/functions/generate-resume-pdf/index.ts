@@ -14,6 +14,16 @@ serve(async (req) => {
 
   try {
     console.log('Resume PDF generation request received');
+    console.log('Request method:', req.method);
+    console.log('Request headers:', Object.fromEntries(req.headers));
+    
+    // Check if request has a body
+    const contentLength = req.headers.get('content-length');
+    console.log('Content-Length:', contentLength);
+    
+    if (!contentLength || contentLength === '0') {
+      throw new Error('No request body received');
+    }
     
     const requestData = await req.json();
     console.log('Request data received:', JSON.stringify(requestData, null, 2));
