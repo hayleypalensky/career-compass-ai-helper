@@ -2,6 +2,7 @@ import { Profile } from "@/types/profile";
 import { Experience } from "@/components/ExperienceForm";
 import { formatDate } from "@/utils/resumeFormatters";
 import { supabase } from "@/integrations/supabase/client";
+import { colorThemes } from "@/components/resume-tailoring/ResumeColorSelector";
 
 interface ResumeApiData {
   name: string;
@@ -21,13 +22,15 @@ interface ResumeApiData {
     bullet_points: string[];
   }>;
   skills: string;
+  header_color?: string; // Add header color field
 }
 
 export const transformProfileForApi = (
   profile: Profile,
   tailoredExperiences: Experience[] = [],
   skillsToAdd: string[] = [],
-  skillsToRemove: string[] = []
+  skillsToRemove: string[] = [],
+  selectedTheme: string = "purple"
 ): ResumeApiData => {
   // Use tailored experiences if provided, otherwise use profile experiences
   const experiences = tailoredExperiences.length > 0 ? tailoredExperiences : profile.experiences;
@@ -37,6 +40,10 @@ export const transformProfileForApi = (
     .filter(skill => !skillsToRemove.includes(skill.id))
     .map(skill => skill.name);
   const finalSkills = [...existingSkills, ...skillsToAdd];
+
+  // Get the hex color for the selected theme
+  const selectedColorTheme = colorThemes.find(theme => theme.id === selectedTheme);
+  const headerColor = selectedColorTheme?.hexColor || "#6B46C1"; // default to purple
 
   // Format phone number with dashes if it doesn't have them
   const formatPhone = (phone?: string) => {
@@ -65,7 +72,8 @@ export const transformProfileForApi = (
       location_dates: `${exp.location || ''} | ${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`.replace(/^\s\|\s/, ''),
       bullet_points: exp.bullets.filter(bullet => bullet.trim() !== '')
     })),
-    skills: finalSkills.join(', ')
+    skills: finalSkills.join(', '),
+    header_color: headerColor // Include the selected header color
   };
 
   console.log('Final transformed data for API:', JSON.stringify(transformedData, null, 2));

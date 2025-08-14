@@ -59,6 +59,7 @@ const TailorActionsRow = ({
           skillsToRemove={skillsToRemove}
           jobTitle={jobTitle}
           companyName={companyName}
+          selectedTheme={colorTheme}
         />
         <p className="text-sm text-muted-foreground">
           Professional formatting with optimized layout and styling

@@ -10,6 +10,7 @@ export type ResumeColorTheme = {
   headingColor: string;
   borderColor: string;
   accentColor: string;
+  hexColor: string; // Add hex color for API
 };
 
 const colorThemes: ResumeColorTheme[] = [
@@ -19,6 +20,7 @@ const colorThemes: ResumeColorTheme[] = [
     headingColor: "text-purple-800",
     borderColor: "border-purple-200",
     accentColor: "bg-purple-100 text-purple-800",
+    hexColor: "#6B46C1", // purple-800
   },
   {
     id: "blue",
@@ -26,6 +28,7 @@ const colorThemes: ResumeColorTheme[] = [
     headingColor: "text-blue-800",
     borderColor: "border-blue-200",
     accentColor: "bg-blue-100 text-blue-800",
+    hexColor: "#1E40AF", // blue-800
   },
   {
     id: "green",
@@ -33,6 +36,7 @@ const colorThemes: ResumeColorTheme[] = [
     headingColor: "text-green-800",
     borderColor: "border-green-200",
     accentColor: "bg-green-100 text-green-800",
+    hexColor: "#166534", // green-800
   },
   {
     id: "navy",
@@ -40,6 +44,7 @@ const colorThemes: ResumeColorTheme[] = [
     headingColor: "text-navy-800",
     borderColor: "border-navy-200",
     accentColor: "bg-navy-100 text-navy-800",
+    hexColor: "#1E3A8A", // navy blue
   },
   {
     id: "gold",
@@ -47,6 +52,7 @@ const colorThemes: ResumeColorTheme[] = [
     headingColor: "text-gold-800",
     borderColor: "border-gold-200",
     accentColor: "bg-gold-100 text-gold-800",
+    hexColor: "#B45309", // amber-700 (gold-like)
   },
   {
     id: "black",
@@ -54,6 +60,7 @@ const colorThemes: ResumeColorTheme[] = [
     headingColor: "text-black",
     borderColor: "border-gray-400",
     accentColor: "bg-gray-800 text-white",
+    hexColor: "#000000", // black
   },
 ];
 

@@ -13,6 +13,7 @@ interface ResumeApiExportProps {
   skillsToRemove?: string[];
   jobTitle?: string;
   companyName?: string;
+  selectedTheme?: string; // Add selectedTheme prop
 }
 
 const ResumeApiExport = ({ 
@@ -21,7 +22,8 @@ const ResumeApiExport = ({
   skillsToAdd = [],
   skillsToRemove = [],
   jobTitle,
-  companyName
+  companyName,
+  selectedTheme = "purple"
 }: ResumeApiExportProps) => {
   const { toast } = useToast();
   const [isExporting, setIsExporting] = useState(false);
@@ -35,7 +37,7 @@ const ResumeApiExport = ({
         description: "Please wait while we create your formatted PDF. This may take up to 60 seconds if the service needs to start up...",
       });
       
-      const apiData = transformProfileForApi(profile, tailoredExperiences, skillsToAdd, skillsToRemove);
+      const apiData = transformProfileForApi(profile, tailoredExperiences, skillsToAdd, skillsToRemove, selectedTheme);
       console.log('Transformed data for API:', JSON.stringify(apiData, null, 2));
       const blob = await generateResumeFromApi(apiData);
       
