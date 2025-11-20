@@ -90,38 +90,26 @@ export const transformProfileForApi = (
 };
 
 export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> => {
-  console.log('Making API request directly to Render API');
+  console.log('Calling Supabase edge function for PDF generation');
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    // Call your Render API directly
-    const response = await fetch('https://resume-pdf-api.onrender.com/generate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
+    // Call the Supabase edge function which proxies to Render
+    const { data: pdfBlob, error } = await supabase.functions.invoke('generate-resume-pdf', {
+      body: data
     });
 
-    console.log('Render API response status:', response.status);
-    console.log('Render API response ok:', response.ok);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Render API error response:', errorText);
-      throw new Error(`Render API failed with status ${response.status}: ${errorText}`);
+    if (error) {
+      console.error('Edge function error:', error);
+      throw new Error(`Failed to generate PDF: ${error.message}`);
     }
 
-    // Get the PDF blob from the API response
-    const blob = await response.blob();
-    console.log('Successfully received blob, size:', blob.size, 'type:', blob.type);
-    
-    // Validate that we have a non-empty blob
-    if (blob.size === 0) {
-      throw new Error('Received empty PDF file from server');
+    if (!pdfBlob) {
+      throw new Error('No PDF data received from server');
     }
-    
-    return blob;
+
+    console.log('Successfully received PDF blob');
+    return pdfBlob;
   } catch (error) {
     console.error('Resume generation error:', error);
     throw error;
