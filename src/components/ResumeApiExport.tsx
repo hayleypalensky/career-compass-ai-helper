@@ -58,11 +58,11 @@ const ResumeApiExport = ({
     } catch (error) {
       console.error("Resume export error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to connect to resume API";
+      
+      // Show error with more specific guidance
       toast({
-        title: "Export failed",
-        description: errorMessage.includes('CORS') || errorMessage.includes('connect') 
-          ? "Unable to connect to the resume formatting service. The server may be unavailable or there may be a connection issue."
-          : errorMessage,
+        title: "Professional PDF service unavailable",
+        description: "The Render API is returning an error (500). Please check your Render logs or use the Basic PDF export as a fallback.",
         variant: "destructive",
       });
     } finally {
