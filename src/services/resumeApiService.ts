@@ -109,21 +109,34 @@ export const generateResumeFromApi = async (data: ResumeApiData): Promise<Blob> 
   console.log('Request data:', JSON.stringify(data, null, 2));
   
   try {
-    // Call the Supabase edge function which proxies to Render
-    const { data: pdfBlob, error } = await supabase.functions.invoke('generate-resume-pdf', {
-      body: data
+    // Get the Supabase URL and anon key
+    const supabaseUrl = "https://ilrrxwkxrbgslpifkdlf.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlscnJ4d2t4cmJnc2xwaWZrZGxmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NTY3MTYsImV4cCI6MjA2MzMzMjcxNn0.pKX2Uzg7DT3H5v7OhUXySAuktLCwk05Rm3ZB3_-XaJ4";
+    
+    // Get the current session token
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    // Call the edge function directly with fetch to handle binary response
+    const response = await fetch(`${supabaseUrl}/functions/v1/generate-resume-pdf`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || supabaseKey}`,
+        'apikey': supabaseKey,
+      },
+      body: JSON.stringify(data),
     });
 
-    if (error) {
-      console.error('Edge function error:', error);
-      throw new Error(`Failed to generate PDF: ${error.message}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Edge function error:', errorText);
+      throw new Error(`Failed to generate PDF: ${response.status} ${response.statusText}`);
     }
 
-    if (!pdfBlob) {
-      throw new Error('No PDF data received from server');
-    }
-
-    console.log('Successfully received PDF blob');
+    // Convert the response to a blob
+    const pdfBlob = await response.blob();
+    console.log('Successfully received PDF blob, size:', pdfBlob.size);
+    
     return pdfBlob;
   } catch (error) {
     console.error('Resume generation error:', error);
