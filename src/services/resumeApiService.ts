@@ -4,6 +4,21 @@ import { formatDate } from "@/utils/resumeFormatters";
 import { supabase } from "@/integrations/supabase/client";
 import { colorThemes } from "@/components/resume-tailoring/ResumeColorSelector";
 
+/**
+ * Sanitize text to replace Unicode characters that cause Latin-1 encoding issues in PDF generation
+ */
+const sanitizeText = (text: string): string => {
+  if (!text) return text;
+  return text
+    .replace(/[\u2018\u2019]/g, "'")  // Smart single quotes to straight quote
+    .replace(/[\u201C\u201D]/g, '"')  // Smart double quotes to straight quote
+    .replace(/\u2013/g, '-')          // En dash to hyphen
+    .replace(/\u2014/g, '--')         // Em dash to double hyphen
+    .replace(/\u2026/g, '...')        // Ellipsis to three dots
+    .replace(/[\u2000-\u200B]/g, ' ') // Various spaces to regular space
+    .replace(/[^\x00-\xFF]/g, '');    // Remove any remaining non-Latin-1 chars
+};
+
 interface ResumeApiData {
   name: string;
   email: string;
@@ -65,23 +80,23 @@ export const transformProfileForApi = (
   };
 
   const transformedData = {
-    name: profile.personalInfo.name,
+    name: sanitizeText(profile.personalInfo.name),
     email: profile.personalInfo.email,
     phone: formatPhone(profile.personalInfo.phone),
     website: profile.personalInfo.website,
-    summary: profile.personalInfo.summary,
+    summary: sanitizeText(profile.personalInfo.summary),
     education: profile.education.map(edu => ({
-      degree: `${edu.degree} in ${edu.field}`,
-      school: edu.school,
+      degree: sanitizeText(`${edu.degree} in ${edu.field}`),
+      school: sanitizeText(edu.school),
       location_dates: `${formatDate(edu.startDate)} - ${edu.endDate ? formatDate(edu.endDate) : 'Present'}`
     })),
     experience: experiences.map(exp => ({
-      job_title: exp.title,
-      company: exp.company,
+      job_title: sanitizeText(exp.title),
+      company: sanitizeText(exp.company),
       location_dates: `${exp.location || ''} | ${formatDate(exp.startDate)} - ${exp.endDate ? formatDate(exp.endDate) : 'Present'}`.replace(/^\s\|\s/, ''),
-      bullet_points: exp.bullets.filter(bullet => bullet.trim() !== '')
+      bullet_points: exp.bullets.filter(bullet => bullet.trim() !== '').map(bullet => sanitizeText(bullet))
     })),
-    skills: finalSkills.join(', '),
+    skills: sanitizeText(finalSkills.join(', ')),
     header_color: headerColor // Include the selected header color
   };
 
