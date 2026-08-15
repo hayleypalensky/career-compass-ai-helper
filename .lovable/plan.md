@@ -1,45 +1,39 @@
-# Career Compass — How it's set up, and how to open it to free public users
+# Move PDF generation into the edge function (drop the Render dependency)
 
-## What the app is
+## Goal
 
-A resume-tailoring + job-application tracker. Signed-in users fill out a profile (personal info, education, experience, skills), paste a job description, and the app suggests skills, rewrites their summary and bullet points, generates a cover letter, and exports a styled PDF resume. It also tracks applications by status.
+Generate the "Professional PDF" entirely inside the `generate-resume-pdf` Supabase edge function, so `https://resume-pdf-api.onrender.com` is no longer in the path. No cold starts, no external service to keep alive, same download UX.
 
-Pages: `/` (home), `/auth` (sign in/up, forgot password, MFA), `/profile`, `/tailor`, `/jobs`, `/help`. Everything except home and auth requires login.
+## How it works today
 
-## Your current setup
+Browser -> `generate-resume-pdf` edge function -> Render FastAPI (Python/fpdf) -> PDF bytes -> browser download. The frontend also sanitizes Unicode to ASCII because fpdf uses latin-1 encoding.
 
-**Frontend (all inside Lovable):** React 18 + Vite + TypeScript, Tailwind + shadcn/ui components, React Router for pages, TanStack Query for data fetching, react-hook-form + zod for forms.
+## How it will work after
 
-**Backend (Supabase project `ilrrxwkxrbgslpifkdlf`):**
-- Auth: email/password with MFA support.
-- Database: two tables.
-  - `profiles` — one row per user (`id` = auth user id, `email`, and the whole resume stored as a `resume_data` JSON blob).
-  - `jobs` — one row per tracked application (company, position, status, application_date, location, remote, notes, description, `attachments` JSON, `user_id`).
-- Edge functions (5): `generate-summary`, `generate-bullets`, `suggest-skills`, `generate-cover-letter`, `generate-resume-pdf`.
+Browser -> `generate-resume-pdf` edge function (builds the PDF in Deno) -> PDF bytes -> browser download.
 
-## What's connected outside of Lovable
+The request/response contract stays identical: the function still accepts the same JSON (`name`, `email`, `phone`, `website`, `summary`, `education[]`, `experience[]`, `skills`, `header_color`) and still returns `application/pdf` bytes. That means `src/services/resumeApiService.ts` and the export buttons need no changes.
 
-1. **OpenAI (your own API key)** — four edge functions call `https://api.openai.com/v1/chat/completions` using an `OPENAI_API_KEY` secret stored in Supabase. Models in use: `gpt-4o-mini` for summaries, bullets, and cover letters; `gpt-4.1-2025-04-14` for skill suggestions. Your OpenAI account is billed, not Lovable AI.
-2. **Resume PDF API on Render** — `https://resume-pdf-api.onrender.com/generate`, a separate FastAPI service you deployed. The `generate-resume-pdf` edge function forwards the resume JSON (including a `header_color` hex value from the color picker) to it and streams the returned PDF back to the browser. The app labels this the "Professional PDF" option.
-3. **Built-in fallback PDF** — `jspdf` + `html2canvas` in the browser, offered as "Basic PDF (Fallback)" so exports still work if the Render service is asleep or down.
+## Implementation
 
-Flow for AI features: browser -> Supabase edge function -> OpenAI -> back.
-Flow for the good PDF: browser -> Supabase edge function -> Render FastAPI -> PDF blob -> download.
+1. **Add a PDF renderer inside the function.** Use `jspdf` via Deno's npm import (`import { jsPDF } from "npm:jspdf"`) — the same library the fallback exporter already uses, so layout code and behavior are familiar. Alternative if we want richer typography later: `pdf-lib`.
 
-## Notes for your developer friend (worth fixing before public launch)
+2. **New file `supabase/functions/generate-resume-pdf/renderResume.ts`** holding the layout: header block (name in `header_color`, contact line), Professional Summary, Experience (job title / company / location+dates, bulleted points with wrapping), Education, Skills. Uses `splitTextToSize` for wrapping, tracks a `y` cursor, and adds a page when content overflows. Ported from the existing `src/utils/pdfGenerator.ts` layout so the output looks like the current professional PDF rather than a downgrade.
 
-- The Supabase URL and anon publishable key are hardcoded in `src/integrations/supabase/client.ts`, `src/services/aiService.ts`, and `src/services/resumeApiService.ts`. `aiService.ts` creates a *second* Supabase client, so AI calls do not share the logged-in session — these should be consolidated onto the single shared client.
-- `resume_data` as one JSON blob works, but normalizing into `experiences` / `education` / `skills` tables is the natural next step for querying and analytics.
-- Edge functions currently accept any request carrying the anon key. For a free public app they need per-user auth checks plus rate limiting, or OpenAI cost can be abused. Same for the Render service, which is open to the internet with no auth.
-- Render free tier cold-starts (~30-60s on first request), which is why the fallback exporter exists.
-- Row Level Security policies and table grants on `profiles` and `jobs` should be re-verified before opening signups.
-- No migration files are checked into `supabase/migrations`, so the schema lives only in the hosted project. Capturing it as migrations makes the setup reproducible.
+3. **Rewrite `supabase/functions/generate-resume-pdf/index.ts`** to: handle CORS preflight, validate the body with zod (clear 400 on bad input), call `renderResume(data)`, and return the bytes with `Content-Type: application/pdf`. Remove the `fetch` to Render.
 
-## Proposed next steps (pick any, in order of value)
+4. **Drop the latin-1 workaround.** jsPDF's standard fonts are still WinAnsi, so keep the existing `sanitizeText` in `resumeApiService.ts` for safety, but the crash risk goes away. If we want true Unicode (accents, curly quotes, non-Latin names), embed a TTF such as DejaVu Sans in the function and register it with `addFileToVFS`/`addFont` — worth doing as a follow-up rather than in the first pass.
 
-1. Verify RLS + grants on `profiles` and `jobs`, and capture the current schema as migration files.
-2. Consolidate to one Supabase client and remove the duplicated hardcoded keys.
-3. Add auth verification + simple per-user rate limits to all five edge functions.
-4. Decide OpenAI vs Lovable AI for the AI features (Lovable AI removes your OpenAI key and billing from the picture).
-5. Harden the PDF path: either lock the Render service down, or move PDF generation into the edge function so there is no third-party dependency.
-6. Public polish: landing page copy, SEO metadata, email confirmation flow, and publishing to your `career-compass-ai-helper` domain.
+5. **Keep the fallback button** for one release, then decide whether to remove it once the edge-function path is proven.
+
+6. **Verify** by calling the deployed function directly with a realistic resume payload, saving the PDF, rendering each page to an image, and inspecting for clipped text, overlap, wrong header color, and page breaks in the middle of a bullet.
+
+## Trade-offs
+
+- Edge functions have a memory/CPU ceiling; a jsPDF text-layout resume is light, so this is not a concern.
+- Layout must be re-expressed in JS. That is the bulk of the work — the Python service's exact spacing won't carry over automatically, so expect a round or two of visual tuning.
+- Once this ships, the Render service and its deployment can be retired.
+
+## Out of scope
+
+Auth checks and rate limiting on the function (tracked separately), and any resume design changes.
